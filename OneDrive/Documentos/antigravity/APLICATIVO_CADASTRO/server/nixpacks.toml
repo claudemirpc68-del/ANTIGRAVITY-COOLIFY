@@ -1,11 +1,5 @@
-[phases.setup]
-nixPkgs = ["nodejs_22", "npm-9_x"]
-
-[phases.install]
-cmds = ["npm ci"]
-
-[start]
-cmd = "npm start"
+# Nixpacks configuration for Node.js API
+providers = ["node"]
 
 [variables]
 NODE_ENV = "production"

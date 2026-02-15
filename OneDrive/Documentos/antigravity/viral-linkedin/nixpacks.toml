@@ -1,14 +1,5 @@
-[phases.setup]
-nixPkgs = ["nodejs_22", "npm-9_x"]
-
-[phases.install]
-cmds = ["npm ci"]
-
-[phases.build]
-cmds = ["npm run build"]
-
-[start]
-cmd = "npm start"
+# Nixpacks configuration for Next.js
+providers = ["node"]
 
 [variables]
 NODE_ENV = "production"
