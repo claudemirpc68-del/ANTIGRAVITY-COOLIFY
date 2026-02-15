@@ -14,4 +14,16 @@ __pycache__/
 
 # OS specific
 .DS_Store
-Thumbs.db
+
+# Dependencies
+node_modThumbs.db
+
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+.tmp/
+.next/
+dist/
+build/
