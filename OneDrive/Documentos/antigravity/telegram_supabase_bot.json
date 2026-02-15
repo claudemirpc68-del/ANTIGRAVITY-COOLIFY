@@ -1,0 +1,280 @@
+{
+    "name": "Telegram Supabase Bot",
+    "nodes": [
+        {
+            "parameters": {
+                "updates": [
+                    "message"
+                ],
+                "additionalFields": {}
+            },
+            "id": "telegram-trigger",
+            "name": "Telegram Trigger",
+            "type": "n8n-nodes-base.telegramTrigger",
+            "typeVersion": 1,
+            "position": [
+                100,
+                300
+            ],
+            "webhookId": "telegram-supabase-webhook",
+            "credentials": {
+                "telegramApi": {
+                    "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+                    "name": "Telegram Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const message = $json.message.text.trim().toLowerCase();\nconst parts = message.split(' ');\nconst command = parts[0];\n\nlet operation = '';\nlet data = {};\nlet id = null;\n\nif (command === 'cadastrar') {\n  operation = 'create';\n  data = {\n    nome: parts[1] || 'Sem Nome',\n    email: parts[2] || 'sem@email.com'\n  };\n} else if (command === 'listar') {\n  operation = 'read';\n} else if (command === 'deletar') {\n  operation = 'delete';\n  id = parts[1];\n}\n\nreturn {\n  operation,\n  data,\n  id,\n  chatId: $json.message.chat.id\n};"
+            },
+            "id": "parser",
+            "name": "Parse Command",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                320,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "dataType": "string",
+                "value1": "={{ $json.operation }}",
+                "rules": {
+                    "rules": [
+                        {
+                            "value2": "create"
+                        },
+                        {
+                            "value1": "={{ $json.operation }}",
+                            "value2": "read"
+                        },
+                        {
+                            "value1": "={{ $json.operation }}",
+                            "value2": "delete"
+                        }
+                    ]
+                }
+            },
+            "id": "router",
+            "name": "Route Operation",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 2,
+            "position": [
+                540,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "tableId": "contatos",
+                "columns": "nome,email",
+                "additionalFields": {}
+            },
+            "id": "supabase-create",
+            "name": "Supabase Create",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                800,
+                100
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "tableId": "contatos",
+                "returnAll": true,
+                "additionalFields": {}
+            },
+            "id": "supabase-read",
+            "name": "Supabase Read",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                800,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "delete",
+                "tableId": "contatos",
+                "deleteKey": "id",
+                "value": "={{ $node[\"Parse Command\"].json.id }}"
+            },
+            "id": "supabase-delete",
+            "name": "Supabase Delete",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                800,
+                500
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $node[\"Parse Command\"].json.chatId }}",
+                "text": "✅ Registro criado com sucesso!",
+                "additionalFields": {}
+            },
+            "id": "reply-create",
+            "name": "Reply Success",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                100
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+                    "name": "Telegram Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $node[\"Parse Command\"].json.chatId }}",
+                "text": "={{ $json.map(r => `🆔 ${r.id} | 👤 ${r.nome} | 📧 ${r.email}`).join('\\n') || 'Nenhum registro encontrado.' }}",
+                "additionalFields": {}
+            },
+            "id": "reply-read",
+            "name": "Reply List",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                300
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+                    "name": "Telegram Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "={{ $node[\"Parse Command\"].json.chatId }}",
+                "text": "🗑️ Registro deletado!",
+                "additionalFields": {}
+            },
+            "id": "reply-delete",
+            "name": "Reply Delete",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                500
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+                    "name": "Telegram Account"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Telegram Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Parse Command",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse Command": {
+            "main": [
+                [
+                    {
+                        "node": "Route Operation",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Route Operation": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase Create",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Read",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Delete",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Create": {
+            "main": [
+                [
+                    {
+                        "node": "Reply Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Read": {
+            "main": [
+                [
+                    {
+                        "node": "Reply List",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Delete": {
+            "main": [
+                [
+                    {
+                        "node": "Reply Delete",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

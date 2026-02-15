@@ -1,0 +1,287 @@
+{
+    "name": "Supabase Agent - Contatos V3",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "contatos",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                100,
+                300
+            ],
+            "webhookId": "supabase-contatos-webhook"
+        },
+        {
+            "parameters": {
+                "dataType": "string",
+                "value1": "={{ $json.body.operation }}",
+                "rules": {
+                    "rules": [
+                        {
+                            "value2": "create"
+                        },
+                        {
+                            "value2": "read"
+                        },
+                        {
+                            "value2": "update"
+                        },
+                        {
+                            "value2": "delete"
+                        }
+                    ]
+                }
+            },
+            "name": "Router",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 1,
+            "position": [
+                300,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "keepOnlySet": true,
+                "values": {
+                    "string": [
+                        {
+                            "name": "id",
+                            "value": "={{ $json.body.id }}"
+                        }
+                    ]
+                },
+                "options": {
+                    "dotNotation": true
+                }
+            },
+            "name": "Extract Metadata",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "const body = $node[\"Webhook\"].json.body;\nif (body.data) {\n  return body.data;\n} else if (body.id) {\n  return { id: body.id };\n}\nreturn {};"
+            },
+            "name": "Prepare Data for Supabase",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                500,
+                100
+            ]
+        },
+        {
+            "parameters": {
+                "tableId": "contatos",
+                "columns": "={{ Object.keys($json).join(',') }}",
+                "additionalFields": {}
+            },
+            "name": "Supabase Create",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                100
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "tableId": "contatos",
+                "returnAll": true,
+                "additionalFields": {}
+            },
+            "name": "Supabase Read",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "tableId": "contatos",
+                "updateKey": "id",
+                "columns": "={{ Object.keys($json).filter(k => k !== 'id').join(',') }}",
+                "value": "={{ $node[\"Router\"].json.body.id }}"
+            },
+            "name": "Supabase Update",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                500
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "delete",
+                "tableId": "contatos",
+                "deleteKey": "id",
+                "value": "={{ $node[\"Router\"].json.body.id }}"
+            },
+            "name": "Supabase Delete",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                700
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($input.first().json) }}",
+                "options": {}
+            },
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Router",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Router": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Data for Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Read",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Prepare Data for Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Delete",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Data for Supabase": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase Create",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Supabase Update",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Create": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Read": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Update": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Delete": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

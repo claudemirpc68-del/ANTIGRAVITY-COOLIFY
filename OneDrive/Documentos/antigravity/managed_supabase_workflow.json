@@ -1,0 +1,237 @@
+{
+    "name": "Managed Supabase Global Workflow",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "supabase-manager",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                100,
+                300
+            ],
+            "webhookId": "managed-supabase-webhook"
+        },
+        {
+            "parameters": {
+                "dataType": "string",
+                "value1": "={{ $json.body.operation }}",
+                "rules": {
+                    "rules": [
+                        {
+                            "value2": "create"
+                        },
+                        {
+                            "value2": "read"
+                        },
+                        {
+                            "value2": "update"
+                        },
+                        {
+                            "value2": "delete"
+                        }
+                    ]
+                }
+            },
+            "name": "Router (Operation)",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 1,
+            "position": [
+                350,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "tableId": "={{ $node[\"Webhook\"].json.body.table }}",
+                "columns": "={{ Object.keys($node[\"Webhook\"].json.body.data || {}).join(',') }}",
+                "additionalFields": {}
+            },
+            "name": "Supabase Create",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                650,
+                100
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "tableId": "={{ $node[\"Webhook\"].json.body.table }}",
+                "returnAll": true,
+                "additionalFields": {}
+            },
+            "name": "Supabase Read",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "tableId": "={{ $node[\"Webhook\"].json.body.table }}",
+                "updateKey": "id",
+                "columns": "={{ Object.keys($node[\"Webhook\"].json.body.data || {}).join(',') }}",
+                "value": "={{ $node[\"Webhook\"].json.body.id }}"
+            },
+            "name": "Supabase Update",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                650,
+                500
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "delete",
+                "tableId": "={{ $node[\"Webhook\"].json.body.table }}",
+                "deleteKey": "id",
+                "value": "={{ $node[\"Webhook\"].json.body.id }}"
+            },
+            "name": "Supabase Delete",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                650,
+                700
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {
+                    "responseCode": 200
+                }
+            },
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Router (Operation)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Router (Operation)": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase Create",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Read",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Update",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Delete",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Create": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Read": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Update": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Delete": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

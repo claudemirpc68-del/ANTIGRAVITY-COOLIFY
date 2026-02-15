@@ -1,0 +1,290 @@
+{
+    "name": "Supabase Agent",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "agent",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "supabase-agent-webhook"
+        },
+        {
+            "parameters": {
+                "dataType": "string",
+                "value1": "={{ $json.body.operation }}",
+                "rules": {
+                    "rules": [
+                        {
+                            "value2": "create"
+                        },
+                        {
+                            "value2": "read"
+                        },
+                        {
+                            "value2": "update"
+                        },
+                        {
+                            "value2": "delete"
+                        }
+                    ]
+                }
+            },
+            "name": "Router",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "tableId": "documents",
+                "columns": "={{ Object.keys($json.body.data || {}).join(',') }}",
+                "additionalFields": {}
+            },
+            "name": "Supabase Create",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                100
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "tableId": "documents",
+                "returnAll": true,
+                "additionalFields": {}
+            },
+            "name": "Supabase Read",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "tableId": "documents",
+                "updateKey": "id",
+                "columns": "={{ Object.keys($json.body.data || {}).join(',') }}",
+                "value": "={{ $json.body.id }}"
+            },
+            "name": "Supabase Update",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                500
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "delete",
+                "tableId": "documents",
+                "deleteKey": "id",
+                "value": "={{ $json.body.id }}"
+            },
+            "name": "Supabase Delete",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                700
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "tableId": "logs_agente",
+                "columns": "operation, status, details, timestamp",
+                "additionalFields": {}
+            },
+            "name": "Log Success",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Supabase Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const operation = $('Webhook').first().json.body.operation;\nconst status = 'success';\nconst timestamp = new Date().toISOString();\nconst details = JSON.stringify($input.all());\n\nreturn [\n  {\n    json: {\n      operation,\n      status,\n      timestamp,\n      details\n    }\n  }\n];"
+            },
+            "name": "Prepare Log",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($input.first().json) }}",
+                "options": {}
+            },
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Router",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Router": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase Create",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Read",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Update",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Supabase Delete",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Create": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Log",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Read": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Log",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Update": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Log",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase Delete": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Log",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Log": {
+            "main": [
+                [
+                    {
+                        "node": "Log Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Log Success": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
