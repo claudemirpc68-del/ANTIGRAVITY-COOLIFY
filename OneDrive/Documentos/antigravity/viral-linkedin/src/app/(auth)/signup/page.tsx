@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Sparkles, ArrowLeft, Mail, Lock, User as UserIcon, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Mail, Lock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -34,8 +34,9 @@ export default function SignupPage() {
 
             toast.success("Conta criada! Verifique seu e-mail para confirmar o cadastro.");
             router.push("/login");
-        } catch (error: any) {
-            toast.error(error.message || "Erro ao cadastrar. Tente novamente.");
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Erro ao cadastrar. Tente novamente.";
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }

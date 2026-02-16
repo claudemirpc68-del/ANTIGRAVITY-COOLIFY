@@ -1,6 +1,8 @@
 "use client";
 
+
 import React from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -13,15 +15,12 @@ import {
     Calendar as CalendarIcon,
     BarChart3,
     Image as GalleryIcon,
-    Settings,
-    LogOut,
     Sparkles,
     ChevronLeft,
     ChevronRight,
     Sun,
     Moon
 } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
 import { useTheme } from "next-themes";
 import {
     Tooltip,
@@ -81,17 +80,35 @@ export function Sidebar() {
                             <Tooltip key={item.href} delayDuration={0} disableHoverableContent={!collapsed}>
                                 <TooltipTrigger asChild>
                                     <Link href={item.href}>
-                                        <Button
-                                            variant={isActive ? "secondary" : "ghost"}
-                                            className={cn(
-                                                "w-full justify-start",
-                                                isActive && "bg-primary/10 text-primary font-semibold hover:bg-primary/20",
-                                                collapsed ? "px-2" : "px-4"
+                                        <div className="relative">
+                                            {isActive && (
+                                                <motion.div
+                                                    layoutId="active-pill"
+                                                    className="absolute inset-0 bg-primary/10 rounded-md"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                />
                                             )}
-                                        >
-                                            <item.icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-muted-foreground")} />
-                                            {!collapsed && <span className="ml-3">{item.label}</span>}
-                                        </Button>
+                                            <Button
+                                                variant="ghost"
+                                                asChild
+                                                className={cn(
+                                                    "w-full justify-start relative z-10",
+                                                    isActive && "text-primary font-semibold hover:bg-transparent",
+                                                    collapsed ? "px-2" : "px-4"
+                                                )}
+                                            >
+                                                <motion.div
+                                                    className="flex items-center w-full"
+                                                    whileHover={{ x: 4 }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                >
+                                                    <item.icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-muted-foreground")} />
+                                                    {!collapsed && <span className="ml-3">{item.label}</span>}
+                                                </motion.div>
+                                            </Button>
+                                        </div>
                                     </Link>
                                 </TooltipTrigger>
                                 {collapsed && (

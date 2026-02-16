@@ -31,8 +31,9 @@ export default function LoginPage() {
 
             toast.success("Bem-vindo de volta! Redirecionando...");
             router.push("/dashboard");
-        } catch (error: any) {
-            toast.error(error.message || "Erro ao entrar. Verifique suas credenciais.");
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Erro ao entrar. Verifique suas credenciais.";
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }

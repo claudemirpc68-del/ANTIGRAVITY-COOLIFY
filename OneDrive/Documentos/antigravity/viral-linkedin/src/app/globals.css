@@ -106,18 +106,18 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsla(210, 100%, 35%, 0.2);
+  background: hsla(210, 100%, 35%, 0.5);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsla(210, 100%, 35%, 0.4);
+  background: hsla(210, 100%, 35%, 0.7);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: hsla(210, 100%, 50%, 0.2);
+  background: hsla(210, 100%, 50%, 0.4);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: hsla(210, 100%, 50%, 0.4);
+  background: hsla(210, 100%, 50%, 0.6);
 }

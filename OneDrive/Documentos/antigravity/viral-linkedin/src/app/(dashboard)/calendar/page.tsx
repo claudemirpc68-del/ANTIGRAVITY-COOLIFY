@@ -12,8 +12,6 @@ import {
     Clock,
     MessageSquare,
     MoreVertical,
-    ChevronLeft,
-    ChevronRight,
     Sparkles
 } from "lucide-react";
 import { ptBR } from "date-fns/locale";

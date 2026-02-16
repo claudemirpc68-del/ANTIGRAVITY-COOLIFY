@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
             model: "gpt-4o", // Ou "gpt-3.5-turbo" se preferir
             messages: [
                 { role: "system", content: SYSTEM_PROMPT },
-                ...messages.map((m: any) => ({
+                ...messages.map((m: { role: string; content: string }) => ({
                     role: m.role === "user" ? "user" : "assistant",
                     content: m.content,
                 })),
@@ -72,9 +72,10 @@ export async function POST(req: NextRequest) {
                 "Connection": "keep-alive",
             },
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error("ERRO NA API DE CHAT (OpenAI):", error);
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        return new Response(JSON.stringify({ error: errorMessage }), {
             status: 500,
             headers: { "Content-Type": "application/json" }
         });

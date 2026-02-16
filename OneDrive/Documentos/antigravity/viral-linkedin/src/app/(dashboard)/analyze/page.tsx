@@ -4,6 +4,7 @@ import React from "react";
 import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
     TrendingUp,
@@ -55,8 +56,9 @@ export default function AnalyzePage() {
             setResult(data);
             saveToDrafts(content, data.score);
             toast.success("Análise concluída com sucesso!");
-        } catch (error: any) {
-            toast.error(error.message);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+            toast.error(errorMessage);
         } finally {
             setIsAnalyzing(false);
         }

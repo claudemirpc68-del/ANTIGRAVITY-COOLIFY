@@ -14,8 +14,7 @@ import {
     Loader2,
     Layout as CarouselIcon,
     ChevronLeft,
-    ChevronRight,
-    GripVertical
+    ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,8 +49,9 @@ export default function CarouselPage() {
             setCurrentSlide(0);
             saveToDrafts(topic, data.slides);
             toast.success("Estrutura do carrossel gerada!");
-        } catch (error: any) {
-            toast.error(error.message);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Erro ao gerar slides.";
+            toast.error(errorMessage);
         } finally {
             setIsGenerating(false);
         }
@@ -258,7 +258,7 @@ export default function CarouselPage() {
                     <div>
                         <h4 className="font-bold text-sm mb-1">Dica para Carrosséis de Sucesso</h4>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                            O primeiro slide deve sempre ter uma pergunta ou uma afirmação polêmica (o gancho). O último slide é obrigatório conter uma CTA específica: "O que você acha?", "Comente 'SIM' se concorda".
+                            O primeiro slide deve sempre ter uma pergunta ou uma afirmação polêmica (o gancho). O último slide é obrigatório conter uma CTA específica: &quot;O que você acha?&quot;, &quot;Comente &apos;SIM&apos; se concorda&quot;.
                         </p>
                     </div>
                 </Card>

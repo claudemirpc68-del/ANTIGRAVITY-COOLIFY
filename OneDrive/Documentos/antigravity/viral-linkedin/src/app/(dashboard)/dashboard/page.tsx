@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/app-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Plus,
     TrendingUp,
@@ -19,12 +20,15 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const stats = [
-    { label: "Posts Gerados", value: "24", icon: MessageSquare, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { label: "Engajamento Estimado", value: "+12.4%", icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" },
-    { label: "Publicações", value: "8", icon: CheckCircle2, color: "text-purple-500", bg: "bg-purple-500/10" },
-    { label: "Próximos Posts", value: "3", icon: CalendarIcon, color: "text-orange-500", bg: "bg-orange-500/10" },
-];
+type ActivityItem = {
+    id: string;
+    title: string;
+    content: string;
+    status: string;
+    date: string;
+    type: string;
+    score?: number;
+};
 
 const quickActions = [
     { title: "Criar novo Post", description: "Use o Chat IA para gerar conteúdo viral", icon: MessageSquare, href: "/chat", color: "linkedin-gradient" },
@@ -33,7 +37,7 @@ const quickActions = [
 ];
 
 export default function DashboardPage() {
-    const [recentActivity, setRecentActivity] = React.useState<any[]>([]);
+    const [recentActivity, setRecentActivity] = React.useState<ActivityItem[]>([]);
 
     React.useEffect(() => {
         try {
@@ -124,40 +128,42 @@ export default function DashboardPage() {
                                 </Button>
                             </div>
                             <Card className="glass border-primary/5 divide-y overflow-hidden">
-                                {recentActivity.length === 0 ? (
-                                    <div className="p-12 text-center space-y-4">
-                                        <p className="text-sm text-muted-foreground">Opa! Nada por aqui ainda.</p>
-                                        <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl text-xs text-red-600 max-w-xs mx-auto">
-                                            <p className="font-bold mb-1">Dica de Diagnóstico:</p>
-                                            Se a IA não responder no Chat, certifique-se de que você inseriu sua <strong>OPENAI_API_KEY</strong> no arquivo <strong>.env.local</strong>.
-                                        </div>
-                                    </div>
-                                ) : (
-                                    recentActivity.map((item, idx) => (
-                                        <div key={idx} className="p-4 flex items-center justify-between hover:bg-secondary/20 transition-colors group cursor-pointer">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded bg-background border flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
-                                                    {item.type === "chat" ? <MessageSquare size={18} /> : <Sparkles size={18} />}
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="font-bold text-sm truncate max-w-[200px] md:max-w-md">{item.title}</p>
-                                                    <p className="text-xs text-muted-foreground">{item.date}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <Badge variant="outline" className={cn(
-                                                    "text-[10px] uppercase font-black tracking-widest px-2 py-0.5",
-                                                    item.status === "Publicado" ? "text-green-500 border-green-500/20 bg-green-500/5" :
-                                                        item.status === "Agendado" ? "text-blue-500 border-blue-500/20 bg-blue-500/5" :
-                                                            "text-orange-500 border-orange-500/20 bg-orange-500/5"
-                                                )}>
-                                                    {item.status}
-                                                </Badge>
-                                                <ArrowUpRight className="text-muted-foreground h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                                <ScrollArea className="h-[400px]">
+                                    {recentActivity.length === 0 ? (
+                                        <div className="p-12 text-center space-y-4">
+                                            <p className="text-sm text-muted-foreground">Opa! Nada por aqui ainda.</p>
+                                            <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl text-xs text-red-600 max-w-xs mx-auto">
+                                                <p className="font-bold mb-1">Dica de Diagnóstico:</p>
+                                                Se a IA não responder no Chat, certifique-se de que você inseriu sua <strong>OPENAI_API_KEY</strong> no arquivo <strong>.env.local</strong>.
                                             </div>
                                         </div>
-                                    ))
-                                )}
+                                    ) : (
+                                        recentActivity.map((item, idx) => (
+                                            <div key={idx} className="p-4 flex items-center justify-between hover:bg-secondary/20 transition-colors group cursor-pointer">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded bg-background border flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                                                        {item.type === "chat" ? <MessageSquare size={18} /> : <Sparkles size={18} />}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="font-bold text-sm truncate max-w-[200px] md:max-w-md">{item.title}</p>
+                                                        <p className="text-xs text-muted-foreground">{item.date}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <Badge variant="outline" className={cn(
+                                                        "text-[10px] uppercase font-black tracking-widest px-2 py-0.5",
+                                                        item.status === "Publicado" ? "text-green-500 border-green-500/20 bg-green-500/5" :
+                                                            item.status === "Agendado" ? "text-blue-500 border-blue-500/20 bg-blue-500/5" :
+                                                                "text-orange-500 border-orange-500/20 bg-orange-500/5"
+                                                    )}>
+                                                        {item.status}
+                                                    </Badge>
+                                                    <ArrowUpRight className="text-muted-foreground h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </ScrollArea>
                             </Card>
                         </section>
                     </div>

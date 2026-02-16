@@ -1,0 +1,59 @@
+﻿
+> viral-linkedin@0.1.0 lint
+> eslint
+
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(auth)\login\page.tsx
+  34:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(auth)\signup\page.tsx
+   8:51  warning  'UserIcon' is defined but never used      @typescript-eslint/no-unused-vars
+  37:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(dashboard)\analyze\page.tsx
+  59:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(dashboard)\calendar\page.tsx
+  15:5  warning  'ChevronLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  16:5  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(dashboard)\carousel\page.tsx
+   18:5    warning  'GripVertical' is defined but never used                         @typescript-eslint/no-unused-vars
+   53:25   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   60:50   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  261:169  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  261:186  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  261:189  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  261:198  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  261:202  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  261:215  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(dashboard)\chat\page.tsx
+   18:5   warning  'Plus' is defined but never used          @typescript-eslint/no-unused-vars
+  116:37  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\(dashboard)\dashboard\page.tsx
+  22:7   warning  'stats' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  36:64  error    Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\api\analyze\route.ts
+  44:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\api\carousel\route.ts
+  42:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\api\chat\route.ts
+  39:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\app\page.tsx
+  8:3  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\FAM├ìLIA\OneDrive\Documentos\antigravity\viral-linkedin\src\components\sidebar.tsx
+  16:5   warning  'Settings' is defined but never used  @typescript-eslint/no-unused-vars
+  17:5   warning  'LogOut' is defined but never used    @typescript-eslint/no-unused-vars
+  24:10  warning  'useAuth' is defined but never used   @typescript-eslint/no-unused-vars
+
+Ô£û 28 problems (18 errors, 10 warnings)
+

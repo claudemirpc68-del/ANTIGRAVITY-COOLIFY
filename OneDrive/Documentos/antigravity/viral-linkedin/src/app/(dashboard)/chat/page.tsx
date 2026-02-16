@@ -15,9 +15,17 @@ import {
     User,
     Bot,
     Loader2,
-    Plus,
-    AlertCircle
+    AlertCircle,
+    History
 } from "lucide-react";
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -41,7 +49,22 @@ export default function ChatPage() {
     const [isLoading, setIsLoading] = React.useState(false);
     const [copiedId, setCopiedId] = React.useState<number | null>(null);
     const [isKeyMissing, setIsKeyMissing] = React.useState(false);
+    const [drafts, setDrafts] = React.useState<any[]>([]);
     const scrollRef = React.useRef<HTMLDivElement>(null);
+
+    // Carregar drafts
+    const loadDrafts = () => {
+        try {
+            const savedPosts = JSON.parse(localStorage.getItem("viral_posts") || "[]");
+            setDrafts(Array.isArray(savedPosts) ? savedPosts : []);
+        } catch (e) {
+            console.error("Erro ao carregar rascunhos:", e);
+        }
+    };
+
+    React.useEffect(() => {
+        loadDrafts();
+    }, []);
 
     // Carregar histórico
     React.useEffect(() => {
@@ -113,17 +136,19 @@ export default function ChatPage() {
                         const last = prev[prev.length - 1];
                         return [...prev.slice(0, -1), { ...last, content: assistantContent }];
                     });
-                } catch (readError: any) {
+                } catch (readError) {
                     console.error("Erro ao ler chunk do stream:", readError);
-                    throw new Error(`Falha na leitura do stream: ${readError.message}`);
+                    const errorMessage = readError instanceof Error ? readError.message : "Erro desconhecido";
+                    throw new Error(`Falha na leitura do stream: ${errorMessage}`);
                 }
             }
 
             // Salvar automaticamente como rascunho após concluir o streaming
             saveToDrafts(assistantContent);
 
-        } catch (error: any) {
-            toast.error(error.message);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Erro na comunicação com a IA";
+            toast.error(errorMessage);
             setMessages((prev) => prev.slice(0, -1)); // Remove a mensagem vazia do assistente
         } finally {
             setIsLoading(false);
@@ -141,6 +166,7 @@ export default function ChatPage() {
             type: "chat"
         };
         localStorage.setItem("viral_posts", JSON.stringify([newPost, ...savedPosts].slice(0, 10)));
+        loadDrafts(); // Atualiza a lista de rascunhos
         toast.success("Rascunho salvo automaticamente!");
     };
 
@@ -163,6 +189,60 @@ export default function ChatPage() {
                         <p className="text-xs text-muted-foreground">Assistente especializado em LinkedIn Brasil</p>
                     </div>
                     <div className="flex gap-2">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="outline" size="sm" className="gap-2 font-bold hidden md:flex" onClick={loadDrafts}>
+                                    <History size={16} /> Meus Rascunhos
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent>
+                                <SheetHeader>
+                                    <SheetTitle>Meus Rascunhos</SheetTitle>
+                                    <SheetDescription>
+                                        Histórico dos seus últimos posts gerados.
+                                    </SheetDescription>
+                                </SheetHeader>
+                                <ScrollArea className="h-[calc(100vh-8rem)] mt-4 pr-4">
+                                    <div className="space-y-4">
+                                        {drafts.length === 0 ? (
+                                            <p className="text-sm text-muted-foreground text-center py-8">Nenhum rascunho salvo ainda.</p>
+                                        ) : (
+                                            drafts.map((draft, idx) => (
+                                                <Card key={idx} className="p-4 hover:bg-secondary/50 transition-colors border-primary/10">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <h4 className="font-bold text-sm line-clamp-1">{draft.title}</h4>
+                                                        <Badge variant="outline" className="text-[10px]">{draft.type}</Badge>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground line-clamp-3 mb-3">
+                                                        {draft.content}
+                                                    </p>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            className="w-full text-xs h-7"
+                                                            onClick={() => copyToClipboard(draft.content, -1)}
+                                                        >
+                                                            <Copy size={12} className="mr-1" /> Copiar
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="w-full text-xs h-7"
+                                                            onClick={() => {
+                                                                handleSend(`Continuar editando este post: ${draft.title}`);
+                                                            }}
+                                                        >
+                                                            <Sparkles size={12} className="mr-1" /> Melhorar
+                                                        </Button>
+                                                    </div>
+                                                </Card>
+                                            ))
+                                        )}
+                                    </div>
+                                </ScrollArea>
+                            </SheetContent>
+                        </Sheet>
                         {isKeyMissing && (
                             <Badge variant="destructive" className="animate-pulse bg-red-500 hover:bg-red-600">
                                 <AlertCircle size={12} className="mr-1" /> Chave API Pendente

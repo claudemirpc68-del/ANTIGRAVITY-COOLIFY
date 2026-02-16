@@ -39,9 +39,10 @@ Retorne um JSON estritamente no seguinte formato:
         return new Response(result, {
             headers: { "Content-Type": "application/json" },
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error("ERRO NA API DE CARROSSEL (OpenAI):", error);
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+        return new Response(JSON.stringify({ error: errorMessage }), {
             status: 500,
             headers: { "Content-Type": "application/json" }
         });
