@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Viral LinkedIn
 
-## Getting Started
+O **Viral LinkedIn** é uma plataforma avançada de criação e análise de conteúdo voltada para maximizar o engajamento na rede profissional. Utilizando o poder da Inteligência Artificial (Gemini e OpenAI), o projeto oferece ferramentas completas para creators e profissionais que buscam consistência e viralidade.
 
-First, run the development server:
+## ✨ Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **📊 Análise de Conteúdo:** Avalie seus posts e receba insights baseados em IA para melhorar performance e alcance.
+- **🎨 Gerador de Carrossel:** Crie carrosséis visualmente impactantes para o LinkedIn de forma automatizada.
+- **🖼️ Galeria de Imagens AI:** Gere imagens personalizadas com prompts e estilos diversos para ilustrar suas publicações.
+- **💬 Chat de Ideação:** Um assistente inteligente para brainstorm de temas, roteiros e estratégias de conteúdo.
+- **📅 Calendário Editorial:** Organize sua frequência de postagens e planeje seu crescimento a longo prazo.
+- **🏠 Dashboard Centralizado:** Visão geral das suas métricas e acesso rápido a todas as ferramentas.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tecnologias
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework:** [Next.js 15+](https://nextjs.org/) (App Router)
+- **Estilização:** [Tailwind CSS](https://tailwindcss.com/) & [Shadcn UI](https://ui.shadcn.com/)
+- **Backend/Banco de Dados:** [Supabase](https://supabase.com/) (Auth & PostgreSQL)
+- **Inteligência Artificial:**
+  - [Google Gemini AI](https://ai.google.dev/)
+  - [OpenAI (GPT-4/DALL-E)](https://openai.com/)
+- **Animações:** [Framer Motion](https://www.framer.com/motion/)
+- **Deployment:** [Coolify](https://coolify.io/) & Docker
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Como Começar
 
-## Learn More
+### Pré-requisitos
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js 20+
+- Conta no Supabase
+- Chaves de API do Google Gemini e/ou OpenAI
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Instalação Local
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/ANTIGRAVITY-COOLIFY.git
+    cd viral-linkedin
+    ```
 
-## Deploy on Vercel
+2.  **Instale as dependências:**
+    ```bash
+    npm install
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3.  **Configure as variáveis de ambiente:**
+    Crie um arquivo `.env.local` na raiz do projeto e adicione suas credenciais:
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=seu_url_supabase
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
+    GEMINI_API_KEY=sua_chave_gemini
+    OPENAI_API_KEY=sua_chave_openai
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4.  **Inicie o servidor de desenvolvimento:**
+    ```bash
+    npm run dev
+    ```
+    Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
+
+## 📦 Deployment via Coolify
+
+Este projeto está configurado para ser implantado facilmente usando o **Coolify**.
+
+1.  Conecte seu repositório GitHub ao painel do Coolify.
+2.  Utilize o `Dockerfile` ou a configuração automática de Nixpacks inclusa no projeto.
+3.  Configure as variáveis de ambiente no painel administrativo do Coolify.
+4.  O projeto utiliza a porta `3000` por padrão.
+
+---
+
+Desenvolvido com ❤️ para transformar sua presença no LinkedIn.
+
