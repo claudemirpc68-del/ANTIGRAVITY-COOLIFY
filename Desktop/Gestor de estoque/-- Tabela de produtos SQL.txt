@@ -1,0 +1,68 @@
+-- Tabela de produtos
+CREATE TABLE Produtos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    codigo_barras VARCHAR(50),
+    volume_ml INT,
+    descricao VARCHAR(255)
+);
+
+-- Tabela de estoque
+CREATE TABLE Estoque (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_produto INT,
+    data_entrada DATE,
+    data_validade DATE,
+    quantidade INT,
+    localizacao VARCHAR(100),
+    FOREIGN KEY (id_produto) REFERENCES Produtos(id)
+);
+
+-- Inserções de Pepsi Black (10 variações)
+INSERT INTO Produtos (nome, codigo_barras, volume_ml, descricao) VALUES
+('Pepsi Black 350ml', '789000000001', 350, 'Pepsi Black sem açúcar, lata'),
+('Pepsi Black 600ml', '789000000002', 600, 'Pepsi Black sem açúcar, garrafa PET'),
+('Pepsi Black 1L', '789000000003', 1000, 'Pepsi Black sem açúcar, garrafa PET'),
+('Pepsi Black 2L', '789000000004', 2000, 'Pepsi Black sem açúcar, garrafa PET'),
+('Pepsi Black 250ml', '789000000005', 250, 'Pepsi Black sem açúcar, lata pequena'),
+('Pepsi Black 500ml', '789000000006', 500, 'Pepsi Black sem açúcar, garrafa PET'),
+('Pepsi Black 1,5L', '789000000007', 1500, 'Pepsi Black sem açúcar, garrafa PET'),
+('Pepsi Black 3L', '789000000008', 3000, 'Pepsi Black sem açúcar, garrafa PET família'),
+('Pepsi Black 200ml', '789000000009', 200, 'Pepsi Black sem açúcar, mini lata'),
+('Pepsi Black 750ml', '789000000010', 750, 'Pepsi Black sem açúcar, garrafa vidro');
+
+-- Inserções de Coca-Cola (10 variações)
+INSERT INTO Produtos (nome, codigo_barras, volume_ml, descricao) VALUES
+('Coca-Cola 350ml', '789100000001', 350, 'Coca-Cola tradicional, lata'),
+('Coca-Cola 600ml', '789100000002', 600, 'Coca-Cola tradicional, garrafa PET'),
+('Coca-Cola 1L', '789100000003', 1000, 'Coca-Cola tradicional, garrafa PET'),
+('Coca-Cola 2L', '789100000004', 2000, 'Coca-Cola tradicional, garrafa PET'),
+('Coca-Cola 250ml', '789100000005', 250, 'Coca-Cola tradicional, lata pequena'),
+('Coca-Cola 500ml', '789100000006', 500, 'Coca-Cola tradicional, garrafa PET'),
+('Coca-Cola 1,5L', '789100000007', 1500, 'Coca-Cola tradicional, garrafa PET'),
+('Coca-Cola 3L', '789100000008', 3000, 'Coca-Cola tradicional, garrafa PET família'),
+('Coca-Cola 200ml', '789100000009', 200, 'Coca-Cola tradicional, mini lata'),
+('Coca-Cola 750ml', '789100000010', 750, 'Coca-Cola tradicional, garrafa vidro');
+
+-- Inserções de estoque (exemplo genérico para todos os produtos)
+INSERT INTO Estoque (id_produto, data_entrada, data_validade, quantidade, localizacao) VALUES
+(1, '2026-03-03', '2026-09-03', 48, 'Prateleira A - Bebidas'),
+(2, '2026-03-03', '2026-08-15', 30, 'Prateleira A - Bebidas'),
+(3, '2026-03-03', '2026-10-01', 25, 'Prateleira A - Bebidas'),
+(4, '2026-03-03', '2026-11-01', 40, 'Prateleira A - Bebidas'),
+(5, '2026-03-03', '2026-07-20', 60, 'Prateleira A - Bebidas'),
+(6, '2026-03-03', '2026-08-30', 35, 'Prateleira A - Bebidas'),
+(7, '2026-03-03', '2026-09-15', 20, 'Prateleira A - Bebidas'),
+(8, '2026-03-03', '2026-12-01', 15, 'Prateleira A - Bebidas'),
+(9, '2026-03-03', '2026-07-10', 50, 'Prateleira A - Bebidas'),
+(10, '2026-03-03', '2026-09-25', 28, 'Prateleira A - Bebidas'),
+(11, '2026-03-03', '2026-09-03', 48, 'Prateleira B - Bebidas'),
+(12, '2026-03-03', '2026-08-15', 30, 'Prateleira B - Bebidas'),
+(13, '2026-03-03', '2026-10-01', 25, 'Prateleira B - Bebidas'),
+(14, '2026-03-03', '2026-11-01', 40, 'Prateleira B - Bebidas'),
+(15, '2026-03-03', '2026-07-20', 60, 'Prateleira B - Bebidas'),
+(16, '2026-03-03', '2026-08-30', 35, 'Prateleira B - Bebidas'),
+(17, '2026-03-03', '2026-09-15', 20, 'Prateleira B - Bebidas'),
+(18, '2026-03-03', '2026-12-01', 15, 'Prateleira B - Bebidas'),
+(19, '2026-03-03', '2026-07-10', 50, 'Prateleira B - Bebidas'),
+(20, '2026-03-03', '2026-09-25', 28, 'Prateleira B - Bebidas');
