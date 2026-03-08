@@ -2,6 +2,7 @@ import React from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
+import { MOCK_COLABORADORES } from '../../logic/mockData';
 import { Users, Calendar as CalendarIcon, AlertCircle, TrendingUp } from 'lucide-react';
 
 const GestorDashboard = () => {
@@ -59,13 +60,15 @@ const GestorDashboard = () => {
                     <TrendingUp size={18} color="var(--text-tertiary)" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {MOCK_COLABORADORES.slice(0, 3).map((colab, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: i < 2 ? '1px solid #F0F0F0' : 'none' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '500' }}>{colab.nome}</span>
-                            <span style={{ fontSize: '11px', background: i === 0 ? '#E8F5E9' : '#FFF3E0', color: i === 0 ? '#2E7D32' : '#E65100', padding: '2px 8px', borderRadius: '12px' }}>
-                                {i === 0 ? 'Em Serviço' : 'Folga'}
-                            </span>
-                        </div>
+                    {MOCK_COLABORADORES?.slice(0, 3)?.map((colab, i) => (
+                        colab ? (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: i < 2 ? '1px solid #F0F0F0' : 'none' }}>
+                                <span style={{ fontSize: '14px', fontWeight: '500' }}>{colab.nome}</span>
+                                <span style={{ fontSize: '11px', background: i === 0 ? '#E8F5E9' : '#FFF3E0', color: i === 0 ? '#2E7D32' : '#E65100', padding: '2px 8px', borderRadius: '12px' }}>
+                                    {i === 0 ? 'Em Serviço' : 'Folga'}
+                                </span>
+                            </div>
+                        ) : null
                     ))}
                 </div>
             </Card>
