@@ -9,8 +9,8 @@ function App() {
   const [view, setView] = useState('login') // 'login', 'colaborador', 'gestor'
   const [user, setUser] = useState(null)
 
-  const handleLogin = (role) => {
-    setUser({ nome: role === 'gestor' ? 'João Gestor' : 'Amanda Porto', role });
+  const handleLogin = (role, nome) => {
+    setUser({ nome, role });
     setView(role);
   };
 
@@ -31,7 +31,7 @@ function App() {
         </div>
       ) : (
         <>
-          <Header title={view === 'gestor' ? "PAINEL ADMINISTRATIVO" : "MINHA ESCALA"} />
+          <Header user={user} title={view === 'gestor' ? "PAINEL ADMINISTRATIVO" : "MINHA ESCALA"} />
           <main style={{ padding: '0 20px' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
               {view === 'colaborador' && <ColaboradorDashboard user={user} />}

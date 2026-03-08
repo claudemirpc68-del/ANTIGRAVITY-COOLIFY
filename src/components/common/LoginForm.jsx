@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from './Button';
 import Card from './Card';
 import { User, Lock } from 'lucide-react';
+import { MOCK_COLABORADORES, MOCK_GESTOR } from '../../logic/mockData';
 
 const LoginForm = ({ onLogin }) => {
     const [matricula, setMatricula] = useState('');
@@ -9,11 +10,16 @@ const LoginForm = ({ onLogin }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Simulação de login
-        if (matricula === '101010') {
-            onLogin('gestor');
+
+        // Busca o colaborador pela matrícula nos dados reais
+        const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matricula);
+
+        if (matricula === MOCK_GESTOR.matricula) {
+            onLogin('gestor', MOCK_GESTOR.nome);
+        } else if (colaborador) {
+            onLogin('colaborador', colaborador.nome);
         } else {
-            onLogin('colaborador');
+            alert('Matrícula não encontrada. Use um dos números da imagem (ex: 5741181).');
         }
     };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { STORE_UNIT, SECTOR } from '../../logic/constants';
 
-const Header = ({ title = "ESCALA DE TRABALHO" }) => {
+const Header = ({ user, title = "ESCALA DE TRABALHO" }) => {
     return (
         <header className="animate-fade-in" style={{ padding: '24px', background: 'white', borderBottom: '1px solid #E0E0E0', marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -18,7 +18,7 @@ const Header = ({ title = "ESCALA DE TRABALHO" }) => {
             <div className="glass-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', padding: '12px', fontSize: '11px', background: '#F8F9FA' }}>
                 <div><strong>CENTRO DE RESULTADO:</strong> 5356</div>
                 <div><strong>ESTABELECIMENTO:</strong> 283</div>
-                <div><strong>GESTOR:</strong> JOHN/ANTONIO/LEONARDO</div>
+                <div><strong>GESTOR:</strong> {user?.role === 'gestor' ? user.nome : 'JOHN/ANTONIO/LEONARDO'}</div>
                 <div><strong>LOJA:</strong> {STORE_UNIT}</div>
             </div>
         </header>
