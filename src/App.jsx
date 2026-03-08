@@ -23,7 +23,7 @@ function App() {
     <div className="app-container">
       {view === 'login' ? (
         <div style={{ padding: '40px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-          <img src="https://upload.wikimedia.org/wikipedia/pt/2/2e/Assa%C3%AD_Atacadista_logo.png" alt="Assai Logo" style={{ height: '60px', marginBottom: '30px' }} />
+          <img src="/assets/logo-assai.png" alt="Assai Logo" style={{ height: '65px', marginBottom: '30px' }} />
           <LoginForm onLogin={handleLogin} />
           <footer style={{ marginTop: 'auto', padding: '20px', fontSize: '11px', color: 'var(--text-tertiary)', textAlign: 'center' }}>
             © {new Date().getFullYear()} Assai Supermercados • Mercearia Suzano 068
