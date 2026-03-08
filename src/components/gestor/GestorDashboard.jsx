@@ -59,9 +59,9 @@ const GestorDashboard = () => {
                     <TrendingUp size={18} color="var(--text-tertiary)" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {['Amanda Porto', 'Kaique Vieira', 'Dayana Angelo'].map((nome, i) => (
+                    {MOCK_COLABORADORES.slice(0, 3).map((colab, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: i < 2 ? '1px solid #F0F0F0' : 'none' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '500' }}>{nome}</span>
+                            <span style={{ fontSize: '14px', fontWeight: '500' }}>{colab.nome}</span>
                             <span style={{ fontSize: '11px', background: i === 0 ? '#E8F5E9' : '#FFF3E0', color: i === 0 ? '#2E7D32' : '#E65100', padding: '2px 8px', borderRadius: '12px' }}>
                                 {i === 0 ? 'Em Serviço' : 'Folga'}
                             </span>
