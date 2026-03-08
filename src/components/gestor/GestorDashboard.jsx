@@ -18,11 +18,19 @@ const getStatusColab = (colab, todayIdx) => {
     if (todayIdx < 0) return { label: 'Fora do Período', bg: '#F5F5F5', color: '#888' };
     const grade = IMAGE_GRID[colab.id] || [];
     const val = grade[todayIdx] || '';
+
     if (val === 'F') return { label: 'Folga', bg: '#FFF3E0', color: '#E65100' };
     if (val === 'D') return { label: 'Descanso (D)', bg: '#E3F2FD', color: '#1565C0' };
-    if (val === '10:30') return { label: 'Turno 10:30', bg: '#F3E5F5', color: '#6A1B9A' };
-    if (val === '22:00') return { label: 'Turno 22:00', bg: '#EDE7F6', color: '#4527A0' };
-    return { label: 'Em Serviço', bg: '#E8F5E9', color: '#2E7D32' };
+
+    // Mapeia o horário do colaborador para o intervalo real
+    const isSegundoTurno = colab.horario === '14:30';
+    const interval = isSegundoTurno ? '14:30 — 22:50' : '07:30 — 14:30';
+
+    return {
+        label: isSegundoTurno ? `2º Turno (${interval})` : `1º Turno (${interval})`,
+        bg: isSegundoTurno ? 'rgba(106, 27, 154, 0.1)' : 'rgba(46, 125, 50, 0.1)',
+        color: isSegundoTurno ? '#6A1B9A' : '#2E7D32'
+    };
 };
 
 const GestorDashboard = () => {
