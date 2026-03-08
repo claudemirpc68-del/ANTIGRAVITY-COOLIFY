@@ -8,14 +8,14 @@
   --assai-yellow: #FFB800;
   --assai-red: #D92B2F;
   --assai-red-light: #FF4D4D;
-  
+
   /* UI Colors */
   --bg-color: #F4F7F6;
   --surface-color: #FFFFFF;
   --text-primary: #1A1C1E;
   --text-secondary: #5D6470;
   --text-tertiary: #9AA3AF;
-  
+
   /* Status Colors */
   --status-success: #00B894;
   --status-warning: #FFB800;
@@ -29,12 +29,16 @@
   --border-radius-sm: 8px;
   --border-radius-md: 12px;
   --border-radius-lg: 20px;
-  
+
   /* Scale Colors (Matching physical sheet) */
-  --color-t: #1A1C1E; /* Trabalho - Escuro */
-  --color-f: #FF6600; /* Folga - Laranja Destaque */
-  --color-ff: #FFB800; /* Compensatória - Amarelo */
-  --color-fbh: #D92B2F; /* Banco de Horas - Vermelho */
+  --color-t: #1A1C1E;
+  /* Trabalho - Escuro */
+  --color-f: #FF6600;
+  /* Folga - Laranja Destaque */
+  --color-ff: #FFB800;
+  /* Compensatória - Amarelo */
+  --color-fbh: #D92B2F;
+  /* Banco de Horas - Vermelho */
 }
 
 * {
@@ -80,22 +84,52 @@ button:active {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-input, select {
+input,
+select {
   font-family: inherit;
   border-radius: var(--border-radius-sm);
   border: 1px solid #E0E0E0;
   padding: 10px 14px;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: var(--assai-orange);
   outline: none;
+}
+
+/* Responsividade Mobile */
+@media screen and (max-width: 768px) {
+  .app-container {
+    padding: 10px !important;
+  }
+
+  h1 {
+    font-size: 20px !important;
+  }
+
+  .glass-card {
+    padding: 16px !important;
+  }
+
+  table th,
+  table td {
+    font-size: 11px !important;
+    padding: 6px !important;
+  }
 }
