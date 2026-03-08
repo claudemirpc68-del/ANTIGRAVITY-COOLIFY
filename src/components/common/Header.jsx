@@ -5,10 +5,13 @@ const Header = ({ title = "ESCALA DE TRABALHO" }) => {
     return (
         <header className="animate-fade-in" style={{ padding: '24px', background: 'white', borderBottom: '1px solid #E0E0E0', marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <img src="https://upload.wikimedia.org/wikipedia/pt/2/2e/Assa%C3%AD_Atacadista_logo.png" alt="Assai Logo" style={{ height: '40px' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <img src="/assets/logo-assai.png" alt="Assai Logo" style={{ height: '45px', marginBottom: '4px' }} />
+                    <span style={{ fontSize: '8px', color: 'var(--text-secondary)', fontWeight: 'bold', marginLeft: '2px' }}>By: Claudemir</span>
+                </div>
                 <div style={{ textAlign: 'right' }}>
-                    <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--assai-orange)' }}>{title}</h2>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>SETOR: {SECTOR}</p>
+                    <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--assai-orange)', margin: 0 }}>{title}</h2>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>SETOR: {SECTOR}</p>
                 </div>
             </div>
 

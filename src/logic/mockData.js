@@ -16,6 +16,54 @@ export const MOCK_COLABORADORES = [
         role: ROLES.COLABORADOR,
         funcao: 'OP. LOJA',
         horario: '06:00'
+    },
+    {
+        id: '3',
+        nome: 'DAYANA ANGELO',
+        matricula: '5477786',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '06:00'
+    },
+    {
+        id: '4',
+        nome: 'LUIZA JESUS',
+        matricula: '604933',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '06:00'
+    },
+    {
+        id: '5',
+        nome: 'LINDINALVA',
+        matricula: '2741768',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '07:00'
+    },
+    {
+        id: '6',
+        nome: 'DENISE ISSI',
+        matricula: '596254',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '07:00'
+    },
+    {
+        id: '7',
+        nome: 'PEDRO ANGELO',
+        matricula: '672167',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '08:00'
+    },
+    {
+        id: '8',
+        nome: 'CLAUDINEI',
+        matricula: '4593634',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '08:00'
     }
 ];
 
