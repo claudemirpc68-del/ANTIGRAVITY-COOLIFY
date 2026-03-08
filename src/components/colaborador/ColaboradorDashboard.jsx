@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { Clock, Calendar, ArrowLeftRight, MessageSquare } from 'lucide-react';
+import ScaleManager from '../gestor/ScaleManager';
 
 const ColaboradorDashboard = ({ user = { nome: 'Amanda Porto' } }) => {
+    const [showScale, setShowScale] = useState(false);
+
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '40px' }}>
             <header style={{ marginBottom: '24px' }}>
@@ -31,9 +34,9 @@ const ColaboradorDashboard = ({ user = { nome: 'Amanda Porto' } }) => {
 
             {/* Ações Rápidas */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                <Card style={{ textAlign: 'center', cursor: 'pointer' }}>
-                    <Calendar size={24} color="var(--assai-orange)" style={{ marginBottom: '8px' }} />
-                    <p style={{ fontSize: '13px', fontWeight: '600' }}>Minha Escala</p>
+                <Card style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowScale(!showScale)}>
+                    <Calendar size={24} color={showScale ? "var(--status-success)" : "var(--assai-orange)"} style={{ marginBottom: '8px' }} />
+                    <p style={{ fontSize: '13px', fontWeight: '600' }}>{showScale ? 'Ocultar Escala' : 'Minha Escala'}</p>
                 </Card>
                 <Card style={{ textAlign: 'center', cursor: 'pointer' }}>
                     <ArrowLeftRight size={24} color="var(--assai-orange)" style={{ marginBottom: '8px' }} />
@@ -44,6 +47,12 @@ const ColaboradorDashboard = ({ user = { nome: 'Amanda Porto' } }) => {
                     <p style={{ fontSize: '13px', fontWeight: '600' }}>Justificativa</p>
                 </Card>
             </div>
+
+            {showScale && (
+                <div style={{ marginBottom: '24px', animation: 'fadeIn 0.3s' }}>
+                    <ScaleManager />
+                </div>
+            )}
 
             <Card style={{ padding: '15px' }}>
                 <h4 style={{ fontSize: '14px', marginBottom: '10px' }}>Próximas Folgas</h4>

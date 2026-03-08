@@ -82,9 +82,24 @@ export const MOCK_GESTOR = {
     role: ROLES.GESTOR
 };
 
-export const MOCK_ESCALA_EXAMPLE = [
-    { colaborador_id: '1', data: '2026-03-01', tipo: SCALE_TYPES.FOLGA },
-    { colaborador_id: '1', data: '2026-03-02', tipo: SCALE_TYPES.TRABALHO },
-    { colaborador_id: '2', data: '2026-03-01', tipo: SCALE_TYPES.TRABALHO },
-    { colaborador_id: '2', data: '2026-03-02', tipo: SCALE_TYPES.FOLGA }
+export const DIAS_IMAGEM = [
+    { dia: 16, sem: 'seg' }, { dia: 17, sem: 'ter' }, { dia: 18, sem: 'qua' }, { dia: 19, sem: 'qui' },
+    { dia: 20, sem: 'sex' }, { dia: 21, sem: 'sab' }, { dia: 22, sem: 'dom' }, { dia: 23, sem: 'seg' },
+    { dia: 24, sem: 'ter' }, { dia: 25, sem: 'qua' }, { dia: 26, sem: 'qui' }, { dia: 27, sem: 'sex' },
+    { dia: 28, sem: 'sab' }, { dia: 1, sem: 'dom' }, { dia: 2, sem: 'seg' }, { dia: 3, sem: 'ter' },
+    { dia: 4, sem: 'qua' }, { dia: 5, sem: 'qui' }, { dia: 6, sem: 'sex' }, { dia: 7, sem: 'sab' },
+    { dia: 8, sem: 'dom' }, { dia: 9, sem: 'seg' }, { dia: 10, sem: 'ter' }, { dia: 11, sem: 'qua' },
+    { dia: 12, sem: 'qui' }, { dia: 13, sem: 'sex' }, { dia: 14, sem: 'sab' }, { dia: 15, sem: 'dom' }
 ];
+
+export const IMAGE_GRID = {
+    '1': ['', '', '', '', '', '', 'F', 'D', 'D', 'D', 'D', 'D', 'D', 'F', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],
+    '2': ['', '', '', '', '', '', 'F', '', '', '', '', '', '', 'F', '', '', '', '', '', '', 'D', '', '', '', '', '', '', 'D'],
+    '3': ['', '', '', '', '', '', 'F', '', '', '', '', '', '', 'F', '', '', '', '', '', '', 'D', '', '', '', '', '', '', 'D'],
+    '4': ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', '10:30', 'D', 'D', 'D', 'D', 'D', 'D', '10:30'],
+    '5': ['', '', '', '', '', 'F', '', '', '', '', '', '', 'F', '', '', '', '', '', 'F', '', '', '', '', '', '', 'F', '', ''],
+    '6': ['', '', '', 'F', '', '', '10:30', '', '', '', 'F', '', '', '10:30', '', '', '', 'F', '', '', 'F', '', '', '', 'F', '', '', 'F'],
+    '7': ['', '', 'F', '', '', '', 'F', '', '', 'F', '', '', '', '10:30', '', '', 'F', '', '', '', 'F', '', '', '', '', '', '', 'F'],
+    '8': ['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', '10:30', 'D', 'F', 'D', 'D', 'D', 'D', '10:30'],
+    '9': ['', '', '', '', 'F', '', '10:30', '', '', '', '', 'F', '', '10:30', '', '', '', '', 'F', '', 'F', '', '', '', '', 'F', '', 'F']
+};
