@@ -59,7 +59,7 @@ export const MOCK_COLABORADORES = [
     },
     {
         id: '8',
-        nome: 'CLAUDINEI',
+        nome: 'CLAUDEMIR',
         matricula: '4593634',
         role: ROLES.COLABORADOR,
         funcao: 'OP. LOJA',
