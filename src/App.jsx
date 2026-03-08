@@ -9,8 +9,8 @@ function App() {
   const [view, setView] = useState('login') // 'login', 'colaborador', 'gestor'
   const [user, setUser] = useState(null)
 
-  const handleLogin = (role, nome) => {
-    setUser({ nome, role });
+  const handleLogin = (role, nome, id) => {
+    setUser({ nome, role, id });
     setView(role);
   };
 

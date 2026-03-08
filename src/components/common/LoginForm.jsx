@@ -15,9 +15,9 @@ const LoginForm = ({ onLogin }) => {
         const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matricula);
 
         if (matricula === MOCK_GESTOR.matricula) {
-            onLogin('gestor', MOCK_GESTOR.nome);
+            onLogin('gestor', MOCK_GESTOR.nome, MOCK_GESTOR.id);
         } else if (colaborador) {
-            onLogin('colaborador', colaborador.nome);
+            onLogin('colaborador', colaborador.nome, colaborador.id);
         } else {
             alert('Matrícula não encontrada. Use um dos números da imagem (ex: 5741181).');
         }

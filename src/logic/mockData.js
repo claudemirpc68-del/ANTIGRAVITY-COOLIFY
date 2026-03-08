@@ -1,18 +1,20 @@
 import { ROLES, SCALE_TYPES } from './constants';
 
 export const MOCK_COLABORADORES = [
-    { id: '1', nome: 'AMANDA PORTO', matricula: '5741181', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00' },
-    { id: '2', nome: 'KAIQUE VIEIRA', matricula: '658526', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '06:00' },
-    { id: '3', nome: 'DAYANA ANGELO', matricula: '5477786', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '06:00' },
-    { id: '4', nome: 'LUIZA JESUS', matricula: '604933', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '06:00' },
-    { id: '5', nome: 'LINDINALVA', matricula: '2741768', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:00' },
-    { id: '6', nome: 'DENISE ISSI', matricula: '596254', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:00' },
-    { id: '7', nome: 'PEDRO ANGELO', matricula: '672167', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00' },
-    { id: '8', nome: 'CLAUDINEI', matricula: '4593634', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00' },
+    // 1º TURNO: 07:30 — 14:30
+    { id: '1', nome: 'AMANDA PORTO', matricula: '5741181', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '2', nome: 'KAIQUE VIEIRA', matricula: '658526', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '3', nome: 'DAYANA ANGELO', matricula: '5477786', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '4', nome: 'LUIZA JESUS', matricula: '604933', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '5', nome: 'LINDINALVA', matricula: '2741768', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '6', nome: 'DENISE ISSI', matricula: '596254', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '7', nome: 'PEDRO ANGELO', matricula: '672167', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '8', nome: 'CLAUDINEI', matricula: '4593634', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    // 2º TURNO: 14:30 — 22:50
     { id: '9', nome: 'CLAUDEMIR', matricula: '4593600', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
-    { id: '10', nome: 'FABIO ROBERTO', matricula: '3366847', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00' },
-    { id: '11', nome: 'CLEONICE SANTOS', matricula: '640515', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '06:00' },
-    { id: '12', nome: 'SERGIO RICARDO', matricula: '6413005', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00' },
+    { id: '10', nome: 'FABIO ROBERTO', matricula: '3366847', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '11', nome: 'CLEONICE SANTOS', matricula: '640515', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
+    { id: '12', nome: 'SERGIO RICARDO', matricula: '6413005', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30' },
     { id: '13', nome: 'ALEXSANDER FREIRE', matricula: '4581008', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
     { id: '14', nome: 'FLAVIO REZENDE', matricula: '6513042', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
     { id: '15', nome: 'FABRICIO SOUZA', matricula: '6789358', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
@@ -27,13 +29,14 @@ export const MOCK_COLABORADORES = [
     { id: '24', nome: 'ABRAÃO', matricula: '6948111', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
     { id: '25', nome: 'IVAN CARMO', matricula: '5839653', role: ROLES.COLABORADOR, funcao: 'OP. PLENO', horario: '14:30' },
     { id: '26', nome: 'RENAN', matricula: '6099980', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
-    { id: '27', nome: 'JACK ARAUJO', matricula: '6011799', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '22:00' },
-    { id: '28', nome: 'CLAUDIOR DE MELO', matricula: '6507859', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '22:00' },
-    { id: '29', nome: 'THOMAS', matricula: '0000002', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '22:00' },
-    { id: '30', nome: 'RENATO', matricula: '5925479', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '22:00' },
-    { id: '31', nome: 'DANIEL SILVA', matricula: '6973647', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '22:00' },
-    { id: '32', nome: 'MAURICIO ALMEIDA', matricula: '6580408', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '22:00' },
-    { id: '33', nome: 'GILBERTO', matricula: '5285771', role: ROLES.COLABORADOR, funcao: 'OP. PLENO', horario: '22:00' },
+    // 2º TURNO NOTURNO: 14:30 — 22:50
+    { id: '27', nome: 'JACK ARAUJO', matricula: '6011799', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
+    { id: '28', nome: 'CLAUDIOR DE MELO', matricula: '6507859', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
+    { id: '29', nome: 'THOMAS', matricula: '0000002', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
+    { id: '30', nome: 'RENATO', matricula: '5925479', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
+    { id: '31', nome: 'DANIEL SILVA', matricula: '6973647', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
+    { id: '32', nome: 'MAURICIO ALMEIDA', matricula: '6580408', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30' },
+    { id: '33', nome: 'GILBERTO', matricula: '5285771', role: ROLES.COLABORADOR, funcao: 'OP. PLENO', horario: '14:30' },
 ];
 
 export const MOCK_GESTOR = {

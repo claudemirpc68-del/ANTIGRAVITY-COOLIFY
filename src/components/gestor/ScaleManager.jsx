@@ -48,17 +48,18 @@ const ScaleManager = ({ colaboradorId }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {displayColabs.map((colab, i) => {
-                        const gridRow = IMAGE_GRID[colab.id] || Array(28).fill('');
+                    {displayColabs?.map((colab, i) => {
+                        if (!colab) return null;
+                        const gridRow = IMAGE_GRID[colab.id] || [];
                         return (
-                            <tr key={colab.id} style={{ borderBottom: '1px solid #EEE', background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
+                            <tr key={colab.id || i} style={{ borderBottom: '1px solid #EEE', background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
                                 <td style={{ padding: '12px', fontWeight: '600', borderRight: '1px solid #EEE', sticky: 'left', background: i % 2 === 0 ? 'white' : '#FAFAFA', whiteSpace: 'nowrap' }}>
                                     {colab.nome}
                                 </td>
-                                {DIAS_IMAGEM.map((d, index) => {
+                                {DIAS_IMAGEM?.map((d, index) => {
                                     const val = gridRow[index] || '';
                                     const { bg, color, size } = getCellStyles(val);
-                                    const isDom = d.sem === 'dom';
+                                    const isDom = d?.sem === 'dom';
 
                                     return (
                                         <td key={index} style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #F5F5F5', background: isDom ? 'rgba(255, 69, 0, 0.03)' : 'transparent' }}>

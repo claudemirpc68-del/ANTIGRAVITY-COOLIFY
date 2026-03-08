@@ -7,7 +7,7 @@ import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp } 
 
 // Calcula o índice do dia atual dentro da grade (16/02 a 15/03/2026)
 const getTodayIndex = () => {
-    const hoje = new Date('2026-03-08');
+    const hoje = new Date();
     const inicio = new Date('2026-02-16');
     const diffDias = Math.floor((hoje - inicio) / (1000 * 60 * 60 * 24));
     if (diffDias < 0 || diffDias > 27) return -1;
