@@ -59,11 +59,19 @@ export const MOCK_COLABORADORES = [
     },
     {
         id: '8',
-        nome: 'CLAUDEMIR',
+        nome: 'CLAUDINEI',
         matricula: '4593634',
         role: ROLES.COLABORADOR,
         funcao: 'OP. LOJA',
         horario: '08:00'
+    },
+    {
+        id: '9',
+        nome: 'CLAUDEMIR',
+        matricula: '4593600',
+        role: ROLES.COLABORADOR,
+        funcao: 'OP. LOJA',
+        horario: '14:30'
     }
 ];
 
