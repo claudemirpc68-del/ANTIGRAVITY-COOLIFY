@@ -14,8 +14,15 @@ const Button = ({ children, onClick, variant = 'primary', className = '', ...pro
         <button
             onClick={onClick}
             className={`${className}`}
-            style={{ ...Object.fromEntries(baseStyles.split(';').filter(s => s.trim()).map(s => s.split(':').map(x => x.trim()))), ...Object.fromEntries(variants[variant].split(';').filter(s => s.trim()).map(s => s.split(':').map(x => x.trim()))) }}
-            {...props}
+            style={{
+                ...Object.fromEntries(baseStyles.split(';').filter(s => s.trim()).map(s => s.split(':').map(x => x.trim()))),
+                ...Object.fromEntries(variants[variant].split(';').filter(s => s.trim()).map(s => s.split(':').map(x => x.trim()))),
+                ...(props.style || {})
+            }}
+            {...Object.keys(props).reduce((acc, key) => {
+                if (key !== 'style') acc[key] = props[key];
+                return acc;
+            }, {})}
         >
             {children}
         </button>
