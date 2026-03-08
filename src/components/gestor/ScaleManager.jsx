@@ -4,12 +4,18 @@ import Button from '../common/Button';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID } from '../../logic/mockData';
 import { Download, Printer } from 'lucide-react';
 
-const ScaleManager = () => {
+const ScaleManager = ({ colaboradorId }) => {
+
+    // Se colaboradorId (usuario específico) não vier, ou vier vazio, é o Gestor vendo a tela cheia.
+    const displayColabs = colaboradorId
+        ? MOCK_COLABORADORES.filter(c => c.id === colaboradorId)
+        : MOCK_COLABORADORES;
 
     const getCellStyles = (val) => {
         if (val === 'F') return { bg: 'var(--assai-orange)', color: 'white', size: '10px' };
         if (val === 'D') return { bg: '#2196F3', color: 'white', size: '10px' };
         if (val === '10:30') return { bg: '#1565C0', color: 'white', size: '8px' };
+        if (val === '22:00') return { bg: '#4527A0', color: 'white', size: '8px' };
         return { bg: 'transparent', color: 'var(--text-tertiary)', size: '10px' };
     };
 
@@ -42,7 +48,7 @@ const ScaleManager = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {MOCK_COLABORADORES.map((colab, i) => {
+                    {displayColabs.map((colab, i) => {
                         const gridRow = IMAGE_GRID[colab.id] || Array(28).fill('');
                         return (
                             <tr key={colab.id} style={{ borderBottom: '1px solid #EEE', background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
