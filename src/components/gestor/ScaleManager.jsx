@@ -4,7 +4,7 @@ import Button from '../common/Button';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID } from '../../logic/mockData';
 import { Download, Printer } from 'lucide-react';
 
-const ScaleManager = ({ colaboradorId }) => {
+const ScaleManager = ({ colaboradorId, onExport }) => {
 
     // Se colaboradorId (usuario específico) não vier, ou vier vazio, é o Gestor vendo a tela cheia.
     const displayColabs = colaboradorId
@@ -27,7 +27,7 @@ const ScaleManager = ({ colaboradorId }) => {
                     <Button variant="ghost" size="sm">
                         <Printer size={16} /> Imprimir
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={onExport}>
                         <Download size={16} /> Exportar PDF
                     </Button>
                 </div>

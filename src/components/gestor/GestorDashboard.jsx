@@ -4,7 +4,7 @@ import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
 import Modal from '../common/Modal';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID } from '../../logic/mockData';
-import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, Eye, ExternalLink, History, CheckCircle2, XCircle } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, Eye, ExternalLink, History, CheckCircle2, XCircle, FileText } from 'lucide-react';
 
 const getTodayIndex = () => {
     const hoje = new Date();
@@ -42,9 +42,9 @@ const GestorDashboard = () => {
     ]);
 
     const [historico] = useState([
-        { id: 101, nome: 'PEDRO ANGELO', motivo: 'Atestado', data: '05/03/2026', status: 'aprovado' },
-        { id: 102, nome: 'DENISE ISSI', motivo: 'Troca de Turno', data: '04/03/2026', status: 'rejeitado' },
-        { id: 103, nome: 'LUIZA JESUS', motivo: 'Compensatória', data: '02/03/2026', status: 'aprovado' }
+        { id: 101, nome: 'PEDRO ANGELO', motivo: 'Atestado', data: '05/03/2026', status: 'aprovado', obs: 'Apresentou atestado de 2 dias por gripe.' },
+        { id: 102, nome: 'DENISE ISSI', motivo: 'Troca de Turno', data: '04/03/2026', status: 'rejeitado', obs: 'Solicitou troca mas não havia substituto disponível.' },
+        { id: 103, nome: 'LUIZA JESUS', motivo: 'Compensatória', data: '02/03/2026', status: 'aprovado', obs: 'Banco de horas positivo utilizado para consulta.' }
     ]);
 
     const todayIdx = getTodayIndex();
@@ -65,6 +65,11 @@ const GestorDashboard = () => {
 
     const handleVerAnexo = (arquivo) => {
         alert(`Abrindo visualização do arquivo: ${arquivo}\n(Simulação de abertura de JPEG/PDF)`);
+    };
+
+    const handleExportPDF = () => {
+        const content = historico.map(h => `- ${h.nome}: ${h.motivo} (${h.status}) - Motivo: ${h.obs}`).join('\n');
+        alert(`Gerando Relatório PDF...\n\nIncluindo Escala de Trabalho e Histórico Mensal:\n${content}\n\nO arquivo "Escala_e_Historico_Assai.pdf" será baixado em instantes.`);
     };
 
     return (
@@ -113,21 +118,31 @@ const GestorDashboard = () => {
                         <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>Ações Realizadas em Março/2026</p>
                     </div>
                     {historico.map(h => (
-                        <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderBottom: '1px solid #F0F0F0' }}>
-                            <div>
-                                <p style={{ fontSize: '13px', fontWeight: '700', margin: 0 }}>{h.nome}</p>
-                                <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', margin: 0 }}>{h.motivo} · {h.data}</p>
+                        <div key={h.id} style={{ padding: '12px', borderBottom: '1px solid #F0F0F0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <div>
+                                    <p style={{ fontSize: '13px', fontWeight: '700', margin: 0 }}>{h.nome}</p>
+                                    <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', margin: 0 }}>{h.motivo} · {h.data}</p>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    {h.status === 'aprovado' ? (
+                                        <><CheckCircle2 size={16} color="var(--status-success)" /> <span style={{ fontSize: '11px', color: 'var(--status-success)', fontWeight: '600' }}>Aprovado</span></>
+                                    ) : (
+                                        <><XCircle size={16} color="var(--status-error)" /> <span style={{ fontSize: '11px', color: 'var(--status-error)', fontWeight: '600' }}>Rejeitado</span></>
+                                    )}
+                                </div>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                {h.status === 'aprovado' ? (
-                                    <><CheckCircle2 size={16} color="var(--status-success)" /> <span style={{ fontSize: '11px', color: 'var(--status-success)', fontWeight: '600' }}>Aprovado</span></>
-                                ) : (
-                                    <><XCircle size={16} color="var(--status-error)" /> <span style={{ fontSize: '11px', color: 'var(--status-error)', fontWeight: '600' }}>Rejeitado</span></>
-                                )}
-                            </div>
+                            <p style={{ fontSize: '11px', color: 'var(--text-secondary)', background: '#F5F5F5', padding: '6px', borderRadius: '4px', fontStyle: 'italic' }}>
+                                <strong>Justificativa:</strong> "{h.obs}"
+                            </p>
                         </div>
                     ))}
-                    <Button variant="outline" style={{ marginTop: '10px' }} onClick={() => setShowHistorico(false)}>Fechar Histórico</Button>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                        <Button variant="primary" style={{ flex: 1 }} onClick={handleExportPDF}>
+                            <FileText size={16} style={{ marginRight: '6px' }} /> Exportar este Histórico
+                        </Button>
+                        <Button variant="outline" style={{ flex: 1 }} onClick={() => setShowHistorico(false)}>Fechar</Button>
+                    </div>
                 </div>
             </Modal>
 
@@ -180,7 +195,9 @@ const GestorDashboard = () => {
                     </div>
                 </Card>
 
-                <div style={{ marginBottom: '24px' }}><ScaleManager /></div>
+                <div style={{ marginBottom: '24px' }}>
+                    <ScaleManager onExport={handleExportPDF} />
+                </div>
 
                 <Card>
                     <div onClick={() => setShowEquipe(!showEquipe)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showEquipe ? '16px' : '0', cursor: 'pointer', userSelect: 'none' }}>
