@@ -3,7 +3,7 @@ import Card from '../common/Card';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID, MOCK_GESTOR } from '../../logic/mockData';
-import { Download, Printer, Search, AlertTriangle, CheckCircle, Info, Calendar, MessageSquare, X } from 'lucide-react';
+import { Download, Printer, Search, AlertTriangle, CheckCircle, Info, Calendar, MessageSquare, X, Filter } from 'lucide-react';
 
 // Constantes da loja
 const LOJA_INFO = {
