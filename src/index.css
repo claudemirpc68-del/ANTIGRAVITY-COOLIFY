@@ -133,3 +133,51 @@ select:focus {
     padding: 6px !important;
   }
 }
+
+/* Regras para Impressão */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  /* Ocultar elementos de UI na impressão */
+  button,
+  .no-print,
+  header button,
+  .animate-fade-in>header,
+  [style*="grid-template-columns"],
+  div[style*="gridTemplateColumns"],
+  h4+div[style*="gridTemplateColumns"],
+  div[style*="position: relative"]>button,
+  .lucide {
+    display: none !important;
+  }
+
+  /* Garantir que o card de escala ocupe a largura total */
+  div[style*="overflowX: auto"],
+  .glass-card {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    backdrop-filter: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  table {
+    width: 100% !important;
+    border: 1px solid #000 !important;
+  }
+
+  th,
+  td {
+    border: 1px solid #EEE !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Destaque para Domingo na impressão */
+  th[style*="background: rgb(255, 224, 208)"] {
+    background-color: #FFE0D0 !important;
+  }
+}

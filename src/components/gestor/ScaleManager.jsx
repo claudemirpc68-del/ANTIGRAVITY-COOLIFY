@@ -24,7 +24,7 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
             <div style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #EEE' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: '700' }}>ESCALA DE TRABALHO - 16/02/2026 a 15/03/2026</h3>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => window.print()}>
                         <Printer size={16} /> Imprimir
                     </Button>
                     <Button variant="outline" size="sm" onClick={onExport}>
