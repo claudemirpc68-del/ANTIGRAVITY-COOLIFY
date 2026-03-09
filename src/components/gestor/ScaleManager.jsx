@@ -18,6 +18,8 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [shiftFilter, setShiftFilter] = useState('ALL');
+    const [obsModalColab, setObsModalColab] = useState(null);
+    const [obsText, setObsText] = useState('');
 
     // Selecionar dia para resumo de "Trabalhando" e "Folgas"
     // Padrão: dia 16 (índice 0) ou algo dinâmico. Vamos usar o índice 0 como hoje fixo pro mock.

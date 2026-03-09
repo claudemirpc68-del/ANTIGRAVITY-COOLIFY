@@ -10,17 +10,19 @@ const LoginForm = ({ onLogin }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        const matriculaLimpa = matricula.trim();
+        const senhaLimpa = senha.trim();
 
         // Busca o colaborador pela matrícula nos dados reais
-        const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matricula);
-        const senhaCorreta = matricula.substring(0, 4);
+        const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matriculaLimpa);
+        const senhaCorreta = matriculaLimpa.substring(0, 4);
 
-        if (senha !== senhaCorreta) {
+        if (senhaLimpa !== senhaCorreta) {
             alert('Senha incorreta! Sua senha são os 4 primeiros números da sua matrícula.');
             return;
         }
 
-        if (matricula === MOCK_GESTOR.matricula) {
+        if (matriculaLimpa === MOCK_GESTOR.matricula) {
             onLogin('gestor', MOCK_GESTOR.nome, MOCK_GESTOR.id);
         } else if (colaborador) {
             onLogin('colaborador', colaborador.nome, colaborador.id);
