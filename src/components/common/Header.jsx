@@ -6,7 +6,7 @@ const Header = ({ user, title = "ESCALA DE TRABALHO" }) => {
         <header className="animate-fade-in" style={{ padding: '24px', background: 'white', borderBottom: '1px solid #E0E0E0', marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <img src="/assets/logo-assai.png" alt="Assai Logo" style={{ height: '65px', marginBottom: '4px' }} />
+                    <img src="/assets/logo-assai.png" alt="Assai Logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginBottom: '8px' }} />
                     <span style={{ fontSize: '8px', color: 'var(--text-secondary)', fontWeight: 'bold', marginLeft: '2px' }}>By: Claudemir</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
