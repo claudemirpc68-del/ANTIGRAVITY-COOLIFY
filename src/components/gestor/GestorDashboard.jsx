@@ -4,7 +4,7 @@ import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
 import Modal from '../common/Modal';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID } from '../../logic/mockData';
-import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, Eye, ExternalLink } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, Eye, ExternalLink, History, CheckCircle2, XCircle } from 'lucide-react';
 
 const getTodayIndex = () => {
     const hoje = new Date();
@@ -35,9 +35,16 @@ const getStatusColab = (colab, todayIdx) => {
 const GestorDashboard = () => {
     const [showEquipe, setShowEquipe] = useState(false);
     const [showAprovar, setShowAprovar] = useState(false);
+    const [showHistorico, setShowHistorico] = useState(false);
     const [justificativas, setJustificativas] = useState([
         { id: 1, nome: 'KAUA PEREIRA', motivo: 'Atestado Médico', obs: 'Consulta de rotina no dentista.', status: 'pendente', temAnexo: true, arquivo: 'atestado_0603.jpg' },
         { id: 2, nome: 'AMANDA PORTO', motivo: 'Transporte', obs: 'Ônibus quebrado na Av. Principal.', status: 'pendente', temAnexo: false }
+    ]);
+
+    const [historico] = useState([
+        { id: 101, nome: 'PEDRO ANGELO', motivo: 'Atestado', data: '05/03/2026', status: 'aprovado' },
+        { id: 102, nome: 'DENISE ISSI', motivo: 'Troca de Turno', data: '04/03/2026', status: 'rejeitado' },
+        { id: 103, nome: 'LUIZA JESUS', motivo: 'Compensatória', data: '02/03/2026', status: 'aprovado' }
     ]);
 
     const todayIdx = getTodayIndex();
@@ -62,7 +69,7 @@ const GestorDashboard = () => {
 
     return (
         <>
-            {/* Modal movido para fora do wrapper de animação para garantir posição fixa correta */}
+            {/* Modal de Aprovação */}
             <Modal isOpen={showAprovar} onClose={() => setShowAprovar(false)} title="Justificativas Pendentes">
                 {justificativas.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -97,6 +104,31 @@ const GestorDashboard = () => {
                         ))}
                     </div>
                 )}
+            </Modal>
+
+            {/* Modal de Histórico */}
+            <Modal isOpen={showHistorico} onClose={() => setShowHistorico(false)} title="Histórico Mensal">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ padding: '10px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #eee', marginBottom: '5px' }}>
+                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>Ações Realizadas em Março/2026</p>
+                    </div>
+                    {historico.map(h => (
+                        <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderBottom: '1px solid #F0F0F0' }}>
+                            <div>
+                                <p style={{ fontSize: '13px', fontWeight: '700', margin: 0 }}>{h.nome}</p>
+                                <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', margin: 0 }}>{h.motivo} · {h.data}</p>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                {h.status === 'aprovado' ? (
+                                    <><CheckCircle2 size={16} color="var(--status-success)" /> <span style={{ fontSize: '11px', color: 'var(--status-success)', fontWeight: '600' }}>Aprovado</span></>
+                                ) : (
+                                    <><XCircle size={16} color="var(--status-error)" /> <span style={{ fontSize: '11px', color: 'var(--status-error)', fontWeight: '600' }}>Rejeitado</span></>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    <Button variant="outline" style={{ marginTop: '10px' }} onClick={() => setShowHistorico(false)}>Fechar Histórico</Button>
+                </div>
             </Modal>
 
             <div className="animate-fade-in" style={{ paddingBottom: '40px' }}>
@@ -144,7 +176,7 @@ const GestorDashboard = () => {
                                 </span>
                             )}
                         </div>
-                        <Button variant="outline" style={{ width: '100%' }}>Histórico Mensal</Button>
+                        <Button variant="outline" style={{ width: '100%' }} onClick={() => setShowHistorico(true)}>Histórico Mensal</Button>
                     </div>
                 </Card>
 
