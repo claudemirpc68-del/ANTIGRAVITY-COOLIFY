@@ -59,6 +59,7 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
     const [showJustificativa, setShowJustificativa] = useState(false);
     const [showTroca, setShowTroca] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [file, setFile] = useState(null);
 
     const todayIdx = getTodayIndex();
     const colabData = MOCK_COLABORADORES.find(c => c.id === user.id) || {};
@@ -71,9 +72,14 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
     const handleSubmitJustificativa = (e) => {
         e.preventDefault();
         setLoading(true);
+        // Simula o processamento do arquivo
+        const fileName = file ? file.name : 'Nenhum arquivo';
+        console.log('Arquivo anexado:', fileName);
+
         setTimeout(() => {
-            alert('Justificativa enviada com sucesso para análise do gestor!');
+            alert(`Justificativa enviada com sucesso! ${file ? '(Anexo incluído)' : ''}`);
             setShowJustificativa(false);
+            setFile(null); // Limpa o arquivo após envio
             setLoading(false);
         }, 1200);
     };
@@ -169,8 +175,26 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
                         <option value="pessoal">Problema Pessoal / Familiar</option>
                         <option value="outros">Outros</option>
                     </select>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>Observações:</label>
-                    <textarea required placeholder="Descreva brevemente o ocorrido..." style={{ width: '100%', height: '80px', marginBottom: '20px', padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>Anexar Atestado/Documento (Opcional):</label>
+                        <div style={{ position: 'relative', border: '2px dashed #ddd', borderRadius: '12px', padding: '16px', textAlign: 'center', background: '#fcfcfc' }}>
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) => setFile(e.target.files[0])}
+                                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+                            />
+                            <div style={{ color: 'var(--text-secondary)' }}>
+                                {file ? (
+                                    <div style={{ color: 'var(--assai-orange)', fontWeight: '600' }}>
+                                        📄 {file.name}
+                                    </div>
+                                ) : (
+                                    <span style={{ fontSize: '12px' }}>Clique ou arraste um arquivo (JPEG/PDF)</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                     <Button type="submit" variant="primary" style={{ width: '100%' }} disabled={loading}>{loading ? 'Enviando...' : 'Enviar para Gestor'}</Button>
                 </form>
             </Modal>
