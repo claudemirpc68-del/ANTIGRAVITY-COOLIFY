@@ -2,15 +2,16 @@ import React, { useState, useMemo } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID, MOCK_GESTOR } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
+import { generateScale } from '../../logic/scaleEngine';
 import { Download, Printer, Search, AlertTriangle, CheckCircle, Info, Calendar, MessageSquare, X, Filter } from 'lucide-react';
 
 // Constantes da loja
 const LOJA_INFO = {
     setor: 'MERCEARIA',
-    loja: 'AMERICANA',
-    cr: '741',
-    unidade: '109',
+    loja: 'SUZANO',
+    cr: '5356',
+    unidade: '068',
     gestor: MOCK_GESTOR?.nome || 'CLAUDEMIR'
 };
 
@@ -21,8 +22,20 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
     const [obsModalColab, setObsModalColab] = useState(null);
     const [obsText, setObsText] = useState('');
 
+    // Gerar escala dinâmica (Março de 2026)
+    const dynamicScale = useMemo(() => generateScale(MOCK_COLABORADORES, 2026, 3), []);
+
+    // Transformar em grid para compatibilidade
+    const dynamicGrid = useMemo(() => {
+        const grid = {};
+        dynamicScale.forEach(entry => {
+            if (!grid[entry.colaborador_id]) grid[entry.colaborador_id] = [];
+            grid[entry.colaborador_id].push(entry.tipo);
+        });
+        return grid;
+    }, [dynamicScale]);
+
     // Selecionar dia para resumo de "Trabalhando" e "Folgas"
-    // Padrão: dia 16 (índice 0) ou algo dinâmico. Vamos usar o índice 0 como hoje fixo pro mock.
     const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
     // Filter Colleagues
@@ -41,40 +54,37 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
 
         if (statusFilter !== 'ALL') {
             list = list.filter(c => {
-                const gridRow = IMAGE_GRID[c.id] || [];
+                const gridRow = dynamicGrid[c.id] || [];
                 const stateToday = gridRow[selectedDayIndex] || '';
 
                 if (statusFilter === 'TRABALHAM') {
-                    return stateToday === '' || stateToday.includes(':');
+                    return stateToday === 'T';
                 }
                 if (statusFilter === 'FOLGAM') {
                     return stateToday === 'F' || stateToday === 'D';
-                }
-                if (statusFilter === 'AUSENTES') {
-                    return stateToday === 'A' || stateToday === 'J';
                 }
                 return true;
             });
         }
 
         return list;
-    }, [colaboradorId, searchTerm, shiftFilter, statusFilter, selectedDayIndex]);
+    }, [colaboradorId, searchTerm, shiftFilter, statusFilter, selectedDayIndex, dynamicGrid]);
 
     // Calcular Totais do Dia
     const totaisDia = useMemo(() => {
         let trab = 0;
         let folg = 0;
         MOCK_COLABORADORES.forEach(c => {
-            const val = (IMAGE_GRID[c.id] || [])[selectedDayIndex] || '';
+            const val = (dynamicGrid[c.id] || [])[selectedDayIndex] || '';
             if (val === 'F' || val === 'D') folg++;
             else trab++;
         });
         return { trabalhando: trab, folgando: folg };
-    }, [selectedDayIndex]);
+    }, [selectedDayIndex, dynamicGrid]);
 
     // Função para verificar alertas por colaborador (ex: > 6 dias seguidos sem folga na grade)
     const checkAlerts = (colabId) => {
-        const row = IMAGE_GRID[colabId] || [];
+        const row = dynamicGrid[colabId] || [];
         let seq = 0;
         let hasAlert = false;
 
@@ -187,8 +197,11 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
                 </Card>
             </div>
 
-            {/* Tabela de Escala */}
-            <Card style={{ padding: '0', overflowX: 'auto', border: '1px solid #E0E0E0', position: 'relative' }}>
+            {/* Tabela de Escala com dica de Scroll no Celular */}
+            <Card style={{ padding: '0', overflowX: 'auto', border: '1px solid #E0E0E0', position: 'relative', WebkitOverflowScrolling: 'touch' }}>
+                <div style={{ padding: '8px', background: '#FFF8E1', color: '#F57F17', fontSize: '11px', textAlign: 'center', borderBottom: '1px solid #FFE082', display: window.innerWidth <= 768 ? 'block' : 'none' }}>
+                    ⟷ Deslize para o lado para ver todos os dias da escala
+                </div>
                 <div style={{ minWidth: '800px' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                         <thead>
@@ -196,7 +209,7 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
                                 <th style={{
                                     padding: '12px', textAlign: 'left', borderBottom: '2px solid #EEE',
                                     background: '#F8F9FA', position: 'sticky', left: 0, zIndex: 10,
-                                    borderRight: '2px solid #E0E0E0', width: '250px'
+                                    borderRight: '2px solid #E0E0E0', minWidth: '180px', maxWidth: '250px'
                                 }}>
                                     COLABORADOR (NOME / MATRÍCULA / TURNO)
                                 </th>
@@ -234,100 +247,89 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
                                         Nenhum colaborador encontrado com os filtros atuais.
                                     </td>
                                 </tr>
-                            ) : filteredColabs?.map((colab, i) => {
-                                if (!colab) return null;
-                                const gridRow = IMAGE_GRID[colab.id] || [];
-                                const hasAlert = checkAlerts(colab.id);
+                            ) : (() => {
+                                // Separar por turno para renderização agrupada
+                                const turno1 = filteredColabs.filter(c => c.horario === '07:30');
+                                const turno2 = filteredColabs.filter(c => c.horario === '14:30');
 
-                                return (
-                                    <tr key={colab.id || i} style={{ borderBottom: '1px solid #EEE', background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
-                                        <td style={{
-                                            padding: '8px 12px', borderRight: '2px solid #E0E0E0',
-                                            background: i % 2 === 0 ? 'white' : '#FAFAFA',
-                                            position: 'sticky', left: 0, zIndex: 5, whiteSpace: 'nowrap'
-                                        }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div>
-                                                    <div style={{ fontWeight: '700', color: '#333' }}>{colab.nome}</div>
-                                                    <div style={{ fontSize: '10px', color: '#777', marginTop: '2px' }}>
-                                                        {colab.matricula} • {colab.horario}
+                                const renderRow = (colab, i, total) => {
+                                    if (!colab) return null;
+                                    const gridRow = dynamicGrid[colab.id] || [];
+                                    const hasAlert = checkAlerts(colab.id);
+                                    return (
+                                        <tr key={colab.id || i} style={{ borderBottom: '1px solid #EEE', background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
+                                            <td style={{ padding: '8px 12px', borderRight: '2px solid #E0E0E0', background: i % 2 === 0 ? 'white' : '#FAFAFA', position: 'sticky', left: 0, zIndex: 5, whiteSpace: 'nowrap' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: '700', color: '#333' }}>{colab.nome}</div>
+                                                        <div style={{ fontSize: '10px', color: '#777', marginTop: '2px' }}>
+                                                            {colab.matricula} • {colab.horario}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                {hasAlert && (
-                                                    <div title="Alerta: Mais de 6 dias consecutivos sem folga detectados!" style={{ color: '#E53935' }}>
-                                                        <AlertTriangle size={16} />
-                                                    </div>
-                                                )}
-                                                <div
-                                                    title="Adicionar Observação / Justificativa"
-                                                    style={{ color: '#0060B1', cursor: 'pointer', marginLeft: '5px' }}
-                                                    onClick={() => { setObsModalColab(colab); setObsText(colab.observacao || ''); }}
-                                                >
-                                                    <MessageSquare size={16} />
-                                                </div>
-                                            </div>
-                                        </td>
-                                        {DIAS_IMAGEM?.map((d, index) => {
-                                            const val = gridRow[index] || '';
-                                            let displayVal = val;
-
-                                            // Se for trabalhar em horário padrão e o valor for vazio ou não preenchido com turno
-                                            if (!val && d.sem !== 'dom') {
-                                                // mock logic assumir q trabalharia no turno padrao se nao tem F nem D
-                                                displayVal = colab.horario;
-                                            } else if (!val && d.sem === 'dom') {
-                                                // domingos vazios no mock = trabalho (pra constar na contagem se nao tiver F/D)
-                                                displayVal = colab.horario;
-                                            }
-
-                                            const { bg, color, size, label, border } = getCellStyles(displayVal);
-                                            const isDom = d?.sem === 'dom';
-                                            const isSelected = selectedDayIndex === index;
-
-                                            // Formatar horario real se for turno
-                                            let cellText = label;
-                                            if (label && label.includes(':')) {
-                                                // Ex transformar "10:30" em "10:30-22:50" (simplificado pra caber, talvez so 10:30)
-                                                // Adicionando um subtexto no tooltip
-                                            } else if (label === '-') {
-                                                cellText = ''; // empty
-                                            }
-
-                                            return (
-                                                <td key={index}
-                                                    style={{
-                                                        padding: '4px',
-                                                        textAlign: 'center',
-                                                        borderRight: '1px solid #F5F5F5',
-                                                        background: isSelected ? 'rgba(33, 150, 243, 0.05)' : (isDom ? 'rgba(255, 69, 0, 0.03)' : 'transparent'),
-                                                    }}
-                                                    title={label.includes(':') ? `Turno: ${label} - ${label === '14:30' ? '22:50' : '15:50'}` : ''}
-                                                >
-                                                    {cellText && (
-                                                        <div style={{
-                                                            width: '100%',
-                                                            minHeight: '26px',
-                                                            margin: '0 auto',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            borderRadius: '4px',
-                                                            background: bg,
-                                                            color: color,
-                                                            border: border || 'none',
-                                                            fontWeight: '700',
-                                                            fontSize: size,
-                                                            boxShadow: (val === 'F' || val === 'D') ? '0 1px 2px rgba(0,0,0,0.1)' : 'none'
-                                                        }}>
-                                                            {cellText}
+                                                    {hasAlert && (
+                                                        <div title="Alerta: Mais de 6 dias consecutivos sem folga detectados!" style={{ color: '#E53935' }}>
+                                                            <AlertTriangle size={16} />
                                                         </div>
                                                     )}
-                                                </td>
-                                            )
-                                        })}
+                                                    <div
+                                                        title="Adicionar Observação / Justificativa"
+                                                        style={{ color: '#0060B1', cursor: 'pointer', marginLeft: '5px' }}
+                                                        onClick={() => { setObsModalColab(colab); setObsText(colab.observacao || ''); }}
+                                                    >
+                                                        <MessageSquare size={16} />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            {DIAS_IMAGEM?.map((d, index) => {
+                                                const val = gridRow[index] || '';
+                                                let displayVal = val === 'T' ? colab.horario : val;
+                                                const { bg, color, size, label, border } = getCellStyles(displayVal);
+                                                const isDom = d?.sem === 'dom';
+                                                const isSelected = selectedDayIndex === index;
+                                                let cellText = label;
+                                                if (label === '-') cellText = '';
+                                                return (
+                                                    <td key={index}
+                                                        style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #F5F5F5', background: isSelected ? 'rgba(33,150,243,0.05)' : (isDom ? 'rgba(255,69,0,0.03)' : 'transparent') }}
+                                                        title={colab.horario === '14:30' ? 'Turno: 14:30 — 22:50' : 'Turno: 07:30 — 14:30'}
+                                                    >
+                                                        {cellText && (
+                                                            <div style={{ width: '100%', minHeight: '26px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', background: bg, color: color, border: border || 'none', fontWeight: '700', fontSize: size, boxShadow: (val === 'F' || val === 'D') ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
+                                                                {cellText}
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                );
+                                            })}
+                                        </tr>
+                                    );
+                                };
+
+                                const renderTurnoHeader = (label, cor, bgCor) => (
+                                    <tr key={label}>
+                                        <td colSpan={DIAS_IMAGEM.length + 1} style={{ background: bgCor, borderLeft: `4px solid ${cor}`, padding: '6px 12px', fontWeight: '800', fontSize: '11px', color: cor, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            {label}
+                                        </td>
                                     </tr>
-                                )
-                            })}
+                                );
+
+                                return (
+                                    <>
+                                        {turno1.length > 0 && (
+                                            <>
+                                                {renderTurnoHeader('1º Turno — 07:30 às 14:30', '#2E7D32', '#E8F5E9')}
+                                                {turno1.map((colab, i) => renderRow(colab, i, turno1.length))}
+                                            </>
+                                        )}
+                                        {turno2.length > 0 && (
+                                            <>
+                                                {renderTurnoHeader('2º Turno — 14:30 às 22:50', '#6A1B9A', '#F3E5F5')}
+                                                {turno2.map((colab, i) => renderRow(colab, i, turno2.length))}
+                                            </>
+                                        )}
+                                    </>
+                                );
+                            })()}
                         </tbody>
                     </table>
                 </div>

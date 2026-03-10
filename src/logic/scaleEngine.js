@@ -6,59 +6,72 @@
  * 3. Garantir 1 folga semanal (dentro de 7 dias).
  */
 
-import { SCALE_TYPES } from './constants';
+import { SCALE_TYPES } from './constants.js';
 
 export const generateScale = (colaboradores, ano, mes) => {
     const escala = [];
     const diasNoMes = new Date(ano, mes, 0).getDate();
-    const startDate = new Date(ano, mes - 1, 1);
 
-    // Controle de domingos trabalhados por colaborador no mês
-    const domingosTrabalhados = {};
-    colaboradores.forEach(c => domingosTrabalhados[c.id] = 0);
+    // Identificar domingos do mês
+    const domingos = [];
+    for (let d = 1; d <= diasNoMes; d++) {
+        const date = new Date(ano, mes - 1, d);
+        if (date.getDay() === 0) domingos.push(d);
+    }
 
-    // Controle de dias seguidos trabalhados por colaborador
-    const diasSeguidos = {};
-    colaboradores.forEach(c => diasSeguidos[c.id] = 0);
+    colaboradores.forEach(colab => {
+        const folgaFixa = colab.folgaFixa; // 0=Dom, 1=Seg...
 
-    for (let dia = 1; dia <= diasNoMes; dia++) {
-        const dataAtual = new Date(ano, mes - 1, dia);
-        const isDomingo = dataAtual.getDay() === 0;
+        // Determinar quais domingos este colaborador folga.
+        // Regra: 2 domingos por mês. Vamos alternar baseado no ID ou algo fixo para consistência.
+        // Para simplificar: Colabs folgam o 1º e 3º OU 2º e 4º domingos.
+        const domingosFolga = (parseInt(colab.id) % 2 === 0)
+            ? [domingos[0], domingos[2]].filter(Boolean)
+            : [domingos[1], domingos[3]].filter(Boolean);
 
-        colaboradores.forEach((colab, index) => {
+        let diasDesdeFolga = 0;
+
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+            const dataAtual = new Date(ano, mes - 1, dia);
+            const diaSemana = dataAtual.getDay();
+            const dataStr = dataAtual.toISOString().split('T')[0];
+
             let tipo = SCALE_TYPES.TRABALHO;
 
-            // Regra 1: Folga obrigatória após 6 dias seguidos
-            if (diasSeguidos[colab.id] >= 6) {
+            // REGRA 1: É o domingo de folga dele?
+            if (domingosFolga.includes(dia)) {
                 tipo = SCALE_TYPES.FOLGA;
             }
-
-            // Regra 2: Balanceamento de Domingos
-            // Se for domingo e o colaborador já trabalhou 2 domingos, ele DEVE folgar.
-            if (isDomingo && domingosTrabalhados[colab.id] >= 2) {
+            // REGRA 2: Escala 6x1 - Se ele está há 6 dias sem folgar, HOJE deve ser folga
+            else if (diasDesdeFolga >= 6) {
                 tipo = SCALE_TYPES.FOLGA;
             }
+            // REGRA 3: É a folga fixa semanal?
+            // Só folga na fixa se não houver um domingo de folga nesta semana 
+            // OU se a folga fixa for necessária para não estourar os 6 dias.
+            else if (diaSemana === folgaFixa) {
+                const currentSunday = new Date(dataAtual);
+                currentSunday.setDate(dataAtual.getDate() + (7 - (dataAtual.getDay() || 7)));
+                const domDia = currentSunday.getDate();
 
-            // Tentar equilibrar as folgas para não folgar todo mundo no mesmo dia
-            // (Simplified: Se não for domingo e não for obrigatório folgar por 6x1, trabalha)
-
-            // Ajuste de contador
-            if (tipo === SCALE_TYPES.FOLGA) {
-                diasSeguidos[colab.id] = 0;
-            } else {
-                diasSeguidos[colab.id]++;
-                if (isDomingo) {
-                    domingosTrabalhados[colab.id]++;
+                if (!domingosFolga.includes(domDia)) {
+                    tipo = SCALE_TYPES.FOLGA;
                 }
+            }
+
+            if (tipo === SCALE_TYPES.FOLGA) {
+                diasDesdeFolga = 0;
+            } else {
+                diasDesdeFolga++;
             }
 
             escala.push({
                 colaborador_id: colab.id,
-                data: dataAtual.toISOString().split('T')[0],
+                data: dataStr,
                 tipo: tipo
             });
-        });
-    }
+        }
+    });
 
     return escala;
 };

@@ -4,7 +4,8 @@ import Button from '../common/Button';
 import { Clock, Calendar, ArrowLeftRight, MessageSquare, Sun, Moon, Coffee } from 'lucide-react';
 import ScaleManager from '../gestor/ScaleManager';
 import Modal from '../common/Modal';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, IMAGE_GRID } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
+import { generateScale } from '../../logic/scaleEngine';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -15,31 +16,32 @@ const getShiftDisplay = (horario) => {
 
 const getTodayIndex = () => {
     const hoje = new Date();
-    const inicio = new Date('2026-02-16');
+    // Ajustado para o mês de Março de 2026 usado na escala dinâmica
+    const inicio = new Date('2026-03-01');
     const diffDias = Math.floor((hoje - inicio) / (1000 * 60 * 60 * 24));
-    if (diffDias < 0 || diffDias > 27) return -1;
+    if (diffDias < 0 || diffDias > 30) return 0; // Fallback para o primeiro dia se fora do range
     return diffDias;
 };
 
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-const getStatusHoje = (colabId, todayIdx) => {
-    if (todayIdx < 0) return { label: 'Fora do Período', color: '#888', bg: '#F5F5F5', icon: null };
-    const grade = IMAGE_GRID[colabId] || [];
+const getStatusHoje = (colabId, todayIdx, dynamicGrid) => {
+    const grade = dynamicGrid[colabId] || [];
     const val = grade[todayIdx] || '';
     if (val === 'F') return { label: 'Folga', color: '#E65100', bg: 'rgba(255,102,0,0.12)', icon: '🌴' };
     if (val === 'D') return { label: 'Descanso (D)', color: '#1565C0', bg: 'rgba(33,150,243,0.12)', icon: '😴' };
     return { label: 'Em Serviço', color: '#2E7D32', bg: 'rgba(46,125,50,0.10)', icon: '✅' };
 };
 
-const getProximasFolgas = (colabId, todayIdx) => {
-    if (todayIdx < 0) return [];
-    const grade = IMAGE_GRID[colabId] || [];
+const getProximasFolgas = (colabId, todayIdx, dynamicGrid) => {
+    const grade = dynamicGrid[colabId] || [];
     const folgas = [];
-    for (let i = todayIdx + 1; i < DIAS_IMAGEM.length; i++) {
-        if (grade[i] === 'F') {
-            const dataBase = new Date('2026-02-16');
+    const startDate = new Date('2026-03-01');
+
+    for (let i = todayIdx + 1; i < grade.length; i++) {
+        if (grade[i] === 'F' || grade[i] === 'D') {
+            const dataBase = new Date(startDate);
             dataBase.setDate(dataBase.getDate() + i);
             folgas.push({
                 diaNum: dataBase.getDate(),
@@ -61,12 +63,24 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState(null);
 
+    // Gerar escala dinâmica (Março de 2026)
+    const dynamicScale = React.useMemo(() => generateScale(MOCK_COLABORADORES, 2026, 3), []);
+
+    const dynamicGrid = React.useMemo(() => {
+        const grid = {};
+        dynamicScale.forEach(entry => {
+            if (!grid[entry.colaborador_id]) grid[entry.colaborador_id] = [];
+            grid[entry.colaborador_id].push(entry.tipo);
+        });
+        return grid;
+    }, [dynamicScale]);
+
     const todayIdx = getTodayIndex();
     const colabData = MOCK_COLABORADORES.find(c => c.id === user.id) || {};
     const { horario = '07:30', funcao = 'OP. LOJA' } = colabData;
     const turno = getShiftDisplay(horario);
-    const statusHoje = getStatusHoje(user.id, todayIdx);
-    const proximasFolgas = getProximasFolgas(user.id, todayIdx);
+    const statusHoje = getStatusHoje(user.id, todayIdx, dynamicGrid);
+    const proximasFolgas = getProximasFolgas(user.id, todayIdx, dynamicGrid);
     const isFolgaHoje = statusHoje.label === 'Folga' || statusHoje.label === 'Descanso (D)';
 
     const handleSubmitJustificativa = (e) => {

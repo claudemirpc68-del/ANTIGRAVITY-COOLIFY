@@ -15,10 +15,10 @@ const LoginForm = ({ onLogin }) => {
 
         // Busca o colaborador pela matrícula nos dados reais
         const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matriculaLimpa);
-        const senhaCorreta = matriculaLimpa.substring(0, 4);
+        const senhaCorreta = '1010';
 
         if (senhaLimpa !== senhaCorreta) {
-            alert('Senha incorreta! Sua senha são os 4 primeiros números da sua matrícula.');
+            alert('Senha incorreta! Use a senha padrão definida.');
             return;
         }
 
@@ -55,7 +55,7 @@ const LoginForm = ({ onLogin }) => {
                     <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
                     <input
                         type="password"
-                        placeholder="Senha (4 primeiros nº do registro)"
+                        placeholder="Senha (1010)"
                         required
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
