@@ -51,7 +51,7 @@ function App() {
         </div>
       ) : (
         <>
-          <Header user={user} title={view === 'gestor' ? "PAINEL ADMINISTRATIVO" : "MINHA ESCALA"} />
+          <Header user={user} title={view === 'gestor' ? "PAINEL ADMINISTRATIVO" : "MINHA ESCALA"} onLogout={handleLogout} />
           <main style={{ padding: '0 20px' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
               {view === 'colaborador' && <ColaboradorDashboard user={user} />}
