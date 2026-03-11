@@ -29,37 +29,30 @@ export const generateScale = (colaboradores, ano, mes) => {
             ? [domingos[0], domingos[2]].filter(Boolean)
             : [domingos[1], domingos[3]].filter(Boolean);
 
-        let diasDesdeFolga = 0;
+        // Inicializando diasDesdeFolga para que a primeira folga caia no dia folgaFixa
+        // Em Março 2026, dia 1 é Domingo (0).
+        let primeiroDiaSem = new Date(ano, mes - 1, 1).getDay();
+        let offsetFolga = (folgaFixa - primeiroDiaSem + 7) % 7;
+        let diasDesdeFolga = 6 - offsetFolga;
 
         for (let dia = 1; dia <= diasNoMes; dia++) {
             const dataAtual = new Date(ano, mes - 1, dia);
-            const diaSemana = dataAtual.getDay();
             const dataStr = dataAtual.toISOString().split('T')[0];
 
             let tipo = SCALE_TYPES.TRABALHO;
 
-            // REGRA 1: É o domingo de folga dele?
+            // REGRA 1: Domingos garantidos
             if (domingosFolga.includes(dia)) {
                 tipo = SCALE_TYPES.FOLGA;
             }
-            // REGRA 2: Escala 6x1 - Se ele está há 6 dias sem folgar, HOJE deve ser folga
+            // REGRA 2: Escala 6x1 estrita - Após 6 dias de trabalho, é FOLGA OBRIGATÓRIA
             else if (diasDesdeFolga >= 6) {
                 tipo = SCALE_TYPES.FOLGA;
             }
-            // REGRA 3: É a folga fixa semanal?
-            // Só folga na fixa se não houver um domingo de folga nesta semana 
-            // OU se a folga fixa for necessária para não estourar os 6 dias.
-            else if (diaSemana === folgaFixa) {
-                const currentSunday = new Date(dataAtual);
-                currentSunday.setDate(dataAtual.getDate() + (7 - (dataAtual.getDay() || 7)));
-                const domDia = currentSunday.getDate();
 
-                if (!domingosFolga.includes(domDia)) {
-                    tipo = SCALE_TYPES.FOLGA;
-                }
-            }
-
+            // Atualiza contador
             if (tipo === SCALE_TYPES.FOLGA) {
+                // Zera o contador após usufruir da folga
                 diasDesdeFolga = 0;
             } else {
                 diasDesdeFolga++;
