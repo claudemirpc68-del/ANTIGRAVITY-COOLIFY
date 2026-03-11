@@ -38,7 +38,7 @@ const LoginForm = ({ onLogin }) => {
         const senhaCorreta = userFound.matricula.substring(0, 4);
 
         if (senhaLimpa !== senhaCorreta) {
-            alert('Senha incorreta! Lembre-se: sua senha são os 4 primeiros dígitos do seu registro.');
+            alert('Senha incorreta! Verifique os dados e tente novamente.');
             return;
         }
 
@@ -87,7 +87,7 @@ const LoginForm = ({ onLogin }) => {
                             placeholder="Matrícula"
                             required
                             readOnly={!!selectedUser}
-                            value={matricula}
+                            value={selectedUser ? '••••••' : matricula}
                             onChange={(e) => setMatricula(e.target.value)}
                             style={{ width: '100%', paddingLeft: '40px', background: selectedUser ? '#f5f5f5' : 'white' }}
                         />
@@ -98,7 +98,7 @@ const LoginForm = ({ onLogin }) => {
                     <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
                     <input
                         type="password"
-                        placeholder="Senha (4 primeiros dígitos da matrícula)"
+                        placeholder="Senha de 4 dígitos"
                         required
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
