@@ -6,6 +6,8 @@ import { MOCK_COLABORADORES, MOCK_GESTOR } from '../../logic/mockData';
 
 const LoginForm = ({ onLogin }) => {
     const [selectedUser, setSelectedUser] = useState('');
+    const [matricula, setMatricula] = useState('');
+    const [senha, setSenha] = useState('');
 
     const handleUserChange = (e) => {
         const val = e.target.value;
