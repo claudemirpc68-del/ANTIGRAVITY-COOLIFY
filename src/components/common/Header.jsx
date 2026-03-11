@@ -19,9 +19,9 @@ const Header = ({ user, title = "ESCALA DE TRABALHO", onLogout }) => {
                 </button>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <img src="/assets/logo-assai.png" alt="Assai Logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginBottom: '8px' }} />
-                    <span style={{ fontSize: '8px', color: 'var(--text-secondary)', fontWeight: 'bold', marginLeft: '2px' }}>By: Claudemir</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <img src="/assets/logo-assai.png" alt="Assai Logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginBottom: '4px' }} />
+                    <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 'bold' }}>By: Claudemir</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--assai-orange)', margin: 0 }}>{title}</h2>
