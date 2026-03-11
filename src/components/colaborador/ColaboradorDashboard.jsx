@@ -56,7 +56,7 @@ const getProximasFolgas = (colabId, todayIdx, dynamicGrid) => {
 // ─── Componente ────────────────────────────────────────────────────────────
 
 const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
-    const [showScale, setShowScale] = useState(false);
+    const [showScale, setShowScale] = useState(true);
     const [showJustificativa, setShowJustificativa] = useState(false);
     const [showTroca, setShowTroca] = useState(false);
     const [loading, setLoading] = useState(false);
