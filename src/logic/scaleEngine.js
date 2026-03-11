@@ -37,22 +37,25 @@ export const generateScale = (colaboradores, ano, mes) => {
 
         for (let dia = 1; dia <= diasNoMes; dia++) {
             const dataAtual = new Date(ano, mes - 1, dia);
-            const dataStr = dataAtual.toISOString().split('T')[0];
+            const diaSemana = dataAtual.getDay();
 
             let tipo = SCALE_TYPES.TRABALHO;
 
-            // REGRA 1: Domingos garantidos
+            // REGRA 1: Domingo de Folga (Escala alternada 2 domingos/mês)
             if (domingosFolga.includes(dia)) {
                 tipo = SCALE_TYPES.FOLGA;
             }
-            // REGRA 2: Escala 6x1 estrita - Após 6 dias de trabalho, é FOLGA OBRIGATÓRIA
+            // REGRA 2: Folga Fixa Semanal
+            else if (diaSemana === folgaFixa) {
+                tipo = SCALE_TYPES.FOLGA;
+            }
+            // REGRA 3: Segurança 6x1 (Não permitir mais de 6 dias seguidos de trabalho)
             else if (diasDesdeFolga >= 6) {
                 tipo = SCALE_TYPES.FOLGA;
             }
 
             // Atualiza contador
             if (tipo === SCALE_TYPES.FOLGA) {
-                // Zera o contador após usufruir da folga
                 diasDesdeFolga = 0;
             } else {
                 diasDesdeFolga++;
@@ -60,7 +63,7 @@ export const generateScale = (colaboradores, ano, mes) => {
 
             escala.push({
                 colaborador_id: colab.id,
-                data: dataStr,
+                data: dataAtual.toISOString().split('T')[0],
                 tipo: tipo
             });
         }

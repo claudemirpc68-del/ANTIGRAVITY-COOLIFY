@@ -64,6 +64,8 @@ const GestorDashboard = () => {
     const [editSituacaoColab, setEditSituacaoColab] = useState(null);
     const [listModal, setListModal] = useState(null); // { title: '', list: [], color: '' }
 
+    // Dia selecionado para o resumo (inicializa com o dia de hoje)
+    const [selectedDayIdx, setSelectedDayIdx] = useState(() => getTodayIndex());
     const [justificativas, setJustificativas] = useState([
         { id: 1, nome: 'KAUA PEREIRA', motivo: 'Atestado Médico', obs: 'Consulta de rotina no dentista.', status: 'pendente', temAnexo: true, arquivo: 'atestado_0603.jpg' },
         { id: 2, nome: 'AMANDA PORTO', motivo: 'Transporte', obs: 'Ônibus quebrado na Av. Principal.', status: 'pendente', temAnexo: false }
@@ -101,12 +103,12 @@ const GestorDashboard = () => {
             if (esp === 'FERIAS') { data.ferias.push(c); return; }
             if (esp === 'AFASTADO') { data.afastado.push(c); return; }
             const grade = dynamicGrid[c.id] || [];
-            const val = grade[todayIdx] || '';
+            const val = grade[selectedDayIdx] || '';
             if (val === 'F' || val === 'D') data.folga.push(c);
             else data.trabalhando.push(c);
         });
         return data;
-    }, [colaboradores, situacaoEspecial, dynamicGrid, todayIdx]);
+    }, [colaboradores, situacaoEspecial, dynamicGrid, selectedDayIdx]);
 
     const handleAction = (id, action) => {
         alert(action === 'aprovar' ? 'Justificativa Aprovada!' : 'Justificativa Rejeitada!');
@@ -301,9 +303,11 @@ const GestorDashboard = () => {
                 <Card style={{ marginBottom: '20px', background: 'linear-gradient(135deg, #1A1C1E 0%, #2D2F33 100%)', color: 'white', border: 'none' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                         <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'white', margin: 0 }}>
-                            📊 Situação da Equipe — Hoje
+                            📊 Situação da Equipe
                         </h4>
-                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{hoje ? `${hoje.dia}/${String(currentMonth).padStart(2, '0')} (${hoje.sem?.toUpperCase()})` : 'Hoje'}</span>
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                            {DIAS_IMAGEM[selectedDayIdx] ? `${DIAS_IMAGEM[selectedDayIdx].dia}/${String(currentMonth).padStart(2, '0')} (${DIAS_IMAGEM[selectedDayIdx].sem?.toUpperCase()})` : 'Selecionado'}
+                        </span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginBottom: '16px' }}>
                         {[
@@ -400,7 +404,11 @@ const GestorDashboard = () => {
                 </Card>
 
                 <div style={{ marginBottom: '24px' }}>
-                    <ScaleManager onExport={handleExportPDF} />
+                    <ScaleManager
+                        onExport={handleExportPDF}
+                        selectedDayIndex={selectedDayIdx}
+                        setSelectedDayIndex={setSelectedDayIdx}
+                    />
                 </div>
 
                 {/* Gerenciar Equipe */}

@@ -15,12 +15,17 @@ const LOJA_INFO = {
     gestor: MOCK_GESTOR?.nome || 'EDERSON CUBAS'
 };
 
-const ScaleManager = ({ colaboradorId, onExport }) => {
+const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [shiftFilter, setShiftFilter] = useState('ALL');
     const [obsModalColab, setObsModalColab] = useState(null);
     const [obsText, setObsText] = useState('');
+
+    // Suporte a estado local se não for passado pelo pai
+    const [localSelectedDayIndex, setLocalSelectedDayIndex] = useState(0);
+    const selectedDayIndex = propSelectedDayIndex !== undefined ? propSelectedDayIndex : localSelectedDayIndex;
+    const setSelectedDayIndex = propSetSelectedDayIndex !== undefined ? propSetSelectedDayIndex : setLocalSelectedDayIndex;
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -37,8 +42,7 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
         return grid;
     }, [dynamicScale]);
 
-    // Selecionar dia para resumo de "Trabalhando" e "Folgas"
-    const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
 
     // Filter Colleagues
     const filteredColabs = useMemo(() => {
