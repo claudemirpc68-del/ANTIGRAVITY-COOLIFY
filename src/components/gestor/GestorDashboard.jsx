@@ -408,6 +408,8 @@ const GestorDashboard = () => {
                         onExport={handleExportPDF}
                         selectedDayIndex={selectedDayIdx}
                         setSelectedDayIndex={setSelectedDayIdx}
+                        justificativas={justificativas}
+                        historico={historico}
                     />
                 </div>
 

@@ -15,11 +15,12 @@ const LOJA_INFO = {
     gestor: MOCK_GESTOR?.nome || 'EDERSON CUBAS'
 };
 
-const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex }) => {
+const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [] }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [shiftFilter, setShiftFilter] = useState('ALL');
     const [obsModalColab, setObsModalColab] = useState(null);
+    const [colabDetails, setColabDetails] = useState(null);
     const [obsText, setObsText] = useState('');
 
     // Suporte a estado local se não for passado pelo pai
@@ -271,8 +272,8 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                                         <tr key={colab.id || i} style={{ borderBottom: '1px solid #EEE', background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
                                             <td style={{ padding: '8px 12px', borderRight: '2px solid #E0E0E0', background: i % 2 === 0 ? 'white' : '#FAFAFA', position: 'sticky', left: 0, zIndex: 5, whiteSpace: 'nowrap' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <div>
-                                                        <div style={{ fontWeight: '700', color: '#333' }}>{colab.nome}</div>
+                                                    <div onClick={() => setColabDetails(colab)} style={{ cursor: 'pointer' }}>
+                                                        <div style={{ fontWeight: '700', color: '#0060B1', textDecoration: 'underline' }}>{colab.nome}</div>
                                                         <div style={{ fontSize: '10px', color: '#777', marginTop: '2px' }}>
                                                             {colab.matricula} • {colab.horario}
                                                         </div>
@@ -345,6 +346,61 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                     </table>
                 </div>
             </Card>
+
+            {/* Modal: Detalhes do Colaborador (Acesso Imediato) */}
+            <Modal isOpen={!!colabDetails} onClose={() => setColabDetails(null)} title="Dados do Colaborador">
+                {colabDetails && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        <div style={{ padding: '15px', background: '#F8F9FA', borderRadius: '10px', border: '1px solid #E0E0E0' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>NOME</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.nome}</p></div>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>MATRÍCULA</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.matricula}</p></div>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>FUNÇÃO</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.funcao}</p></div>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>TURNO</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.horario}</p></div>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>FOLGA FIXA</p><p style={{ margin: 0, fontWeight: '700' }}>{['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][colabDetails.folgaFixa]}</p></div>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>SITUAÇÃO</p><p style={{ margin: 0, fontWeight: '700', color: 'var(--status-success)' }}>ATIVO</p></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <MessageSquare size={16} /> Histórico de Interações
+                            </h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {/* Pendentes */}
+                                {justificativas.filter(j => j.nome === colabDetails.nome).map(j => (
+                                    <div key={`p-${j.id}`} style={{ padding: '10px', background: '#FFF8E1', borderRadius: '8px', border: '1px solid #FFE082' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                                            <span style={{ fontWeight: '700' }}>{j.motivo}</span>
+                                            <span style={{ color: '#E65100', fontWeight: '700' }}>PENDENTE</span>
+                                        </div>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#555' }}>{j.obs}</p>
+                                    </div>
+                                ))}
+                                {/* Histórico Aprovado/Rejeitado */}
+                                {historico.filter(h => h.nome === colabDetails.nome).map(h => (
+                                    <div key={`h-${h.id}`} style={{ padding: '10px', background: h.status === 'aprovado' ? '#E8F5E9' : '#FFEBEE', borderRadius: '8px', border: h.status === 'aprovado' ? '1px solid #C8E6C9' : '1px solid #FFCDD2' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                                            <span style={{ fontWeight: '700' }}>{h.motivo} (em {h.data})</span>
+                                            <span style={{ color: h.status === 'aprovado' ? '#2E7D32' : '#C62828', fontWeight: '700' }}>{h.status.toUpperCase()}</span>
+                                        </div>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#555' }}>{h.obs}</p>
+                                    </div>
+                                ))}
+
+                                {justificativas.filter(j => j.nome === colabDetails.nome).length === 0 &&
+                                    historico.filter(h => h.nome === colabDetails.nome).length === 0 && (
+                                        <p style={{ fontSize: '12px', color: '#999', textAlign: 'center' }}>Sem registros recentes de atestados ou trocas.</p>
+                                    )}
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <Button variant="primary" style={{ flex: 1 }} onClick={() => setColabDetails(null)}>Fechar Verificação</Button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
 
             {/* Legenda */}
             <Card style={{ padding: '15px', display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap', background: '#F8F9FA' }}>
