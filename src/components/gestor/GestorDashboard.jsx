@@ -3,7 +3,7 @@ import Card from '../common/Card';
 import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
 import Modal from '../common/Modal';
-import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
 import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle } from 'lucide-react';
@@ -419,7 +419,7 @@ const GestorDashboard = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', animation: 'fadeIn 0.3s' }}>
                             {colaboradores.map((colab, i) => {
                                 const situacaoConfig = getSituacaoConfig(colab.id, dynamicGrid, todayIdx, situacaoEspecial);
-                                const isMe = colab.nome === 'CLAUDEMIR';
+                                const isMe = colab.nome === MOCK_GESTOR.nome;
                                 return (
                                     <div key={colab.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 8px', borderBottom: i < colaboradores.length - 1 ? '1px solid #F5F5F5' : 'none', borderRadius: '6px', background: isMe ? 'rgba(255,102,0,0.05)' : 'transparent' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

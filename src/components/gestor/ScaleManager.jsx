@@ -12,7 +12,7 @@ const LOJA_INFO = {
     loja: 'SUZANO',
     cr: '5356',
     unidade: '068',
-    gestor: MOCK_GESTOR?.nome || 'CLAUDEMIR'
+    gestor: MOCK_GESTOR?.nome || 'EDERSON CUBAS'
 };
 
 const ScaleManager = ({ colaboradorId, onExport }) => {

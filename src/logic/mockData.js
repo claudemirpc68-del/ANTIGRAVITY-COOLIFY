@@ -41,7 +41,7 @@ export const MOCK_COLABORADORES = [
 
 export const MOCK_GESTOR = {
     id: '0',
-    nome: 'CLAUDEMIR',
+    nome: 'EDERSON CUBAS',
     matricula: '101010',
     role: ROLES.GESTOR
 };
