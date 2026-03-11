@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
-import { Clock, Calendar, ArrowLeftRight, MessageSquare, Sun, Moon, Coffee } from 'lucide-react';
+import { Clock, Calendar, ArrowLeftRight, MessageSquare, Sun, Moon } from 'lucide-react';
 import ScaleManager from '../gestor/ScaleManager';
 import Modal from '../common/Modal';
 import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
@@ -173,10 +173,6 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
                 <Card style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowJustificativa(true)}>
                     <MessageSquare size={24} color="var(--assai-orange)" style={{ marginBottom: '8px' }} />
                     <p style={{ fontSize: '13px', fontWeight: '600' }}>Justificativa</p>
-                </Card>
-                <Card style={{ textAlign: 'center', cursor: 'pointer' }}>
-                    <Coffee size={24} color="var(--assai-orange)" style={{ marginBottom: '8px' }} />
-                    <p style={{ fontSize: '13px', fontWeight: '600' }}>Intervalos</p>
                 </Card>
             </div>
 
