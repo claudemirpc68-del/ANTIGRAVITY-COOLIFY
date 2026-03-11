@@ -61,7 +61,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
 
 
         return list;
-    }, [colaboradorId, searchTerm, shiftFilter, statusFilter, selectedDayIndex, dynamicGrid]);
+    }, [colaboradorId, searchTerm, shiftFilter, selectedDayIndex, dynamicGrid]);
 
     // Calcular Totais do Dia
     const totaisDia = useMemo(() => {
