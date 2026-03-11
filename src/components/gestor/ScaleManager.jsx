@@ -122,82 +122,87 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-            {/* Header / Info Pane */}
-            <Card style={{ padding: '20px', background: 'linear-gradient(to right, #0060B1, #0082ED)', color: 'white' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '15px' }}>
-                    <div>
-                        <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: '800' }}>ESCALA 6X1 - VISAO GESTOR</h2>
-                        <div style={{ display: 'flex', gap: '20px', fontSize: '13px', opacity: 0.9, flexWrap: 'wrap' }}>
-                            <span><strong>SETOR:</strong> {LOJA_INFO.setor}</span>
-                            <span><strong>LOJA:</strong> {LOJA_INFO.loja}</span>
-                            <span><strong>CR:</strong> {LOJA_INFO.cr}</span>
-                            <span><strong>UNIDADE:</strong> {LOJA_INFO.unidade}</span>
-                            <span><strong>GESTOR:</strong> {LOJA_INFO.gestor}</span>
+            {/* Header / Info Pane E Dashboard Resumo & Filtros - Visíveis APENAS para Gestores */}
+            {!colaboradorId && (
+                <>
+                    {/* Header / Info Pane */}
+                    <Card style={{ padding: '20px', background: 'linear-gradient(to right, #0060B1, #0082ED)', color: 'white' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '15px' }}>
+                            <div>
+                                <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: '800' }}>ESCALA 6X1 - VISAO GESTOR</h2>
+                                <div style={{ display: 'flex', gap: '20px', fontSize: '13px', opacity: 0.9, flexWrap: 'wrap' }}>
+                                    <span><strong>SETOR:</strong> {LOJA_INFO.setor}</span>
+                                    <span><strong>LOJA:</strong> {LOJA_INFO.loja}</span>
+                                    <span><strong>CR:</strong> {LOJA_INFO.cr}</span>
+                                    <span><strong>UNIDADE:</strong> {LOJA_INFO.unidade}</span>
+                                    <span><strong>GESTOR:</strong> {LOJA_INFO.gestor}</span>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <Button variant="ghost" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => window.print()}>
+                                    <Printer size={16} /> Imprimir
+                                </Button>
+                                <Button variant="ghost" style={{ background: 'white', color: '#0060B1', border: 'none' }} onClick={onExport}>
+                                    <Download size={16} /> Exportar PDF
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <Button variant="ghost" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => window.print()}>
-                            <Printer size={16} /> Imprimir
-                        </Button>
-                        <Button variant="ghost" style={{ background: 'white', color: '#0060B1', border: 'none' }} onClick={onExport}>
-                            <Download size={16} /> Exportar PDF
-                        </Button>
-                    </div>
-                </div>
-            </Card>
+                    </Card>
 
-            {/* Dashboard Resumo & Filtros */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
-                <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Calendar size={16} /> RESUMO DO DIA: {DIAS_IMAGEM[selectedDayIndex]?.dia}/{String(currentMonth).padStart(2, '0')}
-                    </h3>
-                    <div style={{ display: 'flex', gap: '15px' }}>
-                        <div style={{ flex: 1, background: '#E8F5E9', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '24px', fontWeight: '800', color: '#2E7D32' }}>{totaisDia.trabalhando}</div>
-                            <div style={{ fontSize: '11px', fontWeight: '600', color: '#2E7D32' }}>TRABALHANDO</div>
-                        </div>
-                        <div style={{ flex: 1, background: '#FFF3E0', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '24px', fontWeight: '800', color: '#E65100' }}>{totaisDia.folgando}</div>
-                            <div style={{ fontSize: '11px', fontWeight: '600', color: '#E65100' }}>FOLGAS</div>
-                        </div>
-                    </div>
-                </Card>
+                    {/* Dashboard Resumo & Filtros */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
+                        <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Calendar size={16} /> RESUMO DO DIA: {DIAS_IMAGEM[selectedDayIndex]?.dia}/{String(currentMonth).padStart(2, '0')}
+                            </h3>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <div style={{ flex: 1, background: '#E8F5E9', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '24px', fontWeight: '800', color: '#2E7D32' }}>{totaisDia.trabalhando}</div>
+                                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#2E7D32' }}>TRABALHANDO</div>
+                                </div>
+                                <div style={{ flex: 1, background: '#FFF3E0', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '24px', fontWeight: '800', color: '#E65100' }}>{totaisDia.folgando}</div>
+                                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#E65100' }}>FOLGAS</div>
+                                </div>
+                            </div>
+                        </Card>
 
-                <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Filter size={16} /> FILTROS
-                    </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <input
-                            type="text"
-                            placeholder="Buscar nome ou matrícula..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{ padding: '8px 12px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px', gridColumn: '1 / -1' }}
-                        />
-                        <select
-                            value={shiftFilter}
-                            onChange={(e) => setShiftFilter(e.target.value)}
-                            style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
-                        >
-                            <option value="ALL">Todos os Turnos</option>
-                            <option value="07:30">Manhã (07:30)</option>
-                            <option value="14:30">Tarde (14:30)</option>
-                        </select>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
-                        >
-                            <option value="ALL">Todos os Status</option>
-                            <option value="TRABALHAM">Trabalhando Hoje</option>
-                            <option value="FOLGAM">Folgando Hoje</option>
-                            <option value="AUSENTES">Ausentes</option>
-                        </select>
+                        <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Filter size={16} /> FILTROS
+                            </h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar nome ou matrícula..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ padding: '8px 12px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px', gridColumn: '1 / -1' }}
+                                />
+                                <select
+                                    value={shiftFilter}
+                                    onChange={(e) => setShiftFilter(e.target.value)}
+                                    style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
+                                >
+                                    <option value="ALL">Todos os Turnos</option>
+                                    <option value="07:30">Manhã (07:30)</option>
+                                    <option value="14:30">Tarde (14:30)</option>
+                                </select>
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
+                                >
+                                    <option value="ALL">Todos os Status</option>
+                                    <option value="TRABALHAM">Trabalhando Hoje</option>
+                                    <option value="FOLGAM">Folgando Hoje</option>
+                                    <option value="AUSENTES">Ausentes</option>
+                                </select>
+                            </div>
+                        </Card>
                     </div>
-                </Card>
-            </div>
+                </>
+            )}
 
             {/* Tabela de Escala com dica de Scroll no Celular */}
             <Card style={{ padding: '0', overflowX: 'auto', border: '1px solid #E0E0E0', position: 'relative', WebkitOverflowScrolling: 'touch' }}>
