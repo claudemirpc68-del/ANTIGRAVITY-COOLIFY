@@ -5,8 +5,17 @@ import { User, Lock } from 'lucide-react';
 import { MOCK_COLABORADORES, MOCK_GESTOR } from '../../logic/mockData';
 
 const LoginForm = ({ onLogin }) => {
-    const [matricula, setMatricula] = useState('');
-    const [senha, setSenha] = useState('');
+    const [selectedUser, setSelectedUser] = useState('');
+
+    const handleUserChange = (e) => {
+        const val = e.target.value;
+        setSelectedUser(val);
+        if (val) {
+            setMatricula(val);
+        } else {
+            setMatricula('');
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -47,15 +56,40 @@ const LoginForm = ({ onLogin }) => {
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ position: 'relative' }}>
-                    <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
-                    <input
-                        type="text"
-                        placeholder="Matrícula"
-                        required
-                        value={matricula}
-                        onChange={(e) => setMatricula(e.target.value)}
-                        style={{ width: '100%', paddingLeft: '40px' }}
-                    />
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>Selecione seu Nome:</label>
+                    <div style={{ position: 'relative' }}>
+                        <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', zIndex: 1 }} />
+                        <select
+                            value={selectedUser}
+                            onChange={handleUserChange}
+                            style={{ width: '100%', paddingLeft: '40px', background: 'white' }}
+                            required
+                        >
+                            <option value="">Selecione...</option>
+                            <option value={MOCK_GESTOR.matricula}>{MOCK_GESTOR.nome} (GESTOR)</option>
+                            <optgroup label="Colaboradores">
+                                {MOCK_COLABORADORES.map(c => (
+                                    <option key={c.id} value={c.matricula}>{c.nome}</option>
+                                ))}
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <div style={{ position: 'relative', opacity: selectedUser ? 0.7 : 1 }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>Nº de Registro (Matrícula):</label>
+                    <div style={{ position: 'relative' }}>
+                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
+                        <input
+                            type="text"
+                            placeholder="Matrícula"
+                            required
+                            readOnly={!!selectedUser}
+                            value={matricula}
+                            onChange={(e) => setMatricula(e.target.value)}
+                            style={{ width: '100%', paddingLeft: '40px', background: selectedUser ? '#f5f5f5' : 'white' }}
+                        />
+                    </div>
                 </div>
 
                 <div style={{ position: 'relative' }}>
