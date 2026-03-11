@@ -13,21 +13,28 @@ const LoginForm = ({ onLogin }) => {
         const matriculaLimpa = matricula.trim();
         const senhaLimpa = senha.trim();
 
-        // Busca o colaborador pela matrícula nos dados reais
+        // Busca o colaborador ou gestor pela matrícula
+        const isGestor = matriculaLimpa === MOCK_GESTOR.matricula;
         const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matriculaLimpa);
-        const senhaCorreta = '1010';
+        const userFound = isGestor ? MOCK_GESTOR : colaborador;
 
-        if (senhaLimpa !== senhaCorreta) {
-            alert('Senha incorreta! Use a senha padrão definida.');
+        if (!userFound) {
+            alert('Matrícula não encontrada. Verifique o número e tente novamente.');
             return;
         }
 
-        if (matriculaLimpa === MOCK_GESTOR.matricula) {
+        // A senha são os 4 primeiros dígitos da matrícula
+        const senhaCorreta = userFound.matricula.substring(0, 4);
+
+        if (senhaLimpa !== senhaCorreta) {
+            alert('Senha incorreta! Lembre-se: sua senha são os 4 primeiros dígitos do seu registro.');
+            return;
+        }
+
+        if (isGestor) {
             onLogin('gestor', MOCK_GESTOR.nome, MOCK_GESTOR.id);
-        } else if (colaborador) {
-            onLogin('colaborador', colaborador.nome, colaborador.id);
         } else {
-            alert('Matrícula não encontrada. Verifique o número e tente novamente.');
+            onLogin('colaborador', colaborador.nome, colaborador.id);
         }
     };
 
@@ -55,7 +62,7 @@ const LoginForm = ({ onLogin }) => {
                     <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
                     <input
                         type="password"
-                        placeholder="Senha (1010)"
+                        placeholder="Senha (4 primeiros dígitos da matrícula)"
                         required
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
