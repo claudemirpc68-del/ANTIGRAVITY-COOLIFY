@@ -46,15 +46,19 @@ export const MOCK_GESTOR = {
     role: ROLES.GESTOR
 };
 
-export const DIAS_IMAGEM = [
-    { dia: 16, sem: 'seg' }, { dia: 17, sem: 'ter' }, { dia: 18, sem: 'qua' }, { dia: 19, sem: 'qui' },
-    { dia: 20, sem: 'sex' }, { dia: 21, sem: 'sab' }, { dia: 22, sem: 'dom' }, { dia: 23, sem: 'seg' },
-    { dia: 24, sem: 'ter' }, { dia: 25, sem: 'qua' }, { dia: 26, sem: 'qui' }, { dia: 27, sem: 'sex' },
-    { dia: 28, sem: 'sab' }, { dia: 1, sem: 'dom' }, { dia: 2, sem: 'seg' }, { dia: 3, sem: 'ter' },
-    { dia: 4, sem: 'qua' }, { dia: 5, sem: 'qui' }, { dia: 6, sem: 'sex' }, { dia: 7, sem: 'sab' },
-    { dia: 8, sem: 'dom' }, { dia: 9, sem: 'seg' }, { dia: 10, sem: 'ter' }, { dia: 11, sem: 'qua' },
-    { dia: 12, sem: 'qui' }, { dia: 13, sem: 'sex' }, { dia: 14, sem: 'sab' }, { dia: 15, sem: 'dom' }
-];
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const currentMonth = currentDate.getMonth() + 1; // 1 to 12
+const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+const DIAS_SEMANA_SHORT = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+
+export const DIAS_IMAGEM = Array.from({ length: daysInMonth }, (_, i) => {
+    const d = new Date(currentYear, currentMonth - 1, i + 1);
+    return {
+        dia: i + 1,
+        sem: DIAS_SEMANA_SHORT[d.getDay()]
+    };
+});
 
 export const IMAGE_GRID = {
     '1': ['', '', '', '', '', '', 'F', 'D', 'D', 'D', 'D', 'D', 'D', 'F', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D'],

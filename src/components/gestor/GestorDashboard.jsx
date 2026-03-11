@@ -75,7 +75,10 @@ const GestorDashboard = () => {
         { id: 103, nome: 'LUIZA JESUS', motivo: 'Compensatória', data: '02/03/2026', status: 'aprovado', obs: 'Banco de horas positivo utilizado para consulta.' }
     ]);
 
-    const dynamicScale = useMemo(() => generateScale(colaboradores, 2026, 3), [colaboradores]);
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+
+    const dynamicScale = useMemo(() => generateScale(colaboradores, currentYear, currentMonth), [colaboradores, currentYear, currentMonth]);
     const dynamicGrid = useMemo(() => {
         const grid = {};
         dynamicScale.forEach(entry => {
@@ -238,7 +241,7 @@ const GestorDashboard = () => {
             <Modal isOpen={showHistorico} onClose={() => setShowHistorico(false)} title="Histórico Mensal">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <div style={{ padding: '10px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #eee' }}>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>Ações Realizadas em Março/2026</p>
+                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600' }}>Ações Realizadas Recentes</p>
                     </div>
                     {historico.map(h => (
                         <div key={h.id} style={{ padding: '12px', borderBottom: '1px solid #F0F0F0' }}>
@@ -300,7 +303,7 @@ const GestorDashboard = () => {
                         <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'white', margin: 0 }}>
                             📊 Situação da Equipe — Hoje
                         </h4>
-                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{hoje ? `${hoje.dia}/${hoje.mes || '03'} (${hoje.sem?.toUpperCase()})` : 'Hoje'}</span>
+                        <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>{hoje ? `${hoje.dia}/${String(currentMonth).padStart(2, '0')} (${hoje.sem?.toUpperCase()})` : 'Hoje'}</span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginBottom: '16px' }}>
                         {[

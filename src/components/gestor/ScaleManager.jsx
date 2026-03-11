@@ -22,8 +22,10 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
     const [obsModalColab, setObsModalColab] = useState(null);
     const [obsText, setObsText] = useState('');
 
-    // Gerar escala dinâmica (Março de 2026)
-    const dynamicScale = useMemo(() => generateScale(MOCK_COLABORADORES, 2026, 3), []);
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    // Gerar escala dinâmica para o mês corrente
+    const dynamicScale = useMemo(() => generateScale(MOCK_COLABORADORES, currentYear, currentMonth), [currentYear, currentMonth]);
 
     // Transformar em grid para compatibilidade
     const dynamicGrid = useMemo(() => {
@@ -148,7 +150,7 @@ const ScaleManager = ({ colaboradorId, onExport }) => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
                 <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Calendar size={16} /> RESUMO DO DIA: {DIAS_IMAGEM[selectedDayIndex]?.dia}/{selectedDayIndex < 14 ? '02' : '03'}
+                        <Calendar size={16} /> RESUMO DO DIA: {DIAS_IMAGEM[selectedDayIndex]?.dia}/{String(currentMonth).padStart(2, '0')}
                     </h3>
                     <div style={{ display: 'flex', gap: '15px' }}>
                         <div style={{ flex: 1, background: '#E8F5E9', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>

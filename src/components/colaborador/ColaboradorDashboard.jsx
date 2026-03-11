@@ -16,11 +16,9 @@ const getShiftDisplay = (horario) => {
 
 const getTodayIndex = () => {
     const hoje = new Date();
-    // Ajustado para o mês de Março de 2026 usado na escala dinâmica
-    const inicio = new Date('2026-03-01');
+    const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // 1º dia do mês atual
     const diffDias = Math.floor((hoje - inicio) / (1000 * 60 * 60 * 24));
-    if (diffDias < 0 || diffDias > 30) return 0; // Fallback para o primeiro dia se fora do range
-    return diffDias;
+    return diffDias >= 0 ? diffDias : 0;
 };
 
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -37,7 +35,8 @@ const getStatusHoje = (colabId, todayIdx, dynamicGrid) => {
 const getProximasFolgas = (colabId, todayIdx, dynamicGrid) => {
     const grade = dynamicGrid[colabId] || [];
     const folgas = [];
-    const startDate = new Date('2026-03-01');
+    const hoje = new Date();
+    const startDate = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 
     for (let i = todayIdx + 1; i < grade.length; i++) {
         if (grade[i] === 'F' || grade[i] === 'D') {
@@ -63,8 +62,11 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState(null);
 
-    // Gerar escala dinâmica (Março de 2026)
-    const dynamicScale = React.useMemo(() => generateScale(MOCK_COLABORADORES, 2026, 3), []);
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+
+    // Gerar escala dinâmica para o mês atual
+    const dynamicScale = React.useMemo(() => generateScale(MOCK_COLABORADORES, currentYear, currentMonth), [currentYear, currentMonth]);
 
     const dynamicGrid = React.useMemo(() => {
         const grid = {};
