@@ -17,7 +17,6 @@ const LOJA_INFO = {
 
 const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [] }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('ALL');
     const [shiftFilter, setShiftFilter] = useState('ALL');
     const [obsModalColab, setObsModalColab] = useState(null);
     const [colabDetails, setColabDetails] = useState(null);
@@ -59,20 +58,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
             list = list.filter(c => c.horario === shiftFilter);
         }
 
-        if (statusFilter !== 'ALL') {
-            list = list.filter(c => {
-                const gridRow = dynamicGrid[c.id] || [];
-                const stateToday = gridRow[selectedDayIndex] || '';
 
-                if (statusFilter === 'TRABALHAM') {
-                    return stateToday === 'T';
-                }
-                if (statusFilter === 'FOLGAM') {
-                    return stateToday === 'F' || stateToday === 'D';
-                }
-                return true;
-            });
-        }
 
         return list;
     }, [colaboradorId, searchTerm, shiftFilter, statusFilter, selectedDayIndex, dynamicGrid]);
@@ -155,57 +141,31 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                     </Card>
 
                     {/* Dashboard Resumo & Filtros */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
-                        <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <Calendar size={16} /> RESUMO DO DIA: {DIAS_IMAGEM[selectedDayIndex]?.dia}/{String(currentMonth).padStart(2, '0')}
-                            </h3>
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <div style={{ flex: 1, background: '#E8F5E9', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                                    <div style={{ fontSize: '24px', fontWeight: '800', color: '#2E7D32' }}>{totaisDia.trabalhando}</div>
-                                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#2E7D32' }}>TRABALHANDO</div>
-                                </div>
-                                <div style={{ flex: 1, background: '#FFF3E0', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-                                    <div style={{ fontSize: '24px', fontWeight: '800', color: '#E65100' }}>{totaisDia.folgando}</div>
-                                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#E65100' }}>FOLGAS</div>
-                                </div>
-                            </div>
-                        </Card>
 
-                        <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <Filter size={16} /> FILTROS
-                            </h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar nome ou matrícula..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    style={{ padding: '8px 12px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px', gridColumn: '1 / -1' }}
-                                />
-                                <select
-                                    value={shiftFilter}
-                                    onChange={(e) => setShiftFilter(e.target.value)}
-                                    style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
-                                >
-                                    <option value="ALL">Todos os Turnos</option>
-                                    <option value="07:30">Manhã (07:30)</option>
-                                    <option value="14:30">Tarde (14:30)</option>
-                                </select>
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                    style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
-                                >
-                                    <option value="ALL">Todos os Status</option>
-                                    <option value="TRABALHAM">Trabalhando Hoje</option>
-                                    <option value="FOLGAM">Folgando Hoje</option>
-                                    <option value="AUSENTES">Ausentes</option>
-                                </select>
-                            </div>
-                        </Card>
-                    </div>
+
+                    <Card style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Filter size={16} /> PESQUISAR E FILTRAR TURNOS
+                        </h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '10px' }}>
+                            <input
+                                type="text"
+                                placeholder="Buscar nome ou matrícula..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ padding: '8px 12px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
+                            />
+                            <select
+                                value={shiftFilter}
+                                onChange={(e) => setShiftFilter(e.target.value)}
+                                style={{ padding: '8px', border: '1px solid #CCC', borderRadius: '4px', fontSize: '13px' }}
+                            >
+                                <option value="ALL">Todos os Turnos</option>
+                                <option value="07:30">Manhã (07:30)</option>
+                                <option value="14:30">Tarde (14:30)</option>
+                            </select>
+                        </div>
+                    </Card>
                 </>
             )}
 
@@ -452,7 +412,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                     </div>
                 </div>
             </Modal>
-        </div>
+        </div >
     );
 };
 
