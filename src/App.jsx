@@ -6,17 +6,34 @@ import ColaboradorDashboard from './components/colaborador/ColaboradorDashboard'
 import GestorDashboard from './components/gestor/GestorDashboard'
 
 function App() {
-  const [view, setView] = useState('login') // 'login', 'colaborador', 'gestor'
-  const [user, setUser] = useState(null)
+  // Inicializar estado a partir do localStorage
+  const getInitialUser = () => {
+    const saved = localStorage.getItem('assai_user_session');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const initialUser = getInitialUser();
+  const [user, setUser] = useState(initialUser);
+  const [view, setView] = useState(initialUser ? initialUser.role : 'login');
 
   const handleLogin = (role, nome, id) => {
-    setUser({ nome, role, id });
+    const userData = { nome, role, id };
+    setUser(userData);
     setView(role);
+    localStorage.setItem('assai_user_session', JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setUser(null);
     setView('login');
+    localStorage.removeItem('assai_user_session');
   };
 
   return (
