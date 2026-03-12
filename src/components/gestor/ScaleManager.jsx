@@ -15,7 +15,7 @@ const LOJA_INFO = {
     gestor: MOCK_GESTOR?.nome || 'EDERSON CUBAS'
 };
 
-const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [] }) => {
+const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [], colaboradores: propColaboradores }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [shiftFilter, setShiftFilter] = useState('ALL');
     const [obsModalColab, setObsModalColab] = useState(null);
@@ -27,10 +27,9 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
     const selectedDayIndex = propSelectedDayIndex !== undefined ? propSelectedDayIndex : localSelectedDayIndex;
     const setSelectedDayIndex = propSetSelectedDayIndex !== undefined ? propSetSelectedDayIndex : setLocalSelectedDayIndex;
 
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
+    const currentColaboradores = propColaboradores;
     // Gerar escala dinâmica para o mês corrente
-    const dynamicScale = useMemo(() => generateScale(MOCK_COLABORADORES, currentYear, currentMonth), [currentYear, currentMonth]);
+    const dynamicScale = useMemo(() => generateScale(currentColaboradores, currentYear, currentMonth), [currentColaboradores, currentYear, currentMonth]);
 
     // Transformar em grid para compatibilidade
     const dynamicGrid = useMemo(() => {
@@ -47,8 +46,8 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
     // Filter Colleagues
     const filteredColabs = useMemo(() => {
         let list = colaboradorId
-            ? MOCK_COLABORADORES.filter(c => c.id === colaboradorId)
-            : MOCK_COLABORADORES;
+            ? currentColaboradores.filter(c => c.id === colaboradorId)
+            : currentColaboradores;
 
         if (searchTerm) {
             list = list.filter(c => c.nome.toLowerCase().includes(searchTerm.toLowerCase()) || c.matricula.includes(searchTerm));
@@ -61,19 +60,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
 
 
         return list;
-    }, [colaboradorId, searchTerm, shiftFilter, selectedDayIndex, dynamicGrid]);
-
-    // Calcular Totais do Dia
-    const totaisDia = useMemo(() => {
-        let trab = 0;
-        let folg = 0;
-        MOCK_COLABORADORES.forEach(c => {
-            const val = (dynamicGrid[c.id] || [])[selectedDayIndex] || '';
-            if (val === 'F' || val === 'D') folg++;
-            else trab++;
-        });
-        return { trabalhando: trab, folgando: folg };
-    }, [selectedDayIndex, dynamicGrid]);
+    }, [colaboradorId, searchTerm, shiftFilter]);
 
     // Função para verificar alertas por colaborador (ex: > 6 dias seguidos sem folga na grade)
     const checkAlerts = (colabId) => {
@@ -221,10 +208,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                                 </tr>
                             ) : (() => {
                                 // Separar por turno para renderização agrupada
-                                const turno1 = filteredColabs.filter(c => c.horario === '07:30');
-                                const turno2 = filteredColabs.filter(c => c.horario === '14:30');
-
-                                const renderRow = (colab, i, total) => {
+                                const renderRow = (colab, i) => {
                                     if (!colab) return null;
                                     const gridRow = dynamicGrid[colab.id] || [];
                                     const hasAlert = checkAlerts(colab.id);
@@ -263,7 +247,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                                                 return (
                                                     <td key={index}
                                                         style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #F5F5F5', background: isSelected ? 'rgba(33,150,243,0.05)' : (isDom ? 'rgba(255,69,0,0.03)' : 'transparent') }}
-                                                        title={colab.horario === '14:30' ? 'Turno: 14:30 — 22:50' : 'Turno: 07:30 — 14:30'}
+                                                        title={`Turno: ${colab.horario}`}
                                                     >
                                                         {cellText && (
                                                             <div style={{ width: '100%', minHeight: '26px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', background: bg, color: color, border: border || 'none', fontWeight: '700', fontSize: size, boxShadow: (val === 'F' || val === 'D') ? '0 1px 2px rgba(0,0,0,0.1)' : 'none' }}>
@@ -285,22 +269,17 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                                     </tr>
                                 );
 
-                                return (
-                                    <>
-                                        {turno1.length > 0 && (
-                                            <>
-                                                {renderTurnoHeader('1º Turno — 07:30 às 14:30', '#2E7D32', '#E8F5E9')}
-                                                {turno1.map((colab, i) => renderRow(colab, i, turno1.length))}
-                                            </>
-                                        )}
-                                        {turno2.length > 0 && (
-                                            <>
-                                                {renderTurnoHeader('2º Turno — 14:30 às 22:50', '#6A1B9A', '#F3E5F5')}
-                                                {turno2.map((colab, i) => renderRow(colab, i, turno2.length))}
-                                            </>
-                                        )}
-                                    </>
-                                );
+                                return (() => {
+                                    // Agrupar por turnos únicos presentes na lista filtrada
+                                    const turnos = [...new Set(filteredColabs.map(c => c.horario))].sort();
+                                    return turnos.map(t => (
+                                        <React.Fragment key={t}>
+                                            {renderTurnoHeader(`Turno ${t}`, '#2E7D32', '#E8F5E9')}
+                                            {filteredColabs.filter(c => c.horario === t).map((colab, i) => renderRow(colab, i))}
+                                        </React.Fragment>
+                                    ));
+                                })();
+
                             })()}
                         </tbody>
                     </table>

@@ -9,6 +9,7 @@ import CommunicationCenter from '../common/CommunicationCenter';
 
 import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
+import { STORE_CONFIG } from '../../logic/constants';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -27,12 +28,38 @@ const getTodayIndex = () => {
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-const getStatusHoje = (colabId, todayIdx, dynamicGrid) => {
+const getStatusHoje = (colabId, todayIdx, dynamicGrid, horario) => {
     const grade = dynamicGrid[colabId] || [];
     const val = grade[todayIdx] || '';
     if (val === 'F') return { label: 'Folga', color: '#E65100', bg: 'rgba(255,102,0,0.12)', icon: '🌴' };
     if (val === 'D') return { label: 'Descanso (D)', color: '#1565C0', bg: 'rgba(33,150,243,0.12)', icon: '😴' };
-    return { label: 'Em Serviço', color: '#2E7D32', bg: 'rgba(46,125,50,0.10)', icon: '✅' };
+    
+    let label = 'Em Serviço';
+    let color = '#2E7D32';
+    let bg = 'rgba(46,125,50,0.10)';
+    let icon = '✅';
+
+    if (horario) {
+        const agora = new Date();
+        const minutosAtual = agora.getHours() * 60 + agora.getMinutes();
+        const [h, m] = horario.split(':').map(Number);
+        const minutosTurnoInicio = h * 60 + m;
+        const minutosTurnoFim = minutosTurnoInicio + (8 * 60 + 20); // Turno aproximado 8h20m
+
+        if (minutosAtual < minutosTurnoInicio) {
+            label = 'Aguardando Turno';
+            color = '#F57C00';
+            bg = 'rgba(245,124,0,0.10)';
+            icon = '⏳';
+        } else if (minutosAtual > minutosTurnoFim && h < 18) {
+            label = 'Turno Encerrado';
+            color = '#616161';
+            bg = 'rgba(97,97,97,0.10)';
+            icon = '🏁';
+        }
+    }
+
+    return { label, color, bg, icon };
 };
 
 const getProximasFolgas = (colabId, todayIdx, dynamicGrid) => {
@@ -58,7 +85,9 @@ const getProximasFolgas = (colabId, todayIdx, dynamicGrid) => {
 
 // ─── Componente ────────────────────────────────────────────────────────────
 
-const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onMarkRead }) => {
+const ColaboradorDashboard = ({ user, messages, notifications, historico, pontosBatidos = [], onAddMessage, onMarkRead, onBaterPonto }) => {
+    const [isCheckingIP, setIsCheckingIP] = useState(false);
+    const [bypassIP, setBypassIP] = useState(false);
     const [showScale, setShowScale] = useState(true);
     const [showJustificativa, setShowJustificativa] = useState(false);
     const [showTroca, setShowTroca] = useState(false);
@@ -85,7 +114,7 @@ const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onM
     const colabData = MOCK_COLABORADORES.find(c => c.id === user.id) || {};
     const { horario = '07:30', funcao = 'OP. LOJA' } = colabData;
     const turno = getShiftDisplay(horario);
-    const statusHoje = getStatusHoje(user.id, todayIdx, dynamicGrid);
+    const statusHoje = getStatusHoje(user.id, todayIdx, dynamicGrid, horario);
     const proximasFolgas = getProximasFolgas(user.id, todayIdx, dynamicGrid);
     const isFolgaHoje = statusHoje.label === 'Folga' || statusHoje.label === 'Descanso (D)';
 
@@ -113,6 +142,37 @@ const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onM
             setLoading(false);
         }, 1200);
     };
+
+    const handleCheckIn = async () => {
+        setIsCheckingIP(true);
+        try {
+            // Em produção, usaríamos uma API para pegar o IP público.
+            // Para este demo, simulamos a chamada.
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            const userIP = data.ip;
+
+            if (bypassIP || userIP === STORE_CONFIG.OFFICIAL_IP) {
+                onBaterPonto(user.id);
+                alert('Ponto registrado com sucesso! Bom trabalho.');
+            } else {
+                alert(`Conexão Recusada!\n\nSeu IP atual (${userIP}) não pertence à rede autorizada da Mercearia Suzano.\n\nPor favor, conecte-se ao Wi-Fi da loja para bater o ponto.`);
+            }
+        } catch (error) {
+            console.error('Erro ao verificar IP:', error);
+            // Se a API falhar mas o usuário estiver no modo bypass, permite bater
+            if (bypassIP) {
+                onBaterPonto(user.id);
+                alert('Ponto registrado (Modo de Teste)!');
+            } else {
+                alert('Erro ao validar rede. Verifique sua conexão com o Wi-Fi.');
+            }
+        } finally {
+            setIsCheckingIP(false);
+        }
+    };
+
+    const jaBateuPonto = pontosBatidos.includes(user.id);
 
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '40px' }}>
@@ -177,9 +237,34 @@ const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onM
 
                 {!isFolgaHoje && (
                     <div style={{ marginTop: '14px' }}>
-                        <Button variant="secondary" style={{ width: '100%', background: 'white', color: 'var(--assai-orange)', fontWeight: '700' }}>
-                            BATER PONTO
-                        </Button>
+                        {jaBateuPonto ? (
+                            <div style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.2)', borderRadius: '8px', textAlign: 'center', border: '2px solid #FFF', color: 'white', fontWeight: '800', fontSize: '14px' }}>
+                                ✅ PONTO REGISTRADO
+                            </div>
+                        ) : (
+                            <>
+                                <Button 
+                                    onClick={handleCheckIn} 
+                                    variant="secondary" 
+                                    disabled={isCheckingIP}
+                                    style={{ width: '100%', background: 'white', color: 'var(--assai-orange)', fontWeight: '700' }}
+                                >
+                                    {isCheckingIP ? 'VERIFICANDO REDE...' : 'BATER PONTO'}
+                                </Button>
+                                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        id="bypass" 
+                                        checked={bypassIP} 
+                                        onChange={(e) => setBypassIP(e.target.checked)}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                    <label htmlFor="bypass" style={{ fontSize: '10px', opacity: 0.8, cursor: 'pointer' }}>
+                                        Simular rede da loja (Bypass IP para teste)
+                                    </label>
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
             </Card>
@@ -271,7 +356,7 @@ const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onM
                 </form>
             </Modal>
 
-            {showScale && <div style={{ marginBottom: '24px', animation: 'fadeIn 0.3s' }}><ScaleManager colaboradorId={user.id} /></div>}
+            {showScale && <div style={{ marginBottom: '24px', animation: 'fadeIn 0.3s' }}><ScaleManager colaboradorId={user.id} historico={historico} /></div>}
 
             <Card style={{ padding: '15px' }}>
                 <h4 style={{ fontSize: '14px', marginBottom: '12px', fontWeight: '700' }}>🗓️ Próximas Folgas</h4>

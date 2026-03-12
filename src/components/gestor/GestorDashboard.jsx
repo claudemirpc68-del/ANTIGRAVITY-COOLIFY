@@ -7,7 +7,7 @@ import CommunicationCenter from '../common/CommunicationCenter';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
-import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle, Clock, Flag } from 'lucide-react';
 
 
 const DIAS_SEMANA_NOMES = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -22,7 +22,10 @@ const SITUACOES_ESPECIAIS = {
     AFASTADO: { label: 'Afastado', bg: '#FFF8E1', color: '#F57F17', icon: 'alert' },
 };
 
-const getSituacaoConfig = (colabId, dynamicGrid, todayIdx, situacaoEspecial) => {
+const getSituacaoConfig = (colaborador, dynamicGrid, todayIdx, situacaoEspecial, bateuPonto) => {
+    if (!colaborador) return { label: 'Desconhecido', bg: '#eee', color: '#666', icon: 'clock' };
+    
+    const colabId = colaborador.id;
     // Situação especial tem PRIORIDADE máxima
     const especial = situacaoEspecial[colabId];
     if (especial && SITUACOES_ESPECIAIS[especial]) return SITUACOES_ESPECIAIS[especial];
@@ -32,10 +35,78 @@ const getSituacaoConfig = (colabId, dynamicGrid, todayIdx, situacaoEspecial) => 
     const val = grade[todayIdx] || '';
     if (val === 'F' || val === 'D') return { label: 'Folga', bg: '#FFF3E0', color: '#E65100', icon: 'calendar' };
 
-    const colab = MOCK_COLABORADORES.find(c => c.id === colabId);
-    const isSegundoTurno = colab?.horario === '14:30';
-    const interval = isSegundoTurno ? '14:30—22:50' : '07:30—14:30';
-    return { label: `Trabalhando (${interval})`, bg: 'rgba(46,125,50,0.1)', color: '#2E7D32', icon: 'check' };
+    const horario = colaborador.horario;
+    
+    // Calcular intervalo e horários de forma dinâmica
+    let label = `Em serviço`;
+    let bg = 'rgba(46,125,50,0.1)';
+    let color = '#2E7D32';
+    let icon = 'check';
+    let interval = 'Horário não definido';
+
+    if (horario) {
+        const [h, m] = horario.split(':').map(Number);
+        const minutosTurnoInicio = h * 60 + m;
+        // Turno padrão de 8h20m (incluindo 1h de intervalo ou conforme regra local)
+        const minutosTurnoFim = (minutosTurnoInicio + (8 * 60 + 20)) % 1440;
+        
+        const hFim = Math.floor(minutosTurnoFim / 60);
+        const mFim = minutosTurnoFim % 60;
+        interval = `${horario}—${String(hFim).padStart(2, '0')}:${String(mFim).padStart(2, '0')}`;
+        label = `Trabalhando (${interval})`;
+
+        const agora = new Date();
+        const minutosAtual = agora.getHours() * 60 + agora.getMinutes();
+
+        // Lógica para turnos que atravessam a meia-noite (ex: 22:00 -> 06:20)
+        const atravessaMeiaNoite = minutosTurnoFim < minutosTurnoInicio;
+        
+        let estaNoTurno = false;
+        if (atravessaMeiaNoite) {
+            estaNoTurno = minutosAtual >= minutosTurnoInicio || minutosAtual <= minutosTurnoFim;
+        } else {
+            estaNoTurno = minutosAtual >= minutosTurnoInicio && minutosAtual <= minutosTurnoFim;
+        }
+
+        if (!estaNoTurno) {
+            if (atravessaMeiaNoite) {
+                // Se atravessa meia-noite, "Aguardando" é entre o fim do turno e o próximo início
+                if (minutosAtual > minutosTurnoFim && minutosAtual < minutosTurnoInicio) {
+                    label = `Aguardando (${interval})`;
+                    color = '#F57C00';
+                    bg = 'rgba(245,124,0,0.10)';
+                    icon = 'clock';
+                }
+            } else {
+                if (minutosAtual < minutosTurnoInicio) {
+                    label = `Aguardando (${interval})`;
+                    color = '#F57C00';
+                    bg = 'rgba(245,124,0,0.10)';
+                    icon = 'clock';
+                } else if (minutosAtual > minutosTurnoFim) {
+                    label = `Encerrado (${interval})`;
+                    color = '#616161';
+                    bg = 'rgba(97,97,97,0.10)';
+                    icon = 'flag';
+                }
+            }
+        }
+    }
+
+    // Se ele está no horário do turno mas NÃO bateu o ponto
+    if (label.includes('Trabalhando') && !bateuPonto) {
+        label = `Ponto Pendente (${interval})`;
+        color = '#D32F2F'; // Vermelho de alerta
+        bg = 'rgba(211,47,47,0.1)';
+        icon = 'alert';
+    } else if (label.includes('Trabalhando') && bateuPonto) {
+        label = `Em Serviço (${interval})`;
+        color = '#2E7D32';
+        bg = 'rgba(46,125,50,0.1)';
+        icon = 'check';
+    }
+
+    return { label, bg, color, icon };
 };
 
 const getTodayIndex = () => {
@@ -51,10 +122,12 @@ const StatusIcon = ({ icon, size = 14 }) => {
     if (icon === 'umbrella') return <Umbrella size={size} />;
     if (icon === 'alert') return <AlertTriangle size={size} />;
     if (icon === 'calendar') return <CalendarIcon size={size} />;
+    if (icon === 'clock') return <Clock size={size} />;
+    if (icon === 'flag') return <Flag size={size} />;
     return <CheckCircle size={size} />;
 };
 
-const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNotification, onMarkRead }) => {
+const GestorDashboard = ({ user, messages, notifications, historico, pontosBatidos = [], onAddMessage, onAddNotification, onMarkRead }) => {
     const [showEquipe, setShowEquipe] = useState(false);
     const [showAprovar, setShowAprovar] = useState(false);
     const [showHistorico, setShowHistorico] = useState(false);
@@ -74,11 +147,7 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
         { id: 2, nome: 'AMANDA PORTO', motivo: 'Transporte', obs: 'Ônibus quebrado na Av. Principal.', status: 'pendente', temAnexo: false }
     ]);
 
-    const [historico] = useState([
-        { id: 101, nome: 'PEDRO ANGELO', motivo: 'Atestado', data: '05/03/2026', status: 'aprovado', obs: 'Apresentou atestado de 2 dias por gripe.' },
-        { id: 102, nome: 'DENISE ISSI', motivo: 'Troca de Turno', data: '04/03/2026', status: 'rejeitado', obs: 'Solicitou troca mas não havia substituto disponível.' },
-        { id: 103, nome: 'LUIZA JESUS', motivo: 'Compensatória', data: '02/03/2026', status: 'aprovado', obs: 'Banco de horas positivo utilizado para consulta.' }
-    ]);
+
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -94,24 +163,34 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
     }, [dynamicScale]);
 
     const todayIdx = getTodayIndex();
-    const hoje = DIAS_IMAGEM[todayIdx];
 
     // Contagem geral por situação (guarda a lista em vez de só o contador)
     const resumoHoje = useMemo(() => {
-        const data = { trabalhando: [], folga: [], ausencia: [], atestado: [], ferias: [], afastado: [] };
+        const data = { trabalhando: [], folga: [], ausencia: [], atestado: [], ferias: [], afastado: [], emServico: [], aguardando: [] };
         colaboradores.forEach(c => {
             const esp = situacaoEspecial[c.id];
             if (esp === 'AUSENCIA') { data.ausencia.push(c); return; }
             if (esp === 'ATESTADO') { data.atestado.push(c); return; }
             if (esp === 'FERIAS') { data.ferias.push(c); return; }
             if (esp === 'AFASTADO') { data.afastado.push(c); return; }
+            
             const grade = dynamicGrid[c.id] || [];
             const val = grade[selectedDayIdx] || '';
-            if (val === 'F' || val === 'D') data.folga.push(c);
-            else data.trabalhando.push(c);
+            if (val === 'F' || val === 'D') {
+                data.folga.push(c);
+            } else {
+                data.trabalhando.push(c);
+                // Classificação extra baseada no horário atual se for o dia de hoje
+                if (selectedDayIdx === todayIdx) {
+                    const bateu = pontosBatidos.includes(c.id);
+                    const config = getSituacaoConfig(c, dynamicGrid, todayIdx, situacaoEspecial, bateu);
+                    if (bateu && config.icon === 'check') data.emServico.push(c);
+                    else if (config.label.includes('Aguardando')) data.aguardando.push(c);
+                }
+            }
         });
         return data;
-    }, [colaboradores, situacaoEspecial, dynamicGrid, selectedDayIdx]);
+    }, [colaboradores, situacaoEspecial, dynamicGrid, selectedDayIdx, todayIdx]);
 
     const handleAction = (id, action) => {
         alert(action === 'aprovar' ? 'Justificativa Aprovada!' : 'Justificativa Rejeitada!');
@@ -299,7 +378,15 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
                                 <div key={c.id || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee' }}>
                                     <div>
                                         <div style={{ fontWeight: '600', fontSize: '13px', color: '#333' }}>{c.nome}</div>
-                                        <div style={{ fontSize: '11px', color: '#777' }}>{c.funcao} • {c.horario === '14:30' ? '2º Turno (14:30—22:50)' : '1º Turno (07:30—14:30)'}</div>
+                                        <div style={{ fontSize: '11px', color: '#777' }}>
+                                            {c.funcao} • {(() => {
+                                                const [h, m] = c.horario.split(':').map(Number);
+                                                const fim = (h * 60 + m + 500) % 1440;
+                                                const hF = Math.floor(fim / 60);
+                                                const mF = fim % 60;
+                                                return `Turno ${c.horario}—${String(hF).padStart(2, '0')}:${String(mF).padStart(2, '0')}`;
+                                            })()}
+                                        </div>
                                     </div>
                                     <div style={{ fontSize: '11px', fontWeight: 'bold', color: listModal.color, background: `${listModal.color}15`, padding: '4px 8px', borderRadius: '4px' }}>Mat. {c.matricula}</div>
                                 </div>
@@ -363,26 +450,27 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
                         </span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginBottom: '16px' }}>
-                        {[
-                            { label: 'Trabalhando', list: resumoHoje.trabalhando, color: '#00E676', bg: 'rgba(0,230,118,0.12)' },
-                            { label: 'Folga/Desc.', list: resumoHoje.folga, color: '#FFB300', bg: 'rgba(255,179,0,0.12)' },
-                            { label: 'Ausência', list: resumoHoje.ausencia, color: '#EF5350', bg: 'rgba(239,83,80,0.15)' },
-                            { label: 'Atestado', list: resumoHoje.atestado, color: '#42A5F5', bg: 'rgba(66,165,245,0.15)' },
-                            { label: 'Férias', list: resumoHoje.ferias, color: '#CE93D8', bg: 'rgba(206,147,216,0.15)' },
-                            { label: 'Afastado', list: resumoHoje.afastado, color: '#FFD54F', bg: 'rgba(255,213,79,0.15)' },
-                        ].map(s => (
-                            <div
-                                key={s.label}
-                                onClick={() => setListModal({ title: s.label, list: s.list, color: s.color })}
-                                title="Clique para ver quem são"
-                                style={{ background: s.bg, borderRadius: '10px', padding: '10px', textAlign: 'center', border: `1px solid ${s.color}33`, cursor: 'pointer', transition: 'transform 0.1s' }}
-                                onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                                <div style={{ fontSize: '22px', fontWeight: '800', color: s.color }}>{s.list.length}</div>
-                                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{s.label}</div>
-                            </div>
-                        ))}
+                            {[
+                                { label: 'Em Serviço', list: (selectedDayIdx === todayIdx) ? resumoHoje.emServico : resumoHoje.trabalhando, color: '#00E676', bg: 'rgba(0,230,118,0.12)' },
+                                { label: 'Aguardando', list: resumoHoje.aguardando, color: '#FFB300', bg: 'rgba(255,179,0,0.12)' },
+                                { label: 'Folga/Desc.', list: resumoHoje.folga, color: '#E65100', bg: 'rgba(230,81,0,0.12)' },
+                                { label: 'Ausência', list: resumoHoje.ausencia, color: '#EF5350', bg: 'rgba(239,83,80,0.15)' },
+                                { label: 'Atestado', list: resumoHoje.atestado, color: '#42A5F5', bg: 'rgba(66,165,245,0.15)' },
+                                { label: 'Férias', list: resumoHoje.ferias, color: '#CE93D8', bg: 'rgba(206,147,216,0.15)' },
+                                { label: 'Afastado', list: resumoHoje.afastado, color: '#FFD54F', bg: 'rgba(255,213,79,0.15)' },
+                            ].map(s => (
+                                <div
+                                    key={s.label}
+                                    onClick={() => setListModal({ title: s.label, list: s.list, color: s.color })}
+                                    title="Clique para ver quem são"
+                                    style={{ background: s.bg, borderRadius: '10px', padding: '10px', textAlign: 'center', border: `1px solid ${s.color}33`, cursor: 'pointer', transition: 'transform 0.1s' }}
+                                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    <div style={{ fontSize: '22px', fontWeight: '800', color: s.color }}>{s.list.length}</div>
+                                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{s.label}</div>
+                                </div>
+                            ))}
                     </div>
                     {/* Lista rápida dos que NÃO estão seguindo a escala normal */}
                     {Object.keys(situacaoEspecial).filter(id => situacaoEspecial[id]).length > 0 && (
@@ -465,6 +553,7 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
                         setSelectedDayIndex={setSelectedDayIdx}
                         justificativas={justificativas}
                         historico={historico}
+                        colaboradores={colaboradores}
                     />
                 </div>
 
@@ -483,11 +572,12 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
                     {showEquipe && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', animation: 'fadeIn 0.3s' }}>
                             {colaboradores.map((colab, i) => {
-                                const situacaoConfig = getSituacaoConfig(colab.id, dynamicGrid, todayIdx, situacaoEspecial);
+                                const situacaoConfig = getSituacaoConfig(colab, dynamicGrid, todayIdx, situacaoEspecial);
                                 const isMe = colab.nome === MOCK_GESTOR.nome;
                                 return (
                                     <div key={colab.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 8px', borderBottom: i < colaboradores.length - 1 ? '1px solid #F5F5F5' : 'none', borderRadius: '6px', background: isMe ? 'rgba(255,102,0,0.05)' : 'transparent' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: pontosBatidos.includes(colab.id) ? '#4CAF50' : (situacaoConfig.label.includes('Ponto Pendente') ? '#F44336' : '#DDD') }}></div>
                                             <span style={{ fontSize: '13px', fontWeight: isMe ? '700' : '500', color: isMe ? 'var(--assai-orange)' : 'var(--text-primary)' }}>{colab.nome}</span>
                                             <span style={{ fontSize: '10px', color: 'var(--text-tertiary)' }}>{colab.funcao} · {colab.horario}</span>
                                         </div>
@@ -498,7 +588,7 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
                                             <span
                                                 title="Clique para alterar situação"
                                                 onClick={() => setEditSituacaoColab(colab)}
-                                                style={{ fontSize: '11px', background: situacaoConfig.bg, color: situacaoConfig.color, padding: '3px 10px', borderRadius: '12px', fontWeight: '600', whiteSpace: 'nowrap', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                style={{ fontSize: '11px', background: situacaoConfig.bg, color: situacaoConfig.color, padding: '3px 10px', borderRadius: '12px', fontWeight: '600', whiteSpace: 'nowrap', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', border: `1px solid ${situacaoConfig.color}40` }}
                                             >
                                                 <StatusIcon icon={situacaoConfig.icon} size={12} />
                                                 {situacaoConfig.label}

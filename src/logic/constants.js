@@ -2,7 +2,8 @@ export const SCALE_TYPES = {
     TRABALHO: 'T',
     FOLGA: 'F',
     FERIADO: 'FF',
-    BANCO_HORAS: 'FBH'
+    BANCO_HORAS: 'FBH',
+    PRESENCA_CONFIRMADA: 'P' // Registrado via Wi-Fi/IP
 };
 
 export const ROLES = {
@@ -23,3 +24,10 @@ export const COLORS = {
 
 export const SECTOR = 'Mercearia';
 export const STORE_UNIT = 'Suzano 068';
+
+export const STORE_CONFIG = {
+    MAC_ADDRESS: 'c2:be:cd:5a:e7:2a',
+    // IP simulado da loja para testes. 
+    // Em um cenário real, este seria o IP fixo da rede da loja.
+    OFFICIAL_IP: '201.17.89.44' 
+};

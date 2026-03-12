@@ -53,20 +53,12 @@ export const MOCK_GESTOR = {
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1; // 1 to 12
-const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+const daysInCurrentMonth = new Date(currentYear, currentMonth, 0).getDate();
 const DIAS_SEMANA_SHORT = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
 
-export const DIAS_IMAGEM = Array.from({ length: 28 }, (_, i) => {
-    // Escala da imagem: 16/02 a 15/03
-    let dia, mes, ano = 2026;
-    if (i < 13) {
-        dia = 16 + i;
-        mes = 2; // Fev
-    } else {
-        dia = i - 12;
-        mes = 3; // Mar
-    }
-    const d = new Date(ano, mes - 1, dia);
+export const DIAS_IMAGEM = Array.from({ length: daysInCurrentMonth }, (_, i) => {
+    const dia = i + 1;
+    const d = new Date(currentYear, currentMonth - 1, dia);
     return {
         dia: dia,
         sem: DIAS_SEMANA_SHORT[d.getDay()]

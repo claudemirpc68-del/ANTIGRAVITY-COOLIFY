@@ -12,7 +12,7 @@ function App() {
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {
+      } catch {
         return null;
       }
     }
@@ -34,6 +34,26 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [historico, setHistorico] = useState(() => {
+    const saved = localStorage.getItem('assai_historico');
+    if (saved) return JSON.parse(saved);
+    return [
+        { id: 1, nome: 'CLAUDEMIR ROSA', motivo: 'Atestado Médico (15/02)', status: 'aprovado', obs: 'Atestado validado por EDERSON. Retorna dia 16/02.', data: '12/03/2026' },
+        { id: 2, nome: 'AMANDA PORTO', motivo: 'Troca de Turno', status: 'rejeitado', obs: 'Sem cobertura para o horário.', data: '15/02/2024' },
+        { id: 3, nome: 'VITORIA RIBEIRO', motivo: 'Atestado Medico (1/1)', status: 'aprovado', obs: 'Aprovado pelo Gestor na interação de ontem.', data: '11/03/2026' }
+    ];
+  });
+
+  const [pontosBatidos, setPontosBatidos] = useState(() => {
+    const saved = localStorage.getItem('assai_pontos_batidos');
+    // Só mantém o ponto se for o mesmo dia
+    if (saved) {
+      const { data, lista } = JSON.parse(saved);
+      if (data === new Date().toLocaleDateString()) return lista;
+    }
+    return [];
+  });
+
   // Salvar no localStorage sempre que mudar
   React.useEffect(() => {
     localStorage.setItem('assai_messages', JSON.stringify(messages));
@@ -42,6 +62,17 @@ function App() {
   React.useEffect(() => {
     localStorage.setItem('assai_notifications', JSON.stringify(notifications));
   }, [notifications]);
+
+  React.useEffect(() => {
+    localStorage.setItem('assai_historico', JSON.stringify(historico));
+  }, [historico]);
+
+  React.useEffect(() => {
+    localStorage.setItem('assai_pontos_batidos', JSON.stringify({
+      data: new Date().toLocaleDateString(),
+      lista: pontosBatidos
+    }));
+  }, [pontosBatidos]);
 
   const handleLogin = (role, nome, id) => {
     const userData = { nome, role, id };
@@ -68,6 +99,12 @@ function App() {
 
   const markNotificationAsRead = (id) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  const handleBaterPonto = (colabId) => {
+    if (!pontosBatidos.includes(colabId)) {
+      setPontosBatidos(prev => [...prev, colabId]);
+    }
   };
 
   return (
@@ -98,8 +135,11 @@ function App() {
                   user={user} 
                   messages={messages} 
                   notifications={notifications}
+                  historico={historico}
+                  pontosBatidos={pontosBatidos}
                   onAddMessage={addMessage}
                   onMarkRead={markNotificationAsRead}
+                  onBaterPonto={handleBaterPonto}
                 />
               )}
               {view === 'gestor' && (
@@ -107,6 +147,8 @@ function App() {
                   user={user} 
                   messages={messages} 
                   notifications={notifications}
+                  historico={historico}
+                  pontosBatidos={pontosBatidos}
                   onAddMessage={addMessage}
                   onAddNotification={addNotification}
                   onMarkRead={markNotificationAsRead}

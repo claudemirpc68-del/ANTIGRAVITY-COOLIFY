@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Card from './Card';
 import Button from './Button';
 
-const CommunicationCenter = ({ user, messages, notifications, onAddMessage, onAddNotification, onMarkRead }) => {
+const CommunicationCenter = ({ user, messages, notifications, onAddMessage, onMarkRead }) => {
   const [activeTab, setActiveTab] = useState('messages'); // 'messages' or 'alerts'
   const [msgType, setMsgType] = useState('all'); // 'all' (mural) or 'private'
   const [newMessage, setNewMessage] = useState('');
