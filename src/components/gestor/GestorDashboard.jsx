@@ -457,6 +457,15 @@ const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNot
                 </Card>
 
                 <div style={{ marginBottom: '24px' }}>
+                    <MiniCalendar 
+                        colabId={user.id} 
+                        grid={dynamicGrid[user.id] || []} 
+                        year={currentYear} 
+                        month={currentMonth} 
+                    />
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
                     <ScaleManager
                         onExport={handleExportPDF}
                         selectedDayIndex={selectedDayIdx}
