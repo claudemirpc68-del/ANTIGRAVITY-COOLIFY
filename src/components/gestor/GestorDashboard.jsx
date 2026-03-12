@@ -4,7 +4,7 @@ import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
 import Modal from '../common/Modal';
 import CommunicationCenter from '../common/CommunicationCenter';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTORES } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
 import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle, Clock, Flag } from 'lucide-react';
