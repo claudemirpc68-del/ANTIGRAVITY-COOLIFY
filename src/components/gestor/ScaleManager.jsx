@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTORES } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { Download, Printer, Search, AlertTriangle, CheckCircle, Info, Calendar, MessageSquare, X, Filter } from 'lucide-react';
 
