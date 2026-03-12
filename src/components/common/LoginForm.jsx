@@ -8,10 +8,12 @@ const LoginForm = ({ onLogin }) => {
     const [selectedUser, setSelectedUser] = useState('');
     const [matricula, setMatricula] = useState('');
     const [senha, setSenha] = useState('');
+    const [showMatricula, setShowMatricula] = useState(false);
 
     const handleUserChange = (e) => {
         const val = e.target.value;
         setSelectedUser(val);
+        setShowMatricula(false);
         if (val) {
             setMatricula(val);
         } else {
@@ -78,20 +80,39 @@ const LoginForm = ({ onLogin }) => {
                     </div>
                 </div>
 
-                <div style={{ position: 'relative', opacity: selectedUser ? 0.7 : 1 }}>
+                <div style={{ position: 'relative' }}>
                     <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>Nº de Registro (Matrícula):</label>
-                    <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
-                        <input
-                            type="text"
-                            placeholder="Matrícula"
-                            required
-                            readOnly={!!selectedUser}
-                            value={selectedUser ? '••••••' : matricula}
-                            onChange={(e) => setMatricula(e.target.value)}
-                            style={{ width: '100%', paddingLeft: '40px', background: selectedUser ? '#f5f5f5' : 'white' }}
-                        />
+                    <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
+                        <div style={{ position: 'relative', flex: 1 }}>
+                            <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
+                            <input
+                                type="text"
+                                placeholder="Matrícula"
+                                required
+                                readOnly={!!selectedUser}
+                                value={selectedUser ? (showMatricula ? matricula : '••••••') : matricula}
+                                onChange={(e) => setMatricula(e.target.value)}
+                                style={{ width: '100%', paddingLeft: '40px', background: selectedUser ? '#f5f5f5' : 'white' }}
+                            />
+                        </div>
+                        {selectedUser && (
+                            <Button 
+                                type="button" 
+                                variant="ghost" 
+                                onClick={() => setShowMatricula(!showMatricula)}
+                                style={{ padding: '0 10px', fontSize: '11px', minWidth: '60px' }}
+                            >
+                                {showMatricula ? 'Ocultar' : 'Ver Nº'}
+                            </Button>
+                        )}
                     </div>
+                    {showMatricula && (
+                        <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255, 102, 0, 0.1)', borderRadius: '6px', borderLeft: '3px solid var(--assai-orange)' }}>
+                            <p style={{ fontSize: '11px', color: 'var(--text-primary)', margin: 0 }}>
+                                Sua senha são os <strong>4 primeiros dígitos</strong> (ex: {matricula.substring(0, 4)}).
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ position: 'relative' }}>
@@ -112,9 +133,12 @@ const LoginForm = ({ onLogin }) => {
             </form>
 
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                <a href="#" style={{ fontSize: '12px', color: 'var(--assai-orange)', textDecoration: 'none', fontWeight: '500' }}>Esqueci minha senha</a>
+                <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                    Esqueceu a senha? Selecione seu nome e clique em "Ver Nº" para ver os 4 dígitos iniciais.
+                </span>
             </div>
         </Card>
+
     );
 };
 
