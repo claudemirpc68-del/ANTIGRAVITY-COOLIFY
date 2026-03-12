@@ -5,7 +5,7 @@ import { Clock, Calendar, ArrowLeftRight, MessageSquare, Sun, Moon } from 'lucid
 import ScaleManager from '../gestor/ScaleManager';
 import Modal from '../common/Modal';
 import CommunicationCenter from '../common/CommunicationCenter';
-import MiniCalendar from '../common/MiniCalendar';
+
 
 import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
@@ -184,14 +184,7 @@ const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onM
                 )}
             </Card>
 
-            <div style={{ marginBottom: '20px' }}>
-                <MiniCalendar 
-                    colabId={user.id} 
-                    grid={dynamicGrid[user.id]} 
-                    year={currentYear} 
-                    month={currentMonth} 
-                />
-            </div>
+
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
                 <div style={{ padding: '12px', borderRadius: '10px', background: '#FFF8F0', border: turno.nome === '1º Turno' ? '2px solid var(--assai-orange)' : '1px solid #FFE0C8', display: 'flex', alignItems: 'center', gap: '8px' }}>
