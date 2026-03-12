@@ -3,6 +3,7 @@ import Card from '../common/Card';
 import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
 import Modal from '../common/Modal';
+import CommunicationCenter from '../common/CommunicationCenter';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
@@ -52,7 +53,7 @@ const StatusIcon = ({ icon, size = 14 }) => {
     return <CheckCircle size={size} />;
 };
 
-const GestorDashboard = () => {
+const GestorDashboard = ({ user, messages, notifications, onAddMessage, onAddNotification, onMarkRead }) => {
     const [showEquipe, setShowEquipe] = useState(false);
     const [showAprovar, setShowAprovar] = useState(false);
     const [showHistorico, setShowHistorico] = useState(false);
@@ -62,7 +63,8 @@ const GestorDashboard = () => {
     // Situações especiais: { colabId: 'AUSENCIA' | 'ATESTADO' | 'FERIAS' | 'AFASTADO' | null }
     const [situacaoEspecial, setSituacaoEspecial] = useState({});
     const [editSituacaoColab, setEditSituacaoColab] = useState(null);
-    const [listModal, setListModal] = useState(null); // { title: '', list: [], color: '' }
+    const [listModal, setListModal] = useState(null); 
+    const [activeMainTab, setActiveMainTab] = useState('dashboard'); // 'dashboard' or 'communication'
 
     // Dia selecionado para o resumo (inicializa com o dia de hoje)
     const [selectedDayIdx, setSelectedDayIdx] = useState(() => getTodayIndex());
@@ -130,6 +132,20 @@ const GestorDashboard = () => {
     const handleSetSituacao = (colabId, situacao) => {
         setSituacaoEspecial(prev => ({ ...prev, [colabId]: situacao === 'NORMAL' ? null : situacao }));
         setEditSituacaoColab(null);
+    };
+
+    const handleSendSwapRequest = (colab) => {
+        const confirmResult = window.confirm(`Deseja enviar uma solicitação de TROCA DE TURNO para ${colab.nome}?`);
+        if (confirmResult) {
+            onAddNotification({
+                title: '🔄 Solicitação de Troca de Turno',
+                message: `O gestor ${user.nome} solicitou uma conversa com você sobre uma possível troca de turno na escala atual. Por favor, entre em contato ou aguarde no local.`,
+                type: 'swap',
+                senderId: user.id,
+                recipientId: colab.id
+            });
+            alert('Solicitação enviada como notificação para o colaborador!');
+        }
     };
 
     return (
@@ -295,12 +311,48 @@ const GestorDashboard = () => {
 
             <div className="animate-fade-in" style={{ paddingBottom: '40px' }}>
                 <header style={{ marginBottom: '24px' }}>
-                    <h2 style={{ fontSize: '24px', fontWeight: '700' }}>Painel de Gestão</h2>
-                    <p style={{ color: 'var(--text-secondary)' }}>Setor: Mercearia | Unidade: Suzano 068</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <h2 style={{ fontSize: '24px', fontWeight: '700' }}>Painel de Gestão</h2>
+                            <p style={{ color: 'var(--text-secondary)' }}>Setor: Mercearia | Unidade: Suzano 068</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <Button 
+                                onClick={() => setActiveMainTab('dashboard')} 
+                                variant={activeMainTab === 'dashboard' ? 'primary' : 'outline'}
+                                style={{ fontSize: '13px' }}
+                            >
+                                Painel Principal
+                            </Button>
+                            <Button 
+                                onClick={() => setActiveMainTab('communication')} 
+                                variant={activeMainTab === 'communication' ? 'primary' : 'outline'}
+                                style={{ fontSize: '13px', position: 'relative' }}
+                            >
+                                Comunicação
+                                {notifications.filter(n => !n.read && n.recipientId === user.id).length > 0 && (
+                                    <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', fontSize: '10px', padding: '1px 5px', borderRadius: '10px' }}>
+                                        {notifications.filter(n => !n.read && n.recipientId === user.id).length}
+                                    </span>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
                 </header>
 
-                {/* ═══════ SITUAÇÃO DA EQUIPE — HOJE ═══════ */}
-                <Card style={{ marginBottom: '20px', background: 'linear-gradient(135deg, #1A1C1E 0%, #2D2F33 100%)', color: 'white', border: 'none' }}>
+                {activeMainTab === 'communication' ? (
+                    <CommunicationCenter 
+                        user={user} 
+                        messages={messages} 
+                        notifications={notifications}
+                        onAddMessage={onAddMessage}
+                        onAddNotification={onAddNotification}
+                        onMarkRead={onMarkRead}
+                    />
+                ) : (
+                    <>
+                    <Card style={{ marginBottom: '20px', background: 'linear-gradient(135deg, #1A1C1E 0%, #2D2F33 100%)', color: 'white', border: 'none' }}>
+
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                         <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'white', margin: 0 }}>
                             📊 Situação da Equipe
@@ -437,6 +489,9 @@ const GestorDashboard = () => {
                                             <span style={{ fontSize: '10px', color: 'var(--text-tertiary)' }}>{colab.funcao} · {colab.horario}</span>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <div title="Trocar Turno" onClick={e => { e.stopPropagation(); handleSendSwapRequest(colab); }} style={{ cursor: 'pointer', padding: '5px', borderRadius: '6px', background: 'rgba(255,102,0,0.08)', color: 'var(--assai-orange)', display: 'flex', alignItems: 'center' }}>
+                                                <Users size={14} />
+                                            </div>
                                             <span
                                                 title="Clique para alterar situação"
                                                 onClick={() => setEditSituacaoColab(colab)}
@@ -455,9 +510,12 @@ const GestorDashboard = () => {
                         </div>
                     )}
                 </Card>
+                </>
+                )}
             </div>
         </>
     );
 };
+
 
 export default GestorDashboard;

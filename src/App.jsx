@@ -23,6 +23,26 @@ function App() {
   const [user, setUser] = useState(initialUser);
   const [view, setView] = useState(initialUser ? initialUser.role : 'login');
 
+  // Estado global de mensagens e notificações
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('assai_messages');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('assai_notifications');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Salvar no localStorage sempre que mudar
+  React.useEffect(() => {
+    localStorage.setItem('assai_messages', JSON.stringify(messages));
+  }, [messages]);
+
+  React.useEffect(() => {
+    localStorage.setItem('assai_notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
   const handleLogin = (role, nome, id) => {
     const userData = { nome, role, id };
     setUser(userData);
@@ -34,6 +54,20 @@ function App() {
     setUser(null);
     setView('login');
     localStorage.removeItem('assai_user_session');
+  };
+
+  const addMessage = (msg) => {
+    const newMsg = { ...msg, id: Date.now(), timestamp: new Date().toISOString() };
+    setMessages(prev => [...prev, newMsg]);
+  };
+
+  const addNotification = (notif) => {
+    const newNotif = { ...notif, id: Date.now(), timestamp: new Date().toISOString(), read: false };
+    setNotifications(prev => [newNotif, ...prev]);
+  };
+
+  const markNotificationAsRead = (id) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
   return (
@@ -51,11 +85,33 @@ function App() {
         </div>
       ) : (
         <>
-          <Header user={user} title={view === 'gestor' ? "PAINEL ADMINISTRATIVO" : "MINHA ESCALA"} onLogout={handleLogout} />
+          <Header 
+            user={user} 
+            title={view === 'gestor' ? "PAINEL ADMINISTRATIVO" : "MINHA ESCALA"} 
+            onLogout={handleLogout}
+            notificationCount={notifications.filter(n => !n.read).length}
+          />
           <main style={{ padding: '0 20px' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-              {view === 'colaborador' && <ColaboradorDashboard user={user} />}
-              {view === 'gestor' && <GestorDashboard user={user} />}
+              {view === 'colaborador' && (
+                <ColaboradorDashboard 
+                  user={user} 
+                  messages={messages} 
+                  notifications={notifications}
+                  onAddMessage={addMessage}
+                  onMarkRead={markNotificationAsRead}
+                />
+              )}
+              {view === 'gestor' && (
+                <GestorDashboard 
+                  user={user} 
+                  messages={messages} 
+                  notifications={notifications}
+                  onAddMessage={addMessage}
+                  onAddNotification={addNotification}
+                  onMarkRead={markNotificationAsRead}
+                />
+              )}
 
               <div style={{ marginTop: '30px', borderTop: '1px solid #E0E0E0', paddingTop: '20px', textAlign: 'center' }}>
                 <Button onClick={handleLogout} variant="ghost" style={{ fontSize: '12px' }}>

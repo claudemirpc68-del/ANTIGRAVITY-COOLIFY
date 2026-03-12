@@ -4,6 +4,8 @@ import Button from '../common/Button';
 import { Clock, Calendar, ArrowLeftRight, MessageSquare, Sun, Moon } from 'lucide-react';
 import ScaleManager from '../gestor/ScaleManager';
 import Modal from '../common/Modal';
+import CommunicationCenter from '../common/CommunicationCenter';
+
 import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 
@@ -55,12 +57,13 @@ const getProximasFolgas = (colabId, todayIdx, dynamicGrid) => {
 
 // ─── Componente ────────────────────────────────────────────────────────────
 
-const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
+const ColaboradorDashboard = ({ user, messages, notifications, onAddMessage, onMarkRead }) => {
     const [showScale, setShowScale] = useState(true);
     const [showJustificativa, setShowJustificativa] = useState(false);
     const [showTroca, setShowTroca] = useState(false);
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState(null);
+    const [activeMainTab, setActiveMainTab] = useState('dashboard'); // 'dashboard' or 'communication'
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -113,9 +116,45 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '40px' }}>
             <header style={{ marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '700' }}>Olá, {user.nome.split(' ')[0]}! 👋</h2>
-                <p style={{ color: 'var(--text-secondary)' }}>{funcao} · Mercearia Suzano 068</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <h2 style={{ fontSize: '24px', fontWeight: '700' }}>Olá, {user.nome.split(' ')[0]}! 👋</h2>
+                        <p style={{ color: 'var(--text-secondary)' }}>{funcao} · Mercearia Suzano 068</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <Button 
+                            onClick={() => setActiveMainTab('dashboard')} 
+                            variant={activeMainTab === 'dashboard' ? 'primary' : 'outline'}
+                            style={{ fontSize: '12px' }}
+                        >
+                            Início
+                        </Button>
+                        <Button 
+                            onClick={() => setActiveMainTab('communication')} 
+                            variant={activeMainTab === 'communication' ? 'primary' : 'outline'}
+                            style={{ fontSize: '12px', position: 'relative' }}
+                        >
+                            Mural
+                            {notifications.filter(n => !n.read && n.recipientId === user.id).length > 0 && (
+                                <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', fontSize: '10px', padding: '1px 5px', borderRadius: '10px' }}>
+                                    {notifications.filter(n => !n.read && n.recipientId === user.id).length}
+                                </span>
+                            )}
+                        </Button>
+                    </div>
+                </div>
             </header>
+
+            {activeMainTab === 'communication' ? (
+                <CommunicationCenter 
+                    user={user} 
+                    messages={messages} 
+                    notifications={notifications}
+                    onAddMessage={onAddMessage}
+                    onMarkRead={onMarkRead}
+                />
+            ) : (
+                <>
 
             <Card className="assai-gradient" style={{ color: 'white', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -246,7 +285,9 @@ const ColaboradorDashboard = ({ user = { nome: 'Colaborador', id: '1' } }) => {
                         ))}
                     </div>
                 )}
-            </Card>
+                </Card>
+                </>
+            )}
         </div>
     );
 };
