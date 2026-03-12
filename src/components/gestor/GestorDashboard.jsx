@@ -8,6 +8,7 @@ import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockDa
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
 import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle } from 'lucide-react';
+import MiniCalendar from '../common/MiniCalendar';
 
 const DIAS_SEMANA_NOMES = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const FUNCOES = ['OP. LOJA', 'OP. PLENO', 'FISCAL', 'REPOSITOR', 'AUXILIAR'];
