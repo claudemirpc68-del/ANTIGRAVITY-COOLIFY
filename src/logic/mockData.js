@@ -39,6 +39,10 @@ export const MOCK_COLABORADORES = [
     { id: '33', nome: 'GILBERTO', matricula: '5285771', role: ROLES.COLABORADOR, funcao: 'OP. PLENO', horario: '14:30', folgaFixa: 5 },
 ];
 
+if (typeof window !== 'undefined') {
+    window.MOCK_COLABORADORES = MOCK_COLABORADORES;
+}
+
 export const MOCK_GESTOR = {
     id: '0',
     nome: 'EDERSON CUBAS',
