@@ -43,12 +43,32 @@ if (typeof window !== 'undefined') {
     window.MOCK_COLABORADORES = MOCK_COLABORADORES;
 }
 
-export const MOCK_GESTOR = {
-    id: '0',
-    nome: 'EDERSON CUBAS',
-    matricula: '101010',
-    role: ROLES.GESTOR
-};
+export const MOCK_GESTORES = [
+    {
+        id: '0',
+        nome: 'EDERSON CUBAS',
+        matricula: '101010',
+        role: ROLES.GESTOR
+    },
+    {
+        id: 'g1',
+        nome: 'JOHN',
+        matricula: '202020',
+        role: ROLES.GESTOR
+    },
+    {
+        id: 'g2',
+        nome: 'LEONARDO',
+        matricula: '303030',
+        role: ROLES.GESTOR
+    },
+    {
+        id: 'g3',
+        nome: 'ANTONIO',
+        matricula: '404040',
+        role: ROLES.GESTOR
+    }
+];
 
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();

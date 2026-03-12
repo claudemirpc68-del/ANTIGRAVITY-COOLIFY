@@ -14,9 +14,10 @@ const LoginForm = ({ onLogin }) => {
         const senhaLimpa = senha.trim();
 
         // Busca o colaborador ou gestor pela matrícula
-        const isGestor = matriculaLimpa === MOCK_GESTOR.matricula;
+        const gestorFound = MOCK_GESTORES.find(g => g.matricula === matriculaLimpa);
         const colaborador = MOCK_COLABORADORES.find(c => c.matricula === matriculaLimpa);
-        const userFound = isGestor ? MOCK_GESTOR : colaborador;
+        const userFound = gestorFound || colaborador;
+        const isGestor = !!gestorFound;
 
         if (!userFound) {
             alert('Matrícula não encontrada. Verique os dados ou procure seu gestor.');
@@ -32,7 +33,7 @@ const LoginForm = ({ onLogin }) => {
         }
 
         if (isGestor) {
-            onLogin('gestor', MOCK_GESTOR.nome, MOCK_GESTOR.id);
+            onLogin('gestor', gestorFound.nome, gestorFound.id);
         } else {
             onLogin('colaborador', colaborador.nome, colaborador.id);
         }
