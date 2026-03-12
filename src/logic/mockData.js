@@ -11,7 +11,7 @@ export const MOCK_COLABORADORES = [
     { id: '7', nome: 'PEDRO ANGELO', matricula: '672167', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30', folgaFixa: 1 },
     { id: '8', nome: 'CLAUDINEI', matricula: '4593634', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '07:30', folgaFixa: 2 },
     // 2º TURNO: 14:30 — 22:50
-    { id: '9', nome: 'CLAUDEMIR', matricula: '4593600', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 4 }, // Qui (Exemplo)
+    { id: '9', nome: 'CLAUDEMIR', matricula: '4593600', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 0 }, // Dom (Atualizado)
     { id: '10', nome: 'FABIO ROBERTO', matricula: '3366847', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 3 },
     { id: '11', nome: 'CLEONICE SANTOS', matricula: '640515', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 5 },
     { id: '12', nome: 'SERGIO RICO', matricula: '6413005', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 1 },
