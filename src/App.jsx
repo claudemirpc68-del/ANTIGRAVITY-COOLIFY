@@ -25,18 +25,24 @@ function App() {
 
   // Estado global de mensagens e notificações
   const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem('assai_messages');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('assai_messages');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem('assai_notifications');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('assai_notifications');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
   const [historico, setHistorico] = useState(() => {
-    const saved = localStorage.getItem('assai_historico');
-    if (saved) return JSON.parse(saved);
+    try {
+      const saved = localStorage.getItem('assai_historico');
+      if (saved) return JSON.parse(saved);
+    } catch {}
     return [
         { id: 1, nome: 'CLAUDEMIR ROSA', motivo: 'Atestado Médico (15/02)', status: 'aprovado', obs: 'Atestado validado por EDERSON. Retorna dia 16/02.', data: '12/03/2026' },
         { id: 2, nome: 'AMANDA PORTO', motivo: 'Troca de Turno', status: 'rejeitado', obs: 'Sem cobertura para o horário.', data: '15/02/2024' },
@@ -45,12 +51,16 @@ function App() {
   });
 
   const [pontosBatidos, setPontosBatidos] = useState(() => {
-    const saved = localStorage.getItem('assai_pontos_batidos');
-    // Só mantém o ponto se for o mesmo dia
-    if (saved) {
-      const { data, lista } = JSON.parse(saved);
-      if (data === new Date().toLocaleDateString()) return lista;
-    }
+    try {
+      const saved = localStorage.getItem('assai_pontos_batidos');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.data === new Date().toLocaleDateString() && Array.isArray(parsed.lista)) {
+          // Filtra garantindo que sejam objetos do novo formato (com colabId)
+          return parsed.lista.filter(p => p && typeof p === 'object' && p.colabId);
+        }
+      }
+    } catch (e) { console.warn("Erro ao ler pontos:", e); }
     return [];
   });
 
@@ -101,10 +111,12 @@ function App() {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
-  const handleBaterPonto = (colabId) => {
-    if (!pontosBatidos.includes(colabId)) {
-      setPontosBatidos(prev => [...prev, colabId]);
-    }
+  const handleBaterPonto = (pontoData) => {
+    // pontoData: { colabId, timestamp, coords, networkIP }
+    setPontosBatidos(prev => {
+      if (prev.find(p => p.colabId === pontoData.colabId)) return prev;
+      return [...prev, pontoData];
+    });
   };
 
   return (

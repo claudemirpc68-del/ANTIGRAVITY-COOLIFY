@@ -50,6 +50,14 @@ export const MOCK_GESTOR = {
     role: ROLES.GESTOR
 };
 
+export const LOJA_INFO = {
+    setor: 'MERCEARIA',
+    loja: 'SUZANO',
+    cr: '068',
+    unidade: 'SUZANO 068',
+    gestor: 'EDERSON CUBAS'
+};
+
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1; // 1 to 12

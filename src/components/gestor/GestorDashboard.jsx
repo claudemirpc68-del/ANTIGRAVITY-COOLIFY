@@ -8,7 +8,8 @@ import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockDa
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
 import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle, Clock, Flag } from 'lucide-react';
-
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const DIAS_SEMANA_NOMES = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const FUNCOES = ['OP. LOJA', 'OP. PLENO', 'FISCAL', 'REPOSITOR', 'AUXILIAR'];
@@ -182,9 +183,10 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                 data.trabalhando.push(c);
                 // Classificação extra baseada no horário atual se for o dia de hoje
                 if (selectedDayIdx === todayIdx) {
-                    const bateu = pontosBatidos.includes(c.id);
+                    const pontoInfo = Array.isArray(pontosBatidos) ? pontosBatidos.find(p => p && p.colabId === c.id) : null;
+                    const bateu = !!pontoInfo;
                     const config = getSituacaoConfig(c, dynamicGrid, todayIdx, situacaoEspecial, bateu);
-                    if (bateu && config.icon === 'check') data.emServico.push(c);
+                    if (config.label.includes('Em Serviço') || config.label.includes('Ponto Pendente')) data.emServico.push(c);
                     else if (config.label.includes('Aguardando')) data.aguardando.push(c);
                 }
             }
@@ -197,7 +199,82 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
         setJustificativas(justificativas.filter(j => j.id !== id));
     };
     const handleVerAnexo = (arquivo) => alert(`Abrindo visualização do arquivo: ${arquivo}`);
-    const handleExportPDF = () => alert('Gerando Relatório PDF...\nO arquivo "Escala_e_Historico_Assai.pdf" será baixado.');
+    
+    const handleExportPDF = () => {
+        const doc = new jsPDF();
+        
+        // Header
+        doc.setFillColor(255, 102, 0); // Assaí Orange
+        doc.rect(0, 0, 210, 20, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Relatório e Histórico da Escala - ${currentMonth}/${currentYear}`, 14, 13);
+        
+        // Subtitle Info
+        doc.setTextColor(50, 50, 50);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Setor: Mercearia | Unidade: Suzano 068', 14, 28);
+        doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 14, 34);
+        
+        // Table Data for History
+        const tableColumn = ["Data", "Colaborador", "Motivo", "Status", "Observação"];
+        const tableRows = [];
+        
+        historico.forEach(h => {
+            const hData = [
+                h.data,
+                h.nome,
+                h.motivo,
+                h.status.toUpperCase(),
+                h.obs
+            ];
+            tableRows.push(hData);
+        });
+
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text("Histórico de Ações e Alterações", 14, 45);
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 50,
+            theme: 'striped',
+            headStyles: { fillColor: [255, 102, 0] },
+            styles: { fontSize: 8 }
+        });
+
+        // Add Current Shift Summary Page
+        doc.addPage();
+        doc.setFillColor(25, 118, 210); // Secondary Blue
+        doc.rect(0, 0, 210, 20, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Resumo Geral da Equipe`, 14, 13);
+        
+        let yPos = 30;
+        doc.setTextColor(50, 50, 50);
+        doc.setFontSize(10);
+        
+        const summaryData = [
+            ['Trabalhando Hoje', resumoHoje.trabalhando.length],
+            ['Folgas/Descanso', resumoHoje.folga.length],
+            ['Ausentes/Atestado/Férias/Afastado', resumoHoje.ausencia.length + resumoHoje.atestado.length + resumoHoje.ferias.length + resumoHoje.afastado.length]
+        ];
+
+        doc.autoTable({
+            head: [['Situação', 'Quantidade']],
+            body: summaryData,
+            startY: yPos,
+            theme: 'grid',
+            headStyles: { fillColor: [50, 50, 50] }
+        });
+
+        doc.save(`Escala_e_Historico_Assai_${currentMonth}_${currentYear}.pdf`);
+    };
 
     const handleEditOpen = (colab) => {
         setEditColab(colab);
@@ -374,23 +451,41 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                         {listModal.list.length === 0 ? (
                             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center', padding: '20px 0' }}>Nenhum colaborador nesta situação.</p>
                         ) : (
-                            listModal.list.map((c, i) => (
-                                <div key={c.id || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee' }}>
-                                    <div>
-                                        <div style={{ fontWeight: '600', fontSize: '13px', color: '#333' }}>{c.nome}</div>
-                                        <div style={{ fontSize: '11px', color: '#777' }}>
-                                            {c.funcao} • {(() => {
-                                                const [h, m] = c.horario.split(':').map(Number);
-                                                const fim = (h * 60 + m + 500) % 1440;
-                                                const hF = Math.floor(fim / 60);
-                                                const mF = fim % 60;
-                                                return `Turno ${c.horario}—${String(hF).padStart(2, '0')}:${String(mF).padStart(2, '0')}`;
-                                            })()}
+                            listModal.list.map((c, i) => {
+                                const ponto = Array.isArray(pontosBatidos) ? pontosBatidos.find(p => p && typeof p === 'object' && p.colabId === c.id) : null;
+                                const hasValidTimestamp = ponto && ponto.timestamp && !isNaN(new Date(ponto.timestamp).getTime());
+                                
+                                return (
+                                    <div key={c.id || i} style={{ display: 'flex', flexDirection: 'column', padding: '12px', borderBottom: '1px solid #eee' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div>
+                                                <div style={{ fontWeight: '600', fontSize: '13px', color: '#333' }}>{c.nome}</div>
+                                                <div style={{ fontSize: '11px', color: '#777' }}>{c.funcao} · Mat. {c.matricula}</div>
+                                            </div>
+                                            <div style={{ fontSize: '10px', fontWeight: 'bold', color: listModal.color, background: `${listModal.color}15`, padding: '4px 8px', borderRadius: '4px' }}>
+                                                {hasValidTimestamp ? `PONTO: ${new Date(ponto.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}` : (ponto ? 'REGISTRADO' : 'PENDENTE')}
+                                            </div>
                                         </div>
+                                        {ponto && (
+                                            <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                                {ponto.networkIP && <span style={{ fontSize: '10px', background: '#F0F0F0', padding: '2px 6px', borderRadius: '4px', color: '#666' }}>IP: {ponto.networkIP}</span>}
+                                                {ponto.coords ? (
+                                                    <a 
+                                                        href={`https://www.google.com/maps?q=${ponto.coords.lat},${ponto.coords.lng}`} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        style={{ fontSize: '10px', background: 'rgba(0,184,148,0.1)', padding: '2px 6px', borderRadius: '4px', color: '#00B894', textDecoration: 'none', fontWeight: 'bold' }}
+                                                    >
+                                                        📍 Ver Localização (Mapa)
+                                                    </a>
+                                                ) : (
+                                                    <span style={{ fontSize: '10px', background: '#FFF0F0', padding: '2px 6px', borderRadius: '4px', color: '#D32F2F' }}>📍 GPS Desligado</span>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: listModal.color, background: `${listModal.color}15`, padding: '4px 8px', borderRadius: '4px' }}>Mat. {c.matricula}</div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                         <Button variant="outline" style={{ marginTop: '10px' }} onClick={() => setListModal(null)}>Fechar</Button>
                     </div>
@@ -449,7 +544,8 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                             {DIAS_IMAGEM[selectedDayIdx] ? `${DIAS_IMAGEM[selectedDayIdx].dia}/${String(currentMonth).padStart(2, '0')} (${DIAS_IMAGEM[selectedDayIdx].sem?.toUpperCase()})` : 'Selecionado'}
                         </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', overflowX: 'auto', gap: '10px', paddingBottom: '10px', marginBottom: '6px', WebkitOverflowScrolling: 'touch', minWidth: '100%', scrollSnapType: 'x mandatory' }}>
+
                             {[
                                 { label: 'Em Serviço', list: (selectedDayIdx === todayIdx) ? resumoHoje.emServico : resumoHoje.trabalhando, color: '#00E676', bg: 'rgba(0,230,118,0.12)' },
                                 { label: 'Aguardando', list: resumoHoje.aguardando, color: '#FFB300', bg: 'rgba(255,179,0,0.12)' },
@@ -463,12 +559,13 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                                     key={s.label}
                                     onClick={() => setListModal({ title: s.label, list: s.list, color: s.color })}
                                     title="Clique para ver quem são"
-                                    style={{ background: s.bg, borderRadius: '10px', padding: '10px', textAlign: 'center', border: `1px solid ${s.color}33`, cursor: 'pointer', transition: 'transform 0.1s' }}
+                                    style={{ flex: '0 0 auto', minWidth: '100px', background: s.bg, borderRadius: '10px', padding: '10px', textAlign: 'center', border: `1px solid ${s.color}33`, cursor: 'pointer', transition: 'transform 0.1s', scrollSnapAlign: 'start' }}
                                     onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
                                     onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
                                 >
                                     <div style={{ fontSize: '22px', fontWeight: '800', color: s.color }}>{s.list.length}</div>
-                                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)', fontWeight: '500' }}>{s.label}</div>
+                                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.7)', fontWeight: '500', whiteSpace: 'nowrap' }}>{s.label}</div>
+
                                 </div>
                             ))}
                     </div>
@@ -492,9 +589,10 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                 </Card>
 
                 {/* Cards de contagem */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', overflowX: 'auto', gap: '16px', paddingBottom: '10px', marginBottom: '14px', WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}>
                     <Card
-                        style={{ borderLeft: '4px solid var(--status-success)', padding: '16px', cursor: 'pointer' }}
+                        style={{ flex: '0 0 auto', minWidth: '160px', borderLeft: '4px solid var(--status-success)', padding: '16px', cursor: 'pointer', scrollSnapAlign: 'start' }}
+
                         onClick={() => setListModal({ title: 'Trabalhando Hoje', list: resumoHoje.trabalhando, color: 'var(--status-success)' })}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -505,8 +603,9 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                         <div style={{ fontSize: '10px', color: 'var(--status-success)', marginTop: '4px', fontWeight: '600' }}>Ver Lista »</div>
                     </Card>
                     <Card
-                        style={{ borderLeft: '4px solid var(--assai-orange)', padding: '16px', cursor: 'pointer' }}
+                        style={{ flex: '0 0 auto', minWidth: '160px', borderLeft: '4px solid var(--assai-orange)', padding: '16px', cursor: 'pointer', scrollSnapAlign: 'start' }}
                         onClick={() => setListModal({ title: 'Folgas/Descanso', list: resumoHoje.folga, color: 'var(--assai-orange)' })}
+
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <CalendarIcon size={20} color="var(--assai-orange)" />
@@ -516,8 +615,9 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                         <div style={{ fontSize: '10px', color: 'var(--assai-orange)', marginTop: '4px', fontWeight: '600' }}>Ver Lista »</div>
                     </Card>
                     <Card
-                        style={{ borderLeft: '4px solid var(--status-error)', padding: '16px', cursor: 'pointer' }}
+                        style={{ flex: '0 0 auto', minWidth: '160px', borderLeft: '4px solid var(--status-error)', padding: '16px', cursor: 'pointer', scrollSnapAlign: 'start' }}
                         onClick={() => setListModal({ title: 'Ausentes/Atestado', list: [...resumoHoje.ausencia, ...resumoHoje.atestado, ...resumoHoje.afastado], color: 'var(--status-error)' })}
+
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <AlertCircle size={20} color="var(--status-error)" />
@@ -572,12 +672,14 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                     {showEquipe && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', animation: 'fadeIn 0.3s' }}>
                             {colaboradores.map((colab, i) => {
-                                const situacaoConfig = getSituacaoConfig(colab, dynamicGrid, todayIdx, situacaoEspecial);
+                                const pontoInfo = Array.isArray(pontosBatidos) ? pontosBatidos.find(p => p && p.colabId === colab.id) : null;
+                                const bateu = !!pontoInfo;
+                                const situacaoConfig = getSituacaoConfig(colab, dynamicGrid, todayIdx, situacaoEspecial, bateu);
                                 const isMe = colab.nome === MOCK_GESTOR.nome;
                                 return (
                                     <div key={colab.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 8px', borderBottom: i < colaboradores.length - 1 ? '1px solid #F5F5F5' : 'none', borderRadius: '6px', background: isMe ? 'rgba(255,102,0,0.05)' : 'transparent' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: pontosBatidos.includes(colab.id) ? '#4CAF50' : (situacaoConfig.label.includes('Ponto Pendente') ? '#F44336' : '#DDD') }}></div>
+                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: bateu ? '#4CAF50' : (situacaoConfig.label.includes('Ponto Pendente') ? '#F44336' : '#DDD') }}></div>
                                             <span style={{ fontSize: '13px', fontWeight: isMe ? '700' : '500', color: isMe ? 'var(--assai-orange)' : 'var(--text-primary)' }}>{colab.nome}</span>
                                             <span style={{ fontSize: '10px', color: 'var(--text-tertiary)' }}>{colab.funcao} · {colab.horario}</span>
                                         </div>

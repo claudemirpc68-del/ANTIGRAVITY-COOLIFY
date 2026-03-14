@@ -85,7 +85,7 @@ const LoginForm = ({ onLogin }) => {
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
                     <Info size={16} color="var(--text-tertiary)" style={{ marginTop: '2px' }} />
                     <span style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                        <strong>Esqueceu seus dados?</strong> Por motivos de segurança, a lista de nomes foi removida. Caso não saiba sua matrícula, solicite ao seu gestor direto.
+                        <strong>Esqueceu seus dados?</strong> . Caso não saiba sua matrícula, solicite ao seu gestor direto.
                     </span>
                 </div>
             </div>

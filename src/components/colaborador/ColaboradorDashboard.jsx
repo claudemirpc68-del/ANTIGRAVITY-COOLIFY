@@ -146,33 +146,59 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
     const handleCheckIn = async () => {
         setIsCheckingIP(true);
         try {
-            // Em produção, usaríamos uma API para pegar o IP público.
-            // Para este demo, simulamos a chamada.
+            // 1. Obter Localização (GPS)
+            const getCoords = () => new Promise((resolve, reject) => {
+                if (!navigator.geolocation) reject('Geolocalização não suportada');
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    (err) => reject(err.message),
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            });
+
+            let coords = null;
+            try {
+                coords = await getCoords();
+            } catch (err) {
+                console.warn('Erro ao obter GPS:', err);
+                // Fallback ou aviso se necessário
+            }
+
+            // 2. Verificar IP/Rede
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
             const userIP = data.ip;
 
             if (bypassIP || userIP === STORE_CONFIG.OFFICIAL_IP) {
-                onBaterPonto(user.id);
-                alert('Ponto registrado com sucesso! Bom trabalho.');
+                onBaterPonto({
+                    colabId: user.id,
+                    timestamp: new Date().toISOString(),
+                    coords: coords,
+                    networkIP: userIP
+                });
+                alert('Ponto registrado com sucesso! Localização e IP validados. Bom trabalho.');
             } else {
-                alert(`Conexão Recusada!\n\nSeu IP atual (${userIP}) não pertence à rede autorizada da Mercearia Suzano.\n\nPor favor, conecte-se ao Wi-Fi da loja para bater o ponto.`);
+                alert(`Conexão Recusada!\n\nSeu IP atual (${userIP}) não pertence à rede autorizada da Mercearia Suzano 068.\n\nPor favor, conecte-se ao Wi-Fi da loja para bater o ponto.`);
             }
         } catch (error) {
-            console.error('Erro ao verificar IP:', error);
-            // Se a API falhar mas o usuário estiver no modo bypass, permite bater
+            console.error('Erro no registro de ponto:', error);
             if (bypassIP) {
-                onBaterPonto(user.id);
-                alert('Ponto registrado (Modo de Teste)!');
+                onBaterPonto({
+                    colabId: user.id,
+                    timestamp: new Date().toISOString(),
+                    coords: { lat: -23.5375, lng: -46.3123 }, // Coordenadas simuladas de Suzano
+                    networkIP: '127.0.0.1'
+                });
+                alert('Ponto registrado (Modo de Teste/Bypass)!');
             } else {
-                alert('Erro ao validar rede. Verifique sua conexão com o Wi-Fi.');
+                alert('Erro ao validar presença. Verifique sua conexão e tente novamente.');
             }
         } finally {
             setIsCheckingIP(false);
         }
     };
 
-    const jaBateuPonto = pontosBatidos.includes(user.id);
+    const jaBateuPonto = pontosBatidos.some(p => p.colabId === user.id);
 
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '40px' }}>

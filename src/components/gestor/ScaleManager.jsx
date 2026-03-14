@@ -2,18 +2,14 @@ import React, { useState, useMemo } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR, LOJA_INFO } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { Download, Printer, Search, AlertTriangle, CheckCircle, Info, Calendar, MessageSquare, X, Filter } from 'lucide-react';
 
-// Constantes da loja
-const LOJA_INFO = {
-    setor: 'MERCEARIA',
-    loja: 'SUZANO',
-    cr: '5356',
-    unidade: '068',
-    gestor: MOCK_GESTOR?.nome || 'EDERSON CUBAS'
-};
+// Constantes de data para o mês atual
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const currentMonth = currentDate.getMonth() + 1;
 
 const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [], colaboradores: propColaboradores }) => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,14 +18,21 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
     const [colabDetails, setColabDetails] = useState(null);
     const [obsText, setObsText] = useState('');
 
+    // Encontrar o dia de hoje pra inicializar quando for visão do colaborador
+    const getTodayIndex = () => {
+        const hoje = new Date();
+        const index = DIAS_IMAGEM.findIndex(d => d.dia === hoje.getDate());
+        return index !== -1 ? index : 0;
+    };
+
     // Suporte a estado local se não for passado pelo pai
-    const [localSelectedDayIndex, setLocalSelectedDayIndex] = useState(0);
+    const [localSelectedDayIndex, setLocalSelectedDayIndex] = useState(getTodayIndex());
     const selectedDayIndex = propSelectedDayIndex !== undefined ? propSelectedDayIndex : localSelectedDayIndex;
     const setSelectedDayIndex = propSetSelectedDayIndex !== undefined ? propSetSelectedDayIndex : setLocalSelectedDayIndex;
 
-    const currentColaboradores = propColaboradores;
+    const currentColaboradores = propColaboradores || MOCK_COLABORADORES;
     // Gerar escala dinâmica para o mês corrente
-    const dynamicScale = useMemo(() => generateScale(currentColaboradores, currentYear, currentMonth), [currentColaboradores, currentYear, currentMonth]);
+    const dynamicScale = useMemo(() => generateScale(currentColaboradores, currentYear, currentMonth), [currentColaboradores]);
 
     // Transformar em grid para compatibilidade
     const dynamicGrid = useMemo(() => {
@@ -158,7 +161,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
 
             {/* Tabela de Escala com dica de Scroll no Celular */}
             <Card style={{ padding: '0', overflowX: 'auto', border: '1px solid #E0E0E0', position: 'relative', WebkitOverflowScrolling: 'touch' }}>
-                <div style={{ padding: '8px', background: '#FFF8E1', color: '#F57F17', fontSize: '11px', textAlign: 'center', borderBottom: '1px solid #FFE082', display: window.innerWidth <= 768 ? 'block' : 'none' }}>
+                <div style={{ padding: '8px', background: '#FFF8E1', color: '#F57F17', fontSize: '11px', textAlign: 'center', borderBottom: '1px solid #FFE082' }}>
                     ⟷ Deslize para o lado para ver todos os dias da escala
                 </div>
                 <div style={{ minWidth: '800px' }}>
