@@ -148,7 +148,7 @@ const CommunicationCenter = ({ user, messages, notifications, onAddMessage, onMa
                 Como: <strong>{user.nome}</strong>
               </span>
               <Button type="submit" variant="primary" style={{ padding: '8px 20px' }}>
-                Enviar {msgType === 'all' ? 'Mural' : 'Privado'}
+                {msgType === 'all' ? 'Postar Mensagem' : 'Enviar Mensagem'}
               </Button>
             </div>
           </form>
