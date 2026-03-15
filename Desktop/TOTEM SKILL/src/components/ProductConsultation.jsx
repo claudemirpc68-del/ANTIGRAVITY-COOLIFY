@@ -3,15 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ArrowLeft, Loader2, CheckCircle2, AlertCircle, ShoppingCart, MapPin } from 'lucide-react';
 import { get_product_info, upsell_engine } from '../services/api';
 
-const ProductConsultation = ({ onBack, onShowLocation }) => {
-  const [query, setQuery] = useState('');
+const ProductConsultation = ({ onBack, onShowLocation, initialBarcode }) => {
+  const [query, setQuery] = useState(initialBarcode || '');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [upsell, setUpsell] = useState(null);
 
+  useEffect(() => {
+    if (initialBarcode) {
+      handleSearch();
+    }
+  }, [initialBarcode]);
+
   const handleSearch = (e) => {
     e?.preventDefault();
-    if (!query) return;
+    const searchTerm = e ? query : initialBarcode;
+    if (!searchTerm) return;
     
     setLoading(true);
     setResult(null);
@@ -19,7 +26,7 @@ const ProductConsultation = ({ onBack, onShowLocation }) => {
     
     // Simulate network delay
     setTimeout(() => {
-      const product = get_product_info(query);
+      const product = get_product_info(searchTerm);
       setResult(product || 'not_found');
       if (product) {
         setUpsell(upsell_engine(product.id));

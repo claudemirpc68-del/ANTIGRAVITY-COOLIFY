@@ -37,6 +37,25 @@ export const upsell_engine = (productId) => {
   };
 };
 
+export const recognize_product_from_image = (index) => {
+  // Simulate AI processing - returning product based on the "scanned" scenario
+  const scenarioProductMap = {
+    0: '1', // Maguary Uva
+    1: '6', // Del Valle Uva
+    2: '5', // Panco Rosquinha
+    4: '3'  // Óleo Soya
+  };
+  
+  const productId = scenarioProductMap[index] || '1';
+  const product = products.find(p => p.id === productId);
+  
+  if (product) {
+    log_analytics('image_recognition', { productId: product.id, scenarioIndex: index });
+  }
+  
+  return product;
+};
+
 export const log_analytics = (type, data) => {
   const log = {
     timestamp: new Date().toISOString(),
