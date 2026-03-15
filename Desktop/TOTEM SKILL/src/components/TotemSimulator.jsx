@@ -158,24 +158,7 @@ const TotemSimulator = ({ children, onHome }) => {
             <p style={{ fontSize: '0.4rem', color: '#555', marginTop: '2px' }}>CARD</p>
           </div>
 
-          {/* Compact QR Sticker */}
-          <div style={{ 
-            background: 'white', 
-            padding: '4px', 
-            borderRadius: '4px', 
-            width: '60px', 
-            height: '60px',
-            margin: '0 auto'
-          }}>
-            <div style={{ width: '100%', height: '100%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.4rem', textAlign: 'center', color: '#666' }}>
-              FIXED<br/>QR
-            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
       </div>
     </div>
   );
