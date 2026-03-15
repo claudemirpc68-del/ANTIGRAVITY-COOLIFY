@@ -77,7 +77,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <TotemSimulator>
+      <TotemSimulator onHome={() => setCurrentView('home')}>
         {renderView()}
       </TotemSimulator>
     </div>

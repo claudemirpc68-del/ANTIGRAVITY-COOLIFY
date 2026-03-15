@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Smartphone, ScanLine, Printer } from 'lucide-react';
+import { Smartphone, ScanLine, Printer, Home } from 'lucide-react';
 
-const TotemSimulator = ({ children }) => {
+const TotemSimulator = ({ children, onHome }) => {
   return (
     <div style={{
       minHeight: '100vh',
@@ -27,13 +27,37 @@ const TotemSimulator = ({ children }) => {
         {/* Top Header Label */}
         <div style={{
           background: '#007A33', // Verde Assaí
-          padding: '15px',
+          padding: '15px 30px',
           textAlign: 'center',
           borderRadius: '10px 10px 0 0',
           borderBottom: '2px solid #FF8200', // Laranja Assaí Separator
-          marginBottom: '5px'
+          marginBottom: '5px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
-          <h2 style={{ color: 'white', fontSize: '1.8rem', fontWeight: '900', letterSpacing: '1px' }}>ASSAÍ <span style={{ color: '#FF8200' }}>ATACADISTA</span></h2>
+          <button 
+            onClick={onHome}
+            style={{ 
+              background: 'rgba(255,255,255,0.1)', 
+              border: '1px solid rgba(255,255,255,0.2)', 
+              color: 'white', 
+              padding: '10px', 
+              borderRadius: '12px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '1rem',
+              fontWeight: 'bold'
+            }}
+          >
+            <Home size={24} /> INÍCIO
+          </button>
+          <h2 style={{ color: 'white', fontSize: '1.8rem', fontWeight: '900', letterSpacing: '1px', margin: 0, flex: 1, textAlign: 'center' }}>
+            ASSAÍ <span style={{ color: '#FF8200' }}>ATACADISTA</span>
+          </h2>
+          <div style={{ width: '100px' }}></div> {/* Spacer to keep title centered */}
         </div>
 
         {/* Integrated Discreet Simulator Controls */}
