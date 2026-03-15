@@ -141,6 +141,39 @@ export const products = [
     category: 'Sucos e Bebidas',
     image: 'h2oh_limoneto.jpg',
     related: ['10', '1']
+  },
+  {
+    id: '14',
+    name: 'Café Pilão Tradicional 500g',
+    barcode: '7891234567900',
+    price: 18.99,
+    stock: 120,
+    location: { corridor: '12', shelf: '1' },
+    category: 'Café',
+    image: 'https://images.tcdn.com.br/img/img_prod/739115/cafe_pilao_torrado_e_moido_tradicional_500g_2487_1_793441584ea00c3b88523ec997b69f68.jpg',
+    related: ['15', '16']
+  },
+  {
+    id: '15',
+    name: 'Café 3 Corações Extra Forte 500g',
+    barcode: '7891234567901',
+    price: 19.49,
+    stock: 95,
+    location: { corridor: '12', shelf: '1' },
+    category: 'Café',
+    image: 'https://3coracoes.com.br/wp-content/uploads/2021/08/cafe-3-coracoes-extra-forte-500g.png',
+    related: ['14', '16']
+  },
+  {
+    id: '16',
+    name: 'Café Melitta Tradicional 500g',
+    barcode: '7891234567902',
+    price: 18.49,
+    stock: 110,
+    location: { corridor: '12', shelf: '2' },
+    category: 'Café',
+    image: 'https://conquistandoosucesso.com.br/wp-content/uploads/2020/06/cafe-melitta-tradicional-500g.png',
+    related: ['14', '15']
   }
 ];
 

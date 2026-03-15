@@ -4,17 +4,19 @@ import { Smartphone, ScanLine, Printer, Home } from 'lucide-react';
 const TotemSimulator = ({ children, onHome }) => {
   return (
     <div style={{
-      minHeight: '100vh',
+      height: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       background: '#1a1a1a',
-      padding: '40px'
+      padding: '20px',
+      overflow: 'hidden'
     }}>
       {/* Physical Totem Body */}
       <div style={{
-        width: '1000px',
-        height: 'auto',
+        width: '100%',
+        maxWidth: '1000px',
+        maxHeight: '95vh',
         background: '#333',
         borderRadius: '20px',
         padding: '10px',
@@ -22,34 +24,37 @@ const TotemSimulator = ({ children, onHome }) => {
         border: '4px solid #444',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative'
+        position: 'relative',
+        transform: 'scale(0.9)', // Slight scale down to ensure visibility
       }}>
         {/* Top Header Label */}
         <div style={{
           background: '#007A33', // Verde Assaí
-          padding: '15px 30px',
+          padding: '15px 20px',
           textAlign: 'center',
           borderRadius: '10px 10px 0 0',
-          borderBottom: '2px solid #FF8200', // Laranja Assaí Separator
+          borderBottom: '4px solid #FF8200', // Brighter Orange Separator
           marginBottom: '5px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          zIndex: 10
         }}>
           <button 
             onClick={onHome}
             style={{ 
-              background: 'rgba(255,255,255,0.1)', 
-              border: '1px solid rgba(255,255,255,0.2)', 
+              background: '#FF8200', 
+              border: 'none', 
               color: 'white', 
-              padding: '10px', 
+              padding: '12px 24px', 
               borderRadius: '12px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              fontSize: '1rem',
-              fontWeight: 'bold'
+              fontSize: '1.1rem',
+              fontWeight: '900',
+              boxShadow: '0 4px 0 #b35b00'
             }}
           >
             <Home size={24} /> INÍCIO
@@ -57,66 +62,41 @@ const TotemSimulator = ({ children, onHome }) => {
           <h2 style={{ color: 'white', fontSize: '1.8rem', fontWeight: '900', letterSpacing: '1px', margin: 0, flex: 1, textAlign: 'center' }}>
             ASSAÍ <span style={{ color: '#FF8200' }}>ATACADISTA</span>
           </h2>
-          <div style={{ width: '100px' }}></div> {/* Spacer to keep title centered */}
+          <div style={{ width: '120px' }}></div> 
         </div>
 
         {/* Integrated Discreet Simulator Controls */}
         <div style={{
           background: '#222',
-          padding: '8px 20px',
+          padding: '5px 20px',
           display: 'flex',
-          gap: '15px',
+          gap: '10px',
           alignItems: 'center',
           borderBottom: '1px solid #444',
           justifyContent: 'center'
         }}>
-          <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 'bold', textTransform: 'uppercase' }}>Simular Scanner:</span>
-          <button 
-            onClick={() => {
-              const event = new CustomEvent('simulate-scan', { detail: 'Leite sem lactose' });
-              window.dispatchEvent(event);
-            }}
-            style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              border: '1px solid #444', 
-              color: '#aaa', 
-              fontSize: '0.7rem', 
-              padding: '4px 12px', 
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Leite s/ Lactose
-          </button>
-          <button 
-            onClick={() => {
-              const event = new CustomEvent('simulate-scan', { detail: 'Detergente' });
-              window.dispatchEvent(event);
-            }}
-            style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              border: '1px solid #444', 
-              color: '#aaa', 
-              fontSize: '0.7rem', 
-              padding: '4px 12px', 
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Detergente
-          </button>
+          <span style={{ fontSize: '0.6rem', color: '#555', fontWeight: 'bold' }}>SCAN:</span>
+          {['Leite', 'Café', 'Soya'].map(item => (
+            <button key={item}
+              onClick={() => window.dispatchEvent(new CustomEvent('simulate-scan', { detail: item }))}
+              style={{ background: '#333', border: '1px solid #444', color: '#888', fontSize: '0.6rem', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              {item}
+            </button>
+          ))}
         </div>
 
         {/* The Screen (UI App) */}
         <div style={{
           background: '#f8fafc',
           width: '100%',
-          aspectRatio: '4/3', // Proporção padrão de telas de 15"
+          flex: 1, // Let it fill space
+          minHeight: '400px',
+          aspectRatio: '4/3', 
           borderRadius: '4px',
           overflow: 'hidden',
-          border: '12px solid #111',
-          position: 'relative',
-          boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1)'
+          border: '10px solid #111',
+          position: 'relative'
         }}>
           {children}
         </div>

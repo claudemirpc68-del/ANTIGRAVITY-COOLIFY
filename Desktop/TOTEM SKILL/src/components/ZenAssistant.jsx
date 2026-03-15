@@ -108,16 +108,23 @@ const ZenAssistant = ({ onShowLocation, onBack }) => {
                     animate={{ opacity: 1, height: 'auto' }}
                     style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid rgba(0,0,0,0.05)' }}
                   >
+                    {msg.data.image && (
+                      <img 
+                        src={msg.data.image} 
+                        alt={msg.data.name} 
+                        style={{ width: '100%', borderRadius: '12px', marginBottom: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }} 
+                      />
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: '800' }}>R$ {msg.data.price.toFixed(2).replace('.', ',')}</span>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button 
-                          onClick={() => onShowLocation(msg.data.id)}
-                          style={{ background: 'var(--accent)', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.9rem' }}
-                        >
-                          <MapPin size={16} /> Ver no Mapa
-                        </button>
-                      </div>
+                      <span style={{ fontWeight: '800', fontSize: '1.4rem', color: 'var(--primary)' }}>
+                        R$ {msg.data.price.toFixed(2).replace('.', ',')}
+                      </span>
+                      <button 
+                        onClick={() => onShowLocation(msg.data.id)}
+                        style={{ background: 'var(--accent)', color: 'white', border: 'none', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}
+                      >
+                        <MapPin size={18} /> Ver Localização
+                      </button>
                     </div>
                   </motion.div>
                 )}
@@ -128,77 +135,67 @@ const ZenAssistant = ({ onShowLocation, onBack }) => {
         <div ref={scrollRef} />
       </div>
 
-      {/* Interaction Area */}
-      <div style={{ padding: '30px', background: 'white', borderTop: '1px solid var(--glass-border)' }}>
-        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
-          <input
-            type="text"
-            placeholder="Pergunte sobre um produto..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            style={{
-              width: '100%',
-              padding: '20px 70px 200px 30px', // Large space for the circle
-              fontSize: '1.2rem',
-              borderRadius: '30px',
-              border: '2px solid #eee',
-              outline: 'none',
-              background: '#fcfcfc'
-            }}
-          />
-          
-          {/* Pulsing Mic Circle */}
-          <div style={{ 
-            position: 'absolute', 
-            bottom: '40px', 
-            left: '50%', 
-            transform: 'translateX(-50%)',
-            textAlign: 'center'
-          }}>
-            <motion.div
-              animate={{ 
-                scale: isListening ? [1, 1.2, 1] : 1,
-                boxShadow: isListening ? '0 0 30px var(--primary)' : '0 4px 10px rgba(0,0,0,0.1)'
-              }}
-              transition={{ repeat: isListening ? Infinity : 0, duration: 1.5 }}
-              onClick={toggleMic}
+      {/* Interaction Area - REDESIGNED for Ergonomics */}
+      <div style={{ padding: '20px 30px', background: 'white', borderTop: '1px solid var(--glass-border)' }}>
+        <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <input
+              type="text"
+              placeholder={isListening ? "Ouvindo você..." : "Pergunte sobre um produto..."}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               style={{
-                width: '100px',
-                height: '100px',
-                background: isListening ? 'var(--primary)' : 'white',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                border: '4px solid var(--primary)',
-                margin: '0 auto 10px'
+                width: '100%',
+                padding: '18px 60px 18px 25px',
+                fontSize: '1.2rem',
+                borderRadius: '20px',
+                border: `2px solid ${isListening ? 'var(--primary)' : '#eee'}`,
+                outline: 'none',
+                background: '#fcfcfc',
+                transition: 'all 0.3s'
+              }}
+            />
+            <button 
+              onClick={() => handleSend()}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'var(--primary)',
+                color: 'white',
+                border: 'none',
+                padding: '8px',
+                borderRadius: '12px',
+                cursor: 'pointer'
               }}
             >
-              <Mic size={48} color={isListening ? 'white' : 'var(--primary)'} />
-            </motion.div>
-            <p style={{ fontWeight: '700', color: isListening ? 'var(--primary)' : 'var(--text-secondary)' }}>
-              {isListening ? 'Ouvindo...' : 'Toque para falar'}
-            </p>
+              <ArrowRight size={24} />
+            </button>
           </div>
 
-          <button 
-            onClick={() => handleSend()}
+          <motion.div
+            animate={{ 
+              scale: isListening ? [1, 1.1, 1] : 1,
+              backgroundColor: isListening ? 'var(--primary)' : 'white'
+            }}
+            transition={{ repeat: isListening ? Infinity : 0, duration: 1.5 }}
+            onClick={toggleMic}
             style={{
-              position: 'absolute',
-              right: '15px',
-              top: '12px',
-              background: 'var(--primary)',
-              color: 'white',
-              border: 'none',
-              padding: '12px',
-              borderRadius: '50%',
-              cursor: 'pointer'
+              width: '64px',
+              height: '64px',
+              borderRadius: '18px',
+              border: '3px solid var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
             }}
           >
-            <ArrowRight size={24} />
-          </button>
+            {isListening ? <Mic size={32} color="white" /> : <Mic size={32} color="var(--primary)" />}
+          </motion.div>
         </div>
       </div>
     </div>
