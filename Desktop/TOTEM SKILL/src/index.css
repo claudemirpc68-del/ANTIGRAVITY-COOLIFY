@@ -8,6 +8,9 @@
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --font-main: 'Outfit', sans-serif;
+  --accent-green: #22c55e;
+  --accent-orange: #f97316;
+  --accent-purple: #8b5cf6;
 }
 
 body {

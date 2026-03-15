@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Search, MapPin, Tag, ShoppingCart, User, Bot, ArrowRight } from 'lucide-react';
 import { analyzeIntent, speak } from '../services/llm';
 
-const ZenAssistant = ({ onShowLocation }) => {
+const ZenAssistant = ({ onShowLocation, onBack }) => {
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'Olá! Sou seu assistente Assaí. Como posso te ajudar hoje?' }
   ]);
@@ -50,11 +50,27 @@ const ZenAssistant = ({ onShowLocation }) => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-zen)' }}>
       {/* Header */}
-      <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', background: 'white', display: 'flex', alignItems: 'center', gap: '15px' }}>
-        <div style={{ background: 'var(--primary)', padding: '10px', borderRadius: '12px' }}>
-          <Bot color="white" size={24} />
+      <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ background: 'var(--primary)', padding: '10px', borderRadius: '12px' }}>
+            <Bot color="white" size={24} />
+          </div>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--primary)' }}>ASSISTENTE ASSAÍ</h1>
         </div>
-        <h1 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--primary)' }}>ASSISTENTE ASSAÍ</h1>
+        <button 
+          onClick={onBack}
+          style={{ 
+            background: 'transparent', 
+            border: '2px solid var(--accent-orange)', 
+            color: 'var(--accent-orange)',
+            padding: '8px 16px',
+            borderRadius: '12px',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+        >
+          Voltar
+        </button>
       </div>
 
       {/* Chat Area */}
