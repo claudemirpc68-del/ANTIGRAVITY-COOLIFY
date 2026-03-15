@@ -36,6 +36,53 @@ const TotemSimulator = ({ children }) => {
           <h2 style={{ color: 'white', fontSize: '1.8rem', fontWeight: '900', letterSpacing: '1px' }}>ASSAÍ <span style={{ color: '#FF8200' }}>ATACADISTA</span></h2>
         </div>
 
+        {/* Integrated Discreet Simulator Controls */}
+        <div style={{
+          background: '#222',
+          padding: '8px 20px',
+          display: 'flex',
+          gap: '15px',
+          alignItems: 'center',
+          borderBottom: '1px solid #444',
+          justifyContent: 'center'
+        }}>
+          <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 'bold', textTransform: 'uppercase' }}>Simular Scanner:</span>
+          <button 
+            onClick={() => {
+              const event = new CustomEvent('simulate-scan', { detail: 'Leite sem lactose' });
+              window.dispatchEvent(event);
+            }}
+            style={{ 
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid #444', 
+              color: '#aaa', 
+              fontSize: '0.7rem', 
+              padding: '4px 12px', 
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Leite s/ Lactose
+          </button>
+          <button 
+            onClick={() => {
+              const event = new CustomEvent('simulate-scan', { detail: 'Detergente' });
+              window.dispatchEvent(event);
+            }}
+            style={{ 
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid #444', 
+              color: '#aaa', 
+              fontSize: '0.7rem', 
+              padding: '4px 12px', 
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Detergente
+          </button>
+        </div>
+
         {/* The Screen (UI App) */}
         <div style={{
           background: '#f8fafc',
@@ -130,33 +177,6 @@ const TotemSimulator = ({ children }) => {
         </div>
       </div>
       
-      {/* Simulation Controls (Floating Panels) */}
-      <div style={{ position: 'fixed', left: '40px', top: '40px', width: '250px' }} className="glass-card">
-        <div style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '1rem', marginBottom: '15px' }}>Simulador de Scanner</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <button 
-              className="btn-primary" 
-              style={{ fontSize: '0.8rem', padding: '10px', background: 'var(--primary)' }}
-              onClick={() => {
-                const event = new CustomEvent('simulate-scan', { detail: 'Leite sem lactose' });
-                window.dispatchEvent(event);
-              }}
-            >
-              Simular Voz: "Leite sem lactose"
-            </button>
-            <button 
-              className="btn-primary" 
-              style={{ fontSize: '0.8rem', padding: '10px', background: 'var(--accent)' }}
-              onClick={() => {
-                const event = new CustomEvent('simulate-scan', { detail: 'Detergente' });
-                window.dispatchEvent(event);
-              }}
-            >
-              Simular Voz: "Onde tem detergente?"
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
