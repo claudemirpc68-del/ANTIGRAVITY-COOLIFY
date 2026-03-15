@@ -101,12 +101,12 @@ const TotemSimulator = ({ children, onHome }) => {
           {children}
         </div>
 
-        {/* Hardware Components Section (Bottom) */}
+        {/* Hardware Components Section - COMPACTED */}
         <div style={{
-          padding: '40px 20px',
+          padding: '15px 20px',
           display: 'grid',
-          gridTemplateColumns: '1fr 1.5fr 1fr',
-          gap: '20px',
+          gridTemplateColumns: 'minmax(80px, 1fr) 2fr minmax(80px, 1fr) 100px', // Added QR space
+          gap: '15px',
           alignItems: 'center',
           background: '#222',
           borderRadius: '0 0 10px 10px',
@@ -115,22 +115,21 @@ const TotemSimulator = ({ children, onHome }) => {
           {/* Printer Slot */}
           <div style={{ textAlign: 'center' }}>
             <div style={{ 
-              width: '80px', 
-              height: '10px', 
+              width: '60px', 
+              height: '6px', 
               background: '#000', 
-              margin: '0 auto 10px', 
-              borderRadius: '5px',
+              margin: '0 auto 5px', 
+              borderRadius: '3px',
               border: '1px solid #444'
             }} />
-            <Printer size={32} color="#555" />
-            <p style={{ fontSize: '0.6rem', color: '#555', marginTop: '5px' }}>IMPRESSORA</p>
+            <Printer size={20} color="#555" />
           </div>
 
-          {/* Scanner Window */}
+          {/* Compact Scanner Window */}
           <div style={{ 
             background: '#111', 
-            height: '100px', 
-            borderRadius: '10px', 
+            height: '40px', // Reduced from 100px
+            borderRadius: '8px', 
             border: '2px solid #444',
             display: 'flex',
             alignItems: 'center',
@@ -139,46 +138,44 @@ const TotemSimulator = ({ children, onHome }) => {
             overflow: 'hidden'
           }}>
             <motion.div 
-              animate={{ opacity: [0.2, 0.8, 0.2] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              style={{ width: '80%', height: '2px', background: 'red', boxShadow: '0 0 10px red' }}
+              animate={{ opacity: [0.2, 0.8, 0.2], top: ['0%', '100%'] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              style={{ width: '100%', height: '2px', background: 'red', boxShadow: '0 0 10px red', position: 'absolute' }}
             />
-            <ScanLine size={48} color="#333" style={{ position: 'absolute' }} />
+            <span style={{ fontSize: '0.6rem', color: '#444', fontWeight: 'bold' }}>SCANNER AREA</span>
           </div>
 
-          {/* Card Reader / Touch Pad */}
+          {/* Compact Card Reader */}
           <div style={{ textAlign: 'center' }}>
             <div style={{ 
-              width: '60px', 
-              height: '80px', 
+              width: '40px', 
+              height: '30px', 
               background: '#111', 
               margin: '0 auto', 
-              borderRadius: '8px',
+              borderRadius: '4px',
               border: '2px solid #444' 
             }} />
-            <p style={{ fontSize: '0.6rem', color: '#555', marginTop: '5px' }}>CARD READER</p>
+            <p style={{ fontSize: '0.4rem', color: '#555', marginTop: '2px' }}>CARD</p>
           </div>
-        </div>
 
-        {/* Large Decorative QR for Mobile Sync */}
-        <div style={{
-          marginTop: '30px',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <div style={{ background: 'white', padding: '10px', borderRadius: '8px' }}>
-            <div style={{ width: '120px', height: '120px', background: '#eee' }}>
-              {/* This represents the physical label on the kiosk */}
-              <div style={{ padding: '10px', textAlign: 'center', fontSize: '0.7rem' }}>SIMULATED QR</div>
+          {/* Compact QR Sticker */}
+          <div style={{ 
+            background: 'white', 
+            padding: '4px', 
+            borderRadius: '4px', 
+            width: '60px', 
+            height: '60px',
+            margin: '0 auto'
+          }}>
+            <div style={{ width: '100%', height: '100%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.4rem', textAlign: 'center', color: '#666' }}>
+              FIXED<br/>QR
             </div>
           </div>
-          <p style={{ color: '#aaa', fontSize: '0.8rem', textAlign: 'center' }}>
-            Escaneie e leve as informações<br/>no seu celular
-          </p>
         </div>
+      </div>
+    </div>
+  );
+};
       </div>
     </div>
   );
