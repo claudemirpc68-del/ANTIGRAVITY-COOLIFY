@@ -131,7 +131,7 @@ const TotemSimulator = ({ children }) => {
       </div>
       
       {/* Simulation Controls (Floating Panels) */}
-      <div style={{ position: 'fixed', right: '40px', top: '40px', width: '250px' }} className="glass-card">
+      <div style={{ position: 'fixed', left: '40px', top: '40px', width: '250px' }} className="glass-card">
         <div style={{ padding: '20px' }}>
           <h3 style={{ fontSize: '1rem', marginBottom: '15px' }}>Simulador de Scanner</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
