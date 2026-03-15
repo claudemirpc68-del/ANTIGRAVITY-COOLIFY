@@ -44,7 +44,7 @@ const Home = ({ onNavigate }) => {
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(3, 1fr)', 
-        gap: '30px',
+        gap: '40px', // Aumentado
         padding: '20px'
       }}>
         {menuItems.map((item, index) => (
@@ -57,29 +57,29 @@ const Home = ({ onNavigate }) => {
             whileTap={{ scale: 0.95 }}
             className="glass-card"
             style={{ 
-              padding: '40px', 
+              padding: '60px 40px', // Aumentado padding vertical
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
-              gap: '20px',
-              borderBottom: `6px solid ${item.color}`
+              gap: '25px', // Aumentado
+              borderBottom: `8px solid ${item.color}` // Borda mais grossa
             }}
             onClick={() => onNavigate(item.id)}
           >
             <div style={{ 
               background: item.color, 
-              padding: '20px', 
-              borderRadius: '20px',
+              padding: '24px', // Aumentado
+              borderRadius: '24px', // Aumentado
               boxShadow: `0 0 20px ${item.color}44`
             }}>
-              <item.icon size={48} color="white" />
+              <item.icon size={64} color="white" /> {/* Ícone maior */}
             </div>
             <div>
-              <h2 style={{ fontSize: '1.8rem', marginBottom: '8px' }}>{item.label}</h2>
-              <p style={{ color: 'var(--text-secondary)' }}>{item.description}</p>
+              <h2 style={{ fontSize: '2.2rem', marginBottom: '12px' }}>{item.label}</h2> {/* Fonte maior */}
+              <p style={{ color: 'var(--text-secondary)', fontSize: '1.3rem' }}>{item.description}</p> {/* Fonte maior */}
             </div>
           </motion.div>
         ))}

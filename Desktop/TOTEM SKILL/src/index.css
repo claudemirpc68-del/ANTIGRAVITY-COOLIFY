@@ -25,6 +25,8 @@ body {
   background-image: 
     radial-gradient(at 0% 0%, #dcfce7 0, transparent 50%), 
     radial-gradient(at 100% 0%, #ffedd5 0, transparent 50%);
+  font-size: 18px;
+  overflow: hidden;
 }
 
 #root {
@@ -47,14 +49,15 @@ body {
   border: none;
   border-radius: 16px;
   color: white;
-  padding: 16px 24px;
-  font-weight: 600;
+  padding: 18px 32px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
+  font-size: 1.1rem;
 }
 
 .btn-primary:hover {

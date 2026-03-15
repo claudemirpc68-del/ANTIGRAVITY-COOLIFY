@@ -13,7 +13,7 @@ const TotemSimulator = ({ children }) => {
     }}>
       {/* Physical Totem Body */}
       <div style={{
-        width: '800px',
+        width: '1000px',
         height: 'auto',
         background: '#333',
         borderRadius: '20px',
@@ -87,7 +87,7 @@ const TotemSimulator = ({ children }) => {
         <div style={{
           background: '#f8fafc',
           width: '100%',
-          aspectRatio: '3/4.5', // Slightly taller for chat
+          aspectRatio: '4/3', // Proporção padrão de telas de 15"
           borderRadius: '4px',
           overflow: 'hidden',
           border: '12px solid #111',
