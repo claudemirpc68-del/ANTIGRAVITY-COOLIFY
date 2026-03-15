@@ -176,8 +176,6 @@ const TotemSimulator = ({ children }) => {
           </p>
         </div>
       </div>
-      
-      </div>
     </div>
   );
 };
