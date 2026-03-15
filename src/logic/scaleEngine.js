@@ -23,11 +23,19 @@ export const generateScale = (colaboradores, ano, mes) => {
         const folgaFixa = colab.folgaFixa; // 0=Dom, 1=Seg...
         let domingosTrabalhadosCount = 0;
 
-        // Determinar quais domingos este colaborador folga (base inicial).
-        // Regra: 2 domingos por mês. Vamos alternar baseado no ID ou algo fixo para consistência.
-        const domingosFolgaBase = (parseInt(colab.id) % 2 === 0)
-            ? [domingos[0], domingos[2]].filter(Boolean)
-            : [domingos[1], domingos[3]].filter(Boolean);
+        // Determinar quais domingos este colaborador folga.
+        // Padrão: 2 domingos por mês. 
+        // Claudemir (22) especificou trabalhar 15 e 22 (domingos 3 e 4 do mês).
+        let domingosFolgaBase;
+        if (colab.id === '22' || colab.nome.includes('CLAUDEMIR')) {
+            // Claudemir: hoje (15/03) é o segundo domingo de folga.
+            // Portanto, folgou dia 08 e 15. Trabalha 22 e 29.
+            domingosFolgaBase = [domingos[1], domingos[2]].filter(Boolean);
+        } else {
+            domingosFolgaBase = (parseInt(colab.id) % 2 === 0)
+                ? [domingos[0], domingos[2]].filter(Boolean)
+                : [domingos[1], domingos[3]].filter(Boolean);
+        }
 
         // Inicializando diasDesdeFolga para que a primeira folga caia no dia folgaFixa
         let primeiroDiaSem = new Date(ano, mes - 1, 1).getDay();
@@ -38,24 +46,29 @@ export const generateScale = (colaboradores, ano, mes) => {
             const dataAtual = new Date(ano, mes - 1, dia);
             const diaSemana = dataAtual.getDay();
 
+            // LÓGICA DE TRANSIÇÃO: Reset de Ciclo em 16/03/2026
+            // Se hoje é Segunda (16/03), reiniciamos a contagem para alinhar a nova tabela
+            if (dia === 16 && mes === 3 && ano === 2026) {
+                diasDesdeFolga = 0; // Começa nova contagem de trabalho
+            }
+
             let tipo = SCALE_TYPES.TRABALHO;
 
-            // REGRA 1: Segurança 6x1 (Não permitir mais de 6 dias seguidos de trabalho)
-            if (diasDesdeFolga >= 6) {
-                tipo = SCALE_TYPES.FOLGA;
-            }
-            // REGRA 2: Domingo de Folga
-            else if (diaSemana === 0) {
-                // Se já trabalhou 2 domingos OU está na sua escala de folga de domingo
-                if (domingosTrabalhadosCount >= 2 || domingosFolgaBase.includes(dia)) {
+            // REGRA 1: Domingo de Folga (Prioritária para garantir rodízio Assai)
+            if (diaSemana === 0) {
+                if (domingosFolgaBase.includes(dia)) {
                     tipo = SCALE_TYPES.FOLGA;
                 } else {
                     tipo = SCALE_TYPES.TRABALHO;
                     domingosTrabalhadosCount++;
                 }
             }
-            // REGRA 3: Folga Fixa Semanal
+            // REGRA 2: Folga Fixa Semanal
             else if (diaSemana === folgaFixa) {
+                tipo = SCALE_TYPES.FOLGA;
+            }
+            // REGRA 3: Segurança 6x1 (Não permitir mais de 6 dias seguidos de trabalho)
+            else if (diasDesdeFolga >= 6) {
                 tipo = SCALE_TYPES.FOLGA;
             }
 
