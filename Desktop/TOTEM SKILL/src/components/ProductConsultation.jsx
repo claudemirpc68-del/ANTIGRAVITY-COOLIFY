@@ -1,13 +1,23 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ArrowLeft, Loader2, CheckCircle2, AlertCircle, ShoppingCart, MapPin } from 'lucide-react';
+import { Search, ArrowLeft, Loader2, CheckCircle2, AlertCircle, ShoppingCart, MapPin, Mic, MicOff } from 'lucide-react';
 import { get_product_info, upsell_engine } from '../services/api';
+import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
 const ProductConsultation = ({ onBack, onShowLocation, initialBarcode }) => {
   const [query, setQuery] = useState(initialBarcode || '');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [upsell, setUpsell] = useState(null);
+  
+  const { isListening, transcript, startListening } = useVoiceRecognition();
+
+  useEffect(() => {
+    if (transcript) {
+      setQuery(transcript);
+      handleSearch(null, transcript);
+    }
+  }, [transcript]);
 
   useEffect(() => {
     if (initialBarcode) {
@@ -15,9 +25,9 @@ const ProductConsultation = ({ onBack, onShowLocation, initialBarcode }) => {
     }
   }, [initialBarcode]);
 
-  const handleSearch = (e) => {
+  const handleSearch = (e, voiceTranscript) => {
     e?.preventDefault();
-    const searchTerm = e ? query : initialBarcode;
+    const searchTerm = voiceTranscript || query;
     if (!searchTerm) return;
     
     setLoading(true);
@@ -68,24 +78,35 @@ const ProductConsultation = ({ onBack, onShowLocation, initialBarcode }) => {
           <Search style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} size={32} />
           <input
             type="text"
-            placeholder="Digite o nome ou código do produto..."
+            placeholder={isListening ? "Ouvindo você..." : "Digite o nome ou código do produto..."}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={{ 
               width: '100%',
-              padding: '24px 24px 24px 72px',
+              padding: '24px 140px 24px 72px',
               fontSize: '1.5rem',
               borderRadius: '24px',
-              border: '1px solid var(--glass-border)',
+              border: `2px solid ${isListening ? 'var(--accent)' : 'var(--glass-border)'}`,
               background: 'var(--glass-bg)',
               color: 'white',
               outline: 'none',
-              transition: 'all 0.3s'
+              transition: 'all 0.3s',
+              boxShadow: isListening ? '0 0 20px rgba(255,130,0,0.3)' : 'none'
             }}
           />
-          <button type="submit" className="btn-primary" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
-            Buscar
-          </button>
+          <div style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: '8px' }}>
+            <button 
+              type="button" 
+              onClick={startListening}
+              className={`btn-primary ${isListening ? 'pulse' : ''}`}
+              style={{ padding: '12px', background: isListening ? 'var(--accent)' : 'rgba(255,255,255,0.1)' }}
+            >
+              {isListening ? <Mic size={24} /> : <MicOff size={24} />}
+            </button>
+            <button type="submit" className="btn-primary">
+              Buscar
+            </button>
+          </div>
         </form>
 
         <AnimatePresence mode="wait">

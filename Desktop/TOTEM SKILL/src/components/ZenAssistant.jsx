@@ -1,15 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Search, MapPin, Tag, ShoppingCart, User, Bot, ArrowRight } from 'lucide-react';
+import { Mic, Search, MapPin, Tag, ShoppingCart, User, Bot, ArrowRight, MicOff } from 'lucide-react';
 import { analyzeIntent, speak } from '../services/llm';
+import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
 const ZenAssistant = ({ onShowLocation, onBack }) => {
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'Olá! Sou seu assistente Assaí. Como posso te ajudar hoje?' }
   ]);
   const [input, setInput] = useState('');
-  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef(null);
+  
+  const { isListening, transcript, startListening } = useVoiceRecognition();
+
+  useEffect(() => {
+    if (transcript) {
+      setInput(transcript);
+      handleSend(transcript);
+    }
+  }, [transcript]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,14 +46,7 @@ const ZenAssistant = ({ onShowLocation, onBack }) => {
   };
 
   const toggleMic = () => {
-    setIsListening(!isListening);
-    if (!isListening) {
-      // Simulate voice input end after 2s
-      setTimeout(() => {
-        setIsListening(false);
-        handleSend("Onde encontro leite sem lactose?"); // Simulated voice captured
-      }, 2500);
-    }
+    startListening();
   };
 
   return (
