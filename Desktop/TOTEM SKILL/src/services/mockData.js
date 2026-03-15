@@ -97,6 +97,50 @@ export const products = [
     category: 'Cereais',
     image: 'aveia.jpg',
     related: ['8']
+  },
+  {
+    id: '10',
+    name: 'Água Tônica FYS Laranja Siciliano 350ml',
+    barcode: '7896052607228',
+    price: 3.49,
+    stock: 240,
+    location: { corridor: '6', shelf: '2' },
+    category: 'Sucos e Bebidas',
+    image: 'fys_laranja.jpg',
+    related: ['1', '6']
+  },
+  {
+    id: '11',
+    name: 'Granola Tradicional 1kg',
+    barcode: '7891234567899',
+    price: 18.90,
+    stock: 55,
+    location: { corridor: '11', shelf: '3' },
+    category: 'Cereais',
+    image: 'granola.jpg',
+    related: ['8', '9']
+  },
+  {
+    id: '12',
+    name: 'Seara Big Tekitos 900g',
+    barcode: '7894904283361',
+    price: 24.90,
+    stock: 85,
+    location: { corridor: '14', shelf: '1' }, // Corredor de Congelados
+    category: 'Congelados',
+    image: 'big_tekitos.jpg',
+    related: ['13']
+  },
+  {
+    id: '13',
+    name: 'H2OH! Limoneto 350ml',
+    barcode: '7892840823986',
+    price: 3.25,
+    stock: 310,
+    location: { corridor: '6', shelf: '1' }, // Corredor de Bebidas
+    category: 'Sucos e Bebidas',
+    image: 'h2oh_limoneto.jpg',
+    related: ['10', '1']
   }
 ];
 

@@ -1,6 +1,7 @@
 import { products, promotions } from './mockData';
 
 export const get_product_info = (input) => {
+  // 1. Search in local mock data
   const product = products.find(p => 
     p.name.toLowerCase().includes(input.toLowerCase()) || 
     p.barcode === input
@@ -8,9 +9,26 @@ export const get_product_info = (input) => {
   
   if (product) {
     log_analytics('product_lookup', { productId: product.id, query: input });
+    return product;
+  }
+
+  // 2. Simulate Web Search for EAN-13 barcodes
+  if (/^\d{13}$/.test(input)) {
+    log_analytics('web_barcode_lookup', { barcode: input });
+    // In a real app, this would call an external API like Cosmos or OpenFoodFacts
+    // For the demo, we'll return a "Remote" product structure
+    return {
+      id: 'remote_' + input,
+      name: `Produto Externo (${input})`,
+      price: 0.00,
+      stock: 'Consultar Setor',
+      location: { corridor: '??', shelf: '??' },
+      category: 'Consulta Web',
+      isRemote: true
+    };
   }
   
-  return product;
+  return null;
 };
 
 export const get_location = (productId) => {
