@@ -4,6 +4,8 @@ import LoginForm from './components/common/LoginForm'
 import Button from './components/common/Button'
 import ColaboradorDashboard from './components/colaborador/ColaboradorDashboard'
 import GestorDashboard from './components/gestor/GestorDashboard'
+import ZenAssistant from './components/common/ZenAssistant'
+import { MOCK_COLABORADORES } from './logic/mockData'
 
 function App() {
   // Inicializar estado a partir do localStorage
@@ -27,7 +29,19 @@ function App() {
   const [messages, setMessages] = useState(() => {
     try {
       const saved = localStorage.getItem('assai_messages');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) return JSON.parse(saved);
+      return [
+        {
+          id: 'system-1',
+          senderId: 'bot',
+          senderName: 'Assistente Assaí 🤖',
+          recipientId: 'all',
+          text: 'Olá equipe! Sou seu novo Assistente Virtual. Amanhã teremos o novo ciclo da escala 6x1. Qualquer dúvida, basta clicar no ícone do robô no canto inferior direito!',
+          type: 'text',
+          isPrivate: false,
+          timestamp: new Date().toISOString()
+        }
+      ];
     } catch { return []; }
   });
 
@@ -166,6 +180,8 @@ function App() {
                   onMarkRead={markNotificationAsRead}
                 />
               )}
+
+              <ZenAssistant user={user} colaboradores={MOCK_COLABORADORES} />
 
               <div style={{ marginTop: '30px', borderTop: '1px solid #E0E0E0', paddingTop: '20px', textAlign: 'center' }}>
                 <Button onClick={handleLogout} variant="ghost" style={{ fontSize: '12px' }}>
