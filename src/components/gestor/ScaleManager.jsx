@@ -107,23 +107,21 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
             {!colaboradorId && (
                 <>
                     {/* Header / Info Pane */}
-                    <Card style={{ padding: '20px', background: 'linear-gradient(to right, #0060B1, #0082ED)', color: 'white' }}>
+                    <Card className="assai-gradient" style={{ padding: '24px', color: 'white', border: 'none', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--card-shadow)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '15px' }}>
                             <div>
-                                <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: '800' }}>ESCALA 6X1 - VISAO GESTOR</h2>
-                                <div style={{ display: 'flex', gap: '20px', fontSize: '13px', opacity: 0.9, flexWrap: 'wrap' }}>
-                                    <span><strong>SETOR:</strong> {LOJA_INFO.setor}</span>
-                                    <span><strong>LOJA:</strong> {LOJA_INFO.loja}</span>
-                                    <span><strong>CR:</strong> {LOJA_INFO.cr}</span>
-                                    <span><strong>UNIDADE:</strong> {LOJA_INFO.unidade}</span>
-                                    <span><strong>GESTOR:</strong> {LOJA_INFO.gestor}</span>
+                                <h2 style={{ margin: '0 0 10px 0', fontSize: '26px', fontWeight: '900', letterSpacing: '-0.5px' }}>ESCALA 6X1 — GESTÃO</h2>
+                                <div style={{ display: 'flex', gap: '20px', fontSize: '12px', opacity: 0.9, flexWrap: 'wrap', fontWeight: '500' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '6px', height: '6px', background: 'white', borderRadius: '50%' }} /> <strong>SETOR:</strong> {LOJA_INFO.setor}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '6px', height: '6px', background: 'white', borderRadius: '50%' }} /> <strong>UNIDADE:</strong> {LOJA_INFO.unidade}</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><div style={{ width: '6px', height: '6px', background: 'white', borderRadius: '50%' }} /> <strong>GESTOR:</strong> {LOJA_INFO.gestor}</span>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <Button variant="ghost" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => window.print()}>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <Button variant="ghost" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(4px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 'var(--border-radius-sm)' }} onClick={() => window.print()}>
                                     <Printer size={16} /> Imprimir
                                 </Button>
-                                <Button variant="ghost" style={{ background: 'white', color: '#0060B1', border: 'none' }} onClick={onExport}>
+                                <Button variant="ghost" style={{ background: 'white', color: 'var(--assai-orange)', border: 'none', borderRadius: 'var(--border-radius-sm)', fontWeight: '700' }} onClick={onExport}>
                                     <Download size={16} /> Exportar PDF
                                 </Button>
                             </div>
@@ -160,9 +158,9 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
             )}
 
             {/* Tabela de Escala com dica de Scroll no Celular */}
-            <Card style={{ padding: '0', overflowX: 'auto', border: '1px solid #E0E0E0', position: 'relative', WebkitOverflowScrolling: 'touch' }}>
-                <div style={{ padding: '8px', background: '#FFF8E1', color: '#F57F17', fontSize: '11px', textAlign: 'center', borderBottom: '1px solid #FFE082' }}>
-                    ⟷ Deslize para o lado para ver todos os dias da escala
+            <Card style={{ padding: '0', overflowX: 'auto', border: '1px solid #EAEAEA', borderRadius: 'var(--border-radius-md)', position: 'relative', WebkitOverflowScrolling: 'touch', boxShadow: 'var(--card-shadow)' }}>
+                <div style={{ padding: '10px', background: '#FFFBF5', color: 'var(--assai-orange)', fontSize: '11px', textAlign: 'center', fontWeight: '600', borderBottom: '1px solid #FFEEDD' }}>
+                    💡 Deslize horizontalmente para navegar pelos dias do mês
                 </div>
                 <div style={{ minWidth: '800px' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>

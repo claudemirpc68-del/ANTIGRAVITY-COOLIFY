@@ -7,9 +7,10 @@ import Modal from '../common/Modal';
 import CommunicationCenter from '../common/CommunicationCenter';
 
 
-import { MOCK_COLABORADORES, DIAS_IMAGEM } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { STORE_CONFIG } from '../../logic/constants';
+import WhatsAppModal from '../common/WhatsAppModal';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -89,11 +90,9 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
     const [isCheckingIP, setIsCheckingIP] = useState(false);
     const [bypassIP, setBypassIP] = useState(false);
     const [showScale, setShowScale] = useState(true);
-    const [showJustificativa, setShowJustificativa] = useState(false);
-    const [showTroca, setShowTroca] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [file, setFile] = useState(null);
     const [activeMainTab, setActiveMainTab] = useState('dashboard'); // 'dashboard' or 'communication'
+    const [waModalOpen, setWaModalOpen] = useState(false);
+    const [waTemplate, setWaTemplate] = useState('');
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -133,14 +132,14 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
         }, 1200);
     };
 
-    const handleSubmitTroca = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            alert('Pedido de troca de turno registrado! Aguarde a confirmação de um colega ou gestor.');
-            setShowTroca(false);
-            setLoading(false);
-        }, 1200);
+    const handleTalkToGestor = (type = 'general') => {
+        const templates = {
+            general: `Olá ${MOCK_GESTOR.nome}, aqui é o colaborador ${user.nome}. Gostaria de tratar de um assunto sobre minha escala.`,
+            atraso: `Olá ${MOCK_GESTOR.nome}, tive um imprevisto e vou me atrasar um pouco hoje. Já estou a caminho!`,
+            duvida: `Oi ${MOCK_GESTOR.nome}, estou com uma dúvida sobre meu dia de folga nesta semana. Poderia me confirmar?`
+        };
+        setWaTemplate(templates[type] || templates.general);
+        setWaModalOpen(true);
     };
 
     const handleCheckIn = async () => {
@@ -219,14 +218,9 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
                         <Button 
                             onClick={() => setActiveMainTab('communication')} 
                             variant={activeMainTab === 'communication' ? 'primary' : 'outline'}
-                            style={{ fontSize: '12px', position: 'relative' }}
+                            style={{ fontSize: '12px' }}
                         >
-                            Mural
-                            {notifications.filter(n => !n.read && n.recipientId === user.id).length > 0 && (
-                                <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', fontSize: '10px', padding: '1px 5px', borderRadius: '10px' }}>
-                                    {notifications.filter(n => !n.read && n.recipientId === user.id).length}
-                                </span>
-                            )}
+                            WhatsApp
                         </Button>
                     </div>
                 </div>
@@ -314,73 +308,20 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '24px' }}>
                 <Card style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowScale(!showScale)}>
                     <Calendar size={24} color={showScale ? 'var(--status-success)' : 'var(--assai-orange)'} style={{ marginBottom: '8px' }} />
                     <p style={{ fontSize: '13px', fontWeight: '600' }}>{showScale ? 'Ocultar Escala' : 'Minha Escala'}</p>
                 </Card>
-                <Card style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowTroca(true)}>
-                    <ArrowLeftRight size={24} color="var(--assai-orange)" style={{ marginBottom: '8px' }} />
-                    <p style={{ fontSize: '13px', fontWeight: '600' }}>Trocar Turno</p>
-                </Card>
-                <Card style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowJustificativa(true)}>
-                    <MessageSquare size={24} color="var(--assai-orange)" style={{ marginBottom: '8px' }} />
-                    <p style={{ fontSize: '13px', fontWeight: '600' }}>Justificativa</p>
-                </Card>
             </div>
 
-            <Modal isOpen={showJustificativa} onClose={() => setShowJustificativa(false)} title="Enviar Justificativa">
-                <form onSubmit={handleSubmitJustificativa}>
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>Justifique atrasos, faltas ou saídas antecipadas.</p>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>Motivo:</label>
-                    <select required style={{ width: '100%', marginBottom: '16px', padding: '8px', borderRadius: '8px', border: '1px solid #ddd' }}>
-                        <option value="">Selecione um motivo...</option>
-                        <option value="atestado">Atestado Médico</option>
-                        <option value="transporte">Problemas com Transporte</option>
-                        <option value="pessoal">Problema Pessoal / Familiar</option>
-                        <option value="outros">Outros</option>
-                    </select>
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>Anexar Atestado/Documento (Opcional):</label>
-                        <div style={{ position: 'relative', border: '2px dashed #ddd', borderRadius: '12px', padding: '16px', textAlign: 'center', background: '#fcfcfc' }}>
-                            <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                onChange={(e) => setFile(e.target.files[0])}
-                                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
-                            />
-                            <div style={{ color: 'var(--text-secondary)' }}>
-                                {file ? (
-                                    <div style={{ color: 'var(--assai-orange)', fontWeight: '600' }}>
-                                        📄 {file.name}
-                                    </div>
-                                ) : (
-                                    <span style={{ fontSize: '12px' }}>Clique ou arraste um arquivo (JPEG/PDF)</span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                    <Button type="submit" variant="primary" style={{ width: '100%' }} disabled={loading}>{loading ? 'Enviando...' : 'Enviar para Gestor'}</Button>
-                </form>
-            </Modal>
+            <WhatsAppModal 
+                isOpen={waModalOpen} 
+                onClose={() => setWaModalOpen(false)} 
+                recipient={MOCK_GESTOR} 
+                templateMessage={waTemplate} 
+            />
 
-            <Modal isOpen={showTroca} onClose={() => setShowTroca(false)} title="Solicitar Troca de Turno">
-                <form onSubmit={handleSubmitTroca}>
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>Deseja trocar seu turno {turno.nome} por outro? Selecione o dia:</p>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>Dia da Troca:</label>
-                    <input type="date" required style={{ width: '100%', marginBottom: '16px', padding: '8px', borderRadius: '8px', border: '1px solid #ddd' }} />
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '8px' }}>Turno Desejado:</label>
-                    <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                        <label style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}>
-                            <input type="radio" name="turno" value="1" defaultChecked={turno.nome === '2º Turno'} /> <span style={{ marginLeft: '8px', fontSize: '13px' }}>1º Turno</span>
-                        </label>
-                        <label style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}>
-                            <input type="radio" name="turno" value="2" defaultChecked={turno.nome === '1º Turno'} /> <span style={{ marginLeft: '8px', fontSize: '13px' }}>2º Turno</span>
-                        </label>
-                    </div>
-                    <Button type="submit" variant="primary" style={{ width: '100%' }} disabled={loading}>{loading ? 'Processando...' : 'Solicitar Troca'}</Button>
-                </form>
-            </Modal>
 
             {showScale && <div style={{ marginBottom: '24px', animation: 'fadeIn 0.3s' }}><ScaleManager colaboradorId={user.id} historico={historico} /></div>}
 

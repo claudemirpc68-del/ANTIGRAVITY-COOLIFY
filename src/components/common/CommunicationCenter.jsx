@@ -1,196 +1,139 @@
 import React, { useState } from 'react';
 import Card from './Card';
 import Button from './Button';
+import { MessageSquare, Share2, ExternalLink } from 'lucide-react';
+import WhatsAppModal from './WhatsAppModal';
+import { DIAS_IMAGEM } from '../../logic/mockData';
 
-const CommunicationCenter = ({ user, messages, notifications, onAddMessage, onMarkRead }) => {
-  const [activeTab, setActiveTab] = useState('messages'); // 'messages' or 'alerts'
-  const [msgType, setMsgType] = useState('all'); // 'all' (mural) or 'private'
-  const [newMessage, setNewMessage] = useState('');
+const CommunicationCenter = ({ user }) => {
+  // WhatsApp State
+  const [waModalOpen, setWaModalOpen] = useState(false);
+  const [waRecipient, setWaRecipient] = useState(null);
+  const [waTemplate, setWaTemplate] = useState('');
   const [selectedRecipient, setSelectedRecipient] = useState('');
 
   const colaboradores = user.role === 'gestor' ? (window.MOCK_COLABORADORES || []) : [];
+  const gestor = window.MOCK_GESTOR || { nome: 'Gestor', telefone: '5511974154868' };
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-    if (msgType === 'private' && !selectedRecipient && user.role === 'gestor') {
-      alert('Por favor, selecione um destinatário.');
-      return;
-    }
-
-    onAddMessage({
-      senderId: user.id,
-      senderName: user.nome,
-      recipientId: msgType === 'all' ? 'all' : (user.role === 'gestor' ? selectedRecipient : '0'),
-      text: newMessage,
-      type: 'text',
-      isPrivate: msgType === 'private'
+  const generateScaleSummary = (colab) => {
+    const dynamicScale = window.dynamicScale || [];
+    const grade = {};
+    dynamicScale.forEach(entry => {
+        if (entry.colaborador_id === colab.id) {
+            if (!grade[colab.id]) grade[colab.id] = [];
+            grade[colab.id].push(entry.tipo);
+        }
     });
 
-    setNewMessage('');
-    alert('Mensagem enviada com sucesso!');
+    const colabGrade = grade[colab.id] || [];
+    const folgas = [];
+    const currentMonth = new Date().getMonth() + 1;
+    const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const mesNome = MESES[currentMonth - 1];
+
+    DIAS_IMAGEM.forEach((d, idx) => {
+        if (colabGrade[idx] === 'F' || colabGrade[idx] === 'D') {
+            folgas.push(d.dia);
+        }
+    });
+
+    return `🗓️ *SUA ESCALA - ${mesNome.toUpperCase()}*\n\nOlá ${colab.nome}, segue o resumo das suas folgas para este mês:\n\n*Folgas:* ${folgas.join(', ')}\n*Turno:* ${colab.horario}\n\n_Favor conferir no Painel Zen._`;
   };
 
-  const filteredMessages = messages.filter(m => {
-    if (m.recipientId === 'all') return true;
-    if (m.recipientId === user.id || m.senderId === user.id) return true;
-    return false;
-  });
+  const handleWhatsAppAction = (type) => {
+    let recipient = null;
+    let template = '';
+
+    if (user.role === 'gestor') {
+        recipient = colaboradores.find(c => c.id === selectedRecipient);
+        if (!recipient) {
+            alert('Selecione um colaborador primeiro.');
+            return;
+        }
+        
+        if (type === 'escala') {
+            template = generateScaleSummary(recipient);
+        } else {
+            template = `Olá ${recipient.nome}, aqui é o gestor ${user.nome} do Assaí Suzano. Gostaria de falar sobre sua escala.`;
+        }
+    } else {
+        recipient = gestor;
+        template = `Olá ${gestor.nome}, aqui é o colaborador ${user.nome}. Gostaria de tratar de um assunto sobre minha escala.`;
+    }
+
+    setWaRecipient(recipient);
+    setWaTemplate(template);
+    setWaModalOpen(true);
+  };
 
   return (
     <div className="animate-fade-in" style={{ marginTop: '20px' }}>
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        <Button 
-          onClick={() => setActiveTab('messages')} 
-          variant={activeTab === 'messages' ? 'primary' : 'ghost'}
-          style={{ flex: 1 }}
-        >
-          Mensagens
-        </Button>
-        <Button 
-          onClick={() => setActiveTab('alerts')} 
-          variant={activeTab === 'alerts' ? 'primary' : 'ghost'}
-          style={{ flex: 1 }}
-        >
-          Notificações {notifications.filter(n => !n.read).length > 0 && `(${notifications.filter(n => !n.read).length})`}
-        </Button>
-      </div>
+      <WhatsAppModal 
+        isOpen={waModalOpen} 
+        onClose={() => setWaModalOpen(false)} 
+        recipient={waRecipient} 
+        templateMessage={waTemplate} 
+      />
 
-      {activeTab === 'messages' ? (
-        <Card title="Canais de Comunicação">
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
-            <button 
-              onClick={() => setMsgType('all')}
-              style={{ 
-                flex: 1, padding: '8px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer',
-                background: msgType === 'all' ? 'var(--assai-orange)' : '#f0f0f0',
-                color: msgType === 'all' ? 'white' : 'var(--text-secondary)',
-                border: 'none', fontWeight: 'bold'
-              }}
-            >
-              Mural Público
-            </button>
-            <button 
-              onClick={() => setMsgType('private')}
-              style={{ 
-                flex: 1, padding: '8px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer',
-                background: msgType === 'private' ? 'var(--assai-orange)' : '#f0f0f0',
-                color: msgType === 'private' ? 'white' : 'var(--text-secondary)',
-                border: 'none', fontWeight: 'bold'
-              }}
-            >
-              Conversa Privada
-            </button>
-          </div>
+      <Card title="WhatsApp Assaí — Central de Contatos">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '10px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
+                {user.role === 'gestor' 
+                    ? "Selecione um colaborador abaixo para iniciar um contato direto ou enviar o resumo da escala via WhatsApp."
+                    : "Utilize o botão abaixo para entrar em contato diretamente com o gestor via WhatsApp."}
+            </p>
 
-          <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '20px', padding: '10px', background: '#f9f9f9', borderRadius: '8px', display: 'flex', flexDirection: 'column' }}>
-            {filteredMessages.filter(m => msgType === 'all' ? !m.isPrivate : m.isPrivate).length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '13px' }}>Nenhuma mensagem aqui.</p>
-            ) : (
-              filteredMessages.filter(m => msgType === 'all' ? !m.isPrivate : m.isPrivate).map((msg) => (
-                <div key={msg.id} style={{ 
-                  marginBottom: '12px', 
-                  padding: '10px', 
-                  borderRadius: '12px', 
-                  background: msg.senderId === user.id ? '#E3F2FD' : 'white',
-                  border: '1px solid #EEE',
-                  alignSelf: msg.senderId === user.id ? 'flex-end' : 'flex-start',
-                  maxWidth: '85%',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                }}>
-                  <div style={{ fontSize: '11px', fontWeight: 'bold', color: msg.isPrivate ? '#1976D2' : 'var(--assai-orange)', marginBottom: '4px' }}>
-                    {msg.senderName} {msg.isPrivate ? ' (Privado)' : ''}
-                  </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{msg.text}</div>
-                  <div style={{ fontSize: '9px', color: 'var(--text-tertiary)', textAlign: 'right', marginTop: '4px' }}>
-                    {new Date(msg.timestamp).toLocaleString('pt-BR')}
-                  </div>
+            {user.role === 'gestor' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <select 
+                            value={selectedRecipient} 
+                            onChange={(e) => setSelectedRecipient(e.target.value)}
+                            style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px', background: 'white' }}
+                        >
+                            <option value="">Selecione o colaborador...</option>
+                            {colaboradores.map(c => (
+                            <option key={c.id} value={c.id}>{c.nome} ({c.funcao})</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <Button 
+                            onClick={() => handleWhatsAppAction('general')}
+                            style={{ padding: '15px', background: '#25D366', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                        >
+                            <MessageSquare size={20} /> Iniciar Conversa
+                        </Button>
+                        <Button 
+                            onClick={() => handleWhatsAppAction('escala')}
+                            style={{ padding: '15px', background: '#00B894', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                        >
+                            <Share2 size={20} /> Enviar Escala
+                        </Button>
+                    </div>
                 </div>
-              ))
-            )}
-          </div>
-
-          <form onSubmit={handleSendMessage} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {msgType === 'private' && user.role === 'gestor' && (
-              <select 
-                value={selectedRecipient} 
-                onChange={(e) => setSelectedRecipient(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '13px' }}
-              >
-                <option value="">Selecione o destinatário...</option>
-                {colaboradores.map(c => (
-                  <option key={c.id} value={c.id}>{c.nome}</option>
-                ))}
-              </select>
-            )}
-            {msgType === 'private' && user.role === 'colaborador' && (
-              <div style={{ fontSize: '12px', color: '#1976D2', fontWeight: 'bold', padding: '5px' }}>
-                Enviando mensagem direta para o Gestor.
-              </div>
-            )}
-            <textarea
-              placeholder={msgType === 'all' ? "Postar no mural..." : "Digite sua mensagem privada..."}
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              style={{
-                width: '100%',
-                minHeight: '60px',
-                padding: '12px',
-                borderRadius: '8px',
-                border: '1px solid #E0E0E0',
-                fontFamily: 'inherit',
-                fontSize: '14px',
-                resize: 'none'
-              }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Como: <strong>{user.nome}</strong>
-              </span>
-              <Button type="submit" variant="primary" style={{ padding: '8px 20px' }}>
-                {msgType === 'all' ? 'Postar Mensagem' : 'Enviar Mensagem'}
-              </Button>
-            </div>
-          </form>
-        </Card>
-      ) : (
-        <Card title="Alertas e Solicitações">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {notifications.length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '13px', padding: '20px' }}>
-                Você não tem notificações pendentes.
-              </p>
             ) : (
-              notifications.map((notif) => (
-                <div key={notif.id} style={{ 
-                  padding: '15px', 
-                  borderRadius: '12px', 
-                  background: notif.read ? 'white' : 'rgba(255, 102, 0, 0.05)', 
-                  borderLeft: `5px solid ${notif.read ? '#EEE' : 'var(--assai-orange)'}`,
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                  position: 'relative'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-primary)' }}>{notif.title}</span>
-                    <span style={{ fontSize: '10px', color: 'var(--text-tertiary)' }}>{new Date(notif.timestamp).toLocaleDateString()}</span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '10px' }}>{notif.message}</p>
-                  
-                  {!notif.read && (
+                <div style={{ padding: '20px', background: 'rgba(37,211,102,0.05)', borderRadius: '12px', border: '1px solid rgba(37,211,102,0.2)', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '15px' }}>
+                        <h4 style={{ margin: '0 0 5px 0', color: '#128C7E' }}>Gestor: {gestor.nome}</h4>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#666' }}>Clique no botão abaixo para abrir o WhatsApp</p>
+                    </div>
                     <Button 
-                      onClick={() => onMarkRead(notif.id)} 
-                      variant="ghost" 
-                      style={{ fontSize: '11px', padding: '4px 8px' }}
+                        onClick={() => handleWhatsAppAction('general')}
+                        style={{ width: '100%', padding: '15px', background: '#25D366', color: 'white', fontWeight: 'bold', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
                     >
-                      Marcar como lido
+                        <MessageSquare size={24} /> Falar com o Gestor
+                        <ExternalLink size={16} />
                     </Button>
-                  )}
                 </div>
-              ))
             )}
-          </div>
-        </Card>
-      )}
+
+            <div style={{ marginTop: '10px', padding: '12px', borderRadius: '8px', background: '#f8f9fa', fontSize: '12px', color: '#666' }}>
+                <strong>⚠️ Nota:</strong> Todas as comunicações externas são realizadas via WhatsApp para garantir a agilidade e o registro fora do ambiente do painel.
+            </div>
+        </div>
+      </Card>
     </div>
   );
 };
