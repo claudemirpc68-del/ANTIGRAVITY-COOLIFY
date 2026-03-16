@@ -46,7 +46,12 @@ export const generateScale = (colaboradores, ano, mes) => {
             // RESET DE CICLO: 16/03/2026
             // Se hoje é Segunda (16/03), reiniciamos a contagem para alinhar a nova tabela
             if (dia === 16 && mes === 3 && ano === 2026) {
-                diasDesdeFolga = 0; // Começa nova contagem de trabalho
+                // Se for o Claudemir (id 22), ele começa a trabalhar no 1º dia dos 6.
+                if (colab.id === '22' || colab.nome.includes('CLAUDEMIR')) {
+                     diasDesdeFolga = 0;
+                } else {
+                     diasDesdeFolga = 0; 
+                }
             }
 
             let tipo = SCALE_TYPES.TRABALHO;
@@ -59,6 +64,7 @@ export const generateScale = (colaboradores, ano, mes) => {
             }
             // REGRA 2: Folga Fixa Semanal
             else if (diaSemana === folgaFixa) {
+                // Para Claudemir (22), a folga fixa passa a ser 5 (Sexta-feira).
                 tipo = SCALE_TYPES.FOLGA;
             }
 
