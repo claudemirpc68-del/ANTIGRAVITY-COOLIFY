@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Card from './Card';
 import Button from './Button';
+import Modal from './Modal';
 import { MessageSquare, Share2, CheckCircle, Loader, AlertCircle } from 'lucide-react';
 import { DIAS_IMAGEM } from '../../logic/mockData';
 
@@ -8,6 +9,11 @@ const CommunicationCenter = ({ user }) => {
   const [selectedRecipient, setSelectedRecipient] = useState('');
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null); // { success, message }
+
+  // Estados do Modal de Preview
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewMessage, setPreviewMessage] = useState('');
+  const [pendingRecipient, setPendingRecipient] = useState(null); // Para quem a mensagem vai
 
   const colaboradores = user.role === 'gestor' ? (window.MOCK_COLABORADORES || []) : [];
   const gestor = window.MOCK_GESTOR || { nome: 'EDERSON CUBAS', telefone: '5511974154868' };
@@ -33,14 +39,36 @@ const CommunicationCenter = ({ user }) => {
     return `🗓️ *SUA ESCALA - ${mesNome.toUpperCase()}*\n\nOlá ${colab.nome}, segue o resumo das suas folgas para este mês:\n\n*Folgas:* ${folgas.length ? folgas.join(', ') : 'Nenhuma folga registrada'}\n*Turno:* ${colab.horario}\n\n_Favor conferir no Painel Zen Assaí._`;
   };
 
-  const sendWhatsApp = async (to, message) => {
+  const handleAction = (type) => {
+    if (user.role === 'gestor') {
+      const colab = colaboradores.find(c => c.id === selectedRecipient);
+      if (!colab) { alert('Selecione um colaborador primeiro.'); return; }
+      const msg = type === 'escala'
+        ? generateScaleSummary(colab)
+        : `Olá ${colab.nome}, aqui é o gestor ${user.nome} do Assaí Suzano. Preciso falar sobre sua escala.`;
+        
+      setPendingRecipient({ telefone: colab.telefone, nome: colab.nome });
+      setPreviewMessage(msg);
+      setPreviewModalOpen(true);
+    } else {
+      const msg = `Olá ${gestor.nome}, aqui é ${user.nome}. Gostaria de tratar um assunto sobre minha escala.`;
+      setPendingRecipient({ telefone: gestor.telefone, nome: gestor.nome });
+      setPreviewMessage(msg);
+      setPreviewModalOpen(true);
+    }
+  };
+
+  const confirmSendWhatsApp = async () => {
+    if (!pendingRecipient) return;
+    
+    setPreviewModalOpen(false);
     setSending(true);
     setResult(null);
     try {
       const response = await fetch('/api/whatsapp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to, message })
+        body: JSON.stringify({ to: pendingRecipient.telefone, message: previewMessage })
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -52,20 +80,7 @@ const CommunicationCenter = ({ user }) => {
       setResult({ success: false, message: `❌ Erro de conexão: ${err.message}` });
     } finally {
       setSending(false);
-    }
-  };
-
-  const handleAction = async (type) => {
-    if (user.role === 'gestor') {
-      const colab = colaboradores.find(c => c.id === selectedRecipient);
-      if (!colab) { alert('Selecione um colaborador primeiro.'); return; }
-      const msg = type === 'escala'
-        ? generateScaleSummary(colab)
-        : `Olá ${colab.nome}, aqui é o gestor ${user.nome} do Assaí Suzano. Preciso falar sobre sua escala.`;
-      await sendWhatsApp(colab.telefone, msg);
-    } else {
-      const msg = `Olá ${gestor.nome}, aqui é ${user.nome}. Gostaria de tratar um assunto sobre minha escala.`;
-      await sendWhatsApp(gestor.telefone, msg);
+      setPendingRecipient(null);
     }
   };
 
@@ -76,8 +91,8 @@ const CommunicationCenter = ({ user }) => {
 
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
             {user.role === 'gestor'
-              ? 'Selecione um colaborador e envie uma mensagem via WhatsApp diretamente pelo sistema.'
-              : 'Envie uma mensagem ao seu gestor via WhatsApp diretamente pelo sistema.'}
+              ? 'Selecione um colaborador e edite a mensagem antes de enviá-la pelo sistema.'
+              : 'Edite e envie uma mensagem ao seu gestor via WhatsApp.'}
           </p>
 
           {user.role === 'gestor' ? (
@@ -108,7 +123,7 @@ const CommunicationCenter = ({ user }) => {
                   style={{ padding: '15px', background: sending ? '#ccc' : '#00B894', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
                 >
                   {sending ? <Loader size={18} /> : <Share2 size={20} />}
-                  Enviar Escala
+                  Revisar Escala
                 </Button>
               </div>
             </div>
@@ -149,6 +164,55 @@ const CommunicationCenter = ({ user }) => {
           </div>
         </div>
       </Card>
+
+      {/* Modal de Confirmação e Edição */}
+      <Modal 
+        isOpen={previewModalOpen} 
+        onClose={() => setPreviewModalOpen(false)} 
+        title={`Revisar e Enviar para ${pendingRecipient?.nome || ''}`}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                Edite a mensagem abaixo como desejar antes de enviá-la através do Twilio API:
+            </p>
+            
+            <textarea 
+                value={previewMessage} 
+                onChange={(e) => setPreviewMessage(e.target.value)}
+                placeholder="Escreva sua mensagem aqui..."
+                style={{ 
+                    width: '100%', 
+                    padding: '12px', 
+                    borderRadius: '10px', 
+                    border: '1px solid #ddd', 
+                    fontSize: '14px', 
+                    minHeight: '150px', 
+                    resize: 'none',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.5'
+                }}
+            />
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <Button variant="outline" style={{ flex: 1 }} onClick={() => setPreviewModalOpen(false)}>
+                    Cancelar
+                </Button>
+                <Button 
+                    variant="primary" 
+                    style={{ flex: 1, backgroundColor: '#25D366', borderColor: '#25D366' }} 
+                    onClick={confirmSendWhatsApp}
+                >
+                    <MessageSquare size={18} style={{ marginRight: '8px' }} />
+                    Confirmar Envio
+                </Button>
+            </div>
+            
+            <p style={{ fontSize: '11px', color: '#777', textAlign: 'center', marginTop: '5px' }}>
+                O envio será feito automaticamente pelo nosso servidor. Certifique-se do número.
+            </p>
+        </div>
+      </Modal>
+
     </div>
   );
 };
