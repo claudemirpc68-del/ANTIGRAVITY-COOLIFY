@@ -24,16 +24,11 @@ export const generateScale = (colaboradores, ano, mes) => {
         let domingosTrabalhadosCount = 0;
 
         // Determinar quais domingos este colaborador folga.
-        // Claudemir (22) folga 08/03 e 15/03. Trabalha 22 e 29 de Março.
         let domingosFolgaBase;
-        if (colab.id === '22' || colab.nome.includes('CLAUDEMIR')) {
-            domingosFolgaBase = [domingos[0], domingos[1]].filter(Boolean); // 1º e 2º domingos
-        } else {
-            // Rodízio padrão para os demais
-            domingosFolgaBase = (parseInt(colab.id) % 2 === 0)
-                ? [domingos[1], domingos[3]].filter(Boolean)
-                : [domingos[0], domingos[2]].filter(Boolean);
-        }
+        // Rodízio padrão
+        domingosFolgaBase = (parseInt(colab.id) % 2 === 0)
+            ? [domingos[1], domingos[3]].filter(Boolean)
+            : [domingos[0], domingos[2]].filter(Boolean);
 
         // Lógica de contagem de dias trabalhados
         // Precisamos garantir que a contagem seja contínua.
@@ -46,12 +41,7 @@ export const generateScale = (colaboradores, ano, mes) => {
             // RESET DE CICLO: 16/03/2026
             // Se hoje é Segunda (16/03), reiniciamos a contagem para alinhar a nova tabela
             if (dia === 16 && mes === 3 && ano === 2026) {
-                // Se for o Claudemir (id 22), ele começa a trabalhar no 1º dia dos 6.
-                if (colab.id === '22' || colab.nome.includes('CLAUDEMIR')) {
-                     diasDesdeFolga = 0;
-                } else {
-                     diasDesdeFolga = 0; 
-                }
+                diasDesdeFolga = 0; 
             }
 
             let tipo = SCALE_TYPES.TRABALHO;
@@ -64,7 +54,6 @@ export const generateScale = (colaboradores, ano, mes) => {
             }
             // REGRA 2: Folga Fixa Semanal
             else if (diaSemana === folgaFixa) {
-                // Para Claudemir (22), a folga fixa passa a ser 5 (Sexta-feira).
                 tipo = SCALE_TYPES.FOLGA;
             }
 

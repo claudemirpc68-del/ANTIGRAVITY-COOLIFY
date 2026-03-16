@@ -24,7 +24,6 @@ export const MOCK_COLABORADORES = [
     { id: '19', nome: 'LUANA VIEIRA', matricula: '6885551', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 2, telefone: '5511922221111' },
     { id: '20', nome: 'ALINE', matricula: '6778011', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 1, telefone: '5511933332222' },
     { id: '21', nome: 'VALDEMIR', matricula: '9999001', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 2, telefone: '5511944443333' },
-    { id: '22', nome: 'CLAUDEMIR CUBAS', matricula: '4593600', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 5, telefone: '5511961909818' },
     { id: '23', nome: 'THIAGO', matricula: '6945961', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 2, telefone: '5511966665555' },
     { id: '24', nome: 'ABRAÃO', matricula: '6948111', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 4, telefone: '5511977776666' },
     { id: '25', nome: 'IVAN CARMO', matricula: '5839653', role: ROLES.COLABORADOR, funcao: 'OP. PLENO', horario: '14:30', folgaFixa: 0, telefone: '5511988887777' },
