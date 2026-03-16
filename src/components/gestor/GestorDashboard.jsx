@@ -7,7 +7,7 @@ import CommunicationCenter from '../common/CommunicationCenter';
 import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
-import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle, Clock, Flag } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle, Clock, Flag, MessageSquare } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -140,6 +140,8 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
     const [editSituacaoColab, setEditSituacaoColab] = useState(null);
     const [listModal, setListModal] = useState(null); 
     const [activeMainTab, setActiveMainTab] = useState('dashboard'); // 'dashboard' or 'communication'
+    const [whatsAppModal, setWhatsAppModal] = useState(null); // { colab: object }
+    const [customWAMsg, setCustomWAMsg] = useState('');
 
     // Dia selecionado para o resumo (inicializa com o dia de hoje)
     const [selectedDayIdx, setSelectedDayIdx] = useState(() => getTodayIndex());
@@ -276,9 +278,35 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
         doc.save(`Escala_e_Historico_Assai_${currentMonth}_${currentYear}.pdf`);
     };
 
-    const handleEditOpen = (colab) => {
-        setEditColab(colab);
-        setEditForm({ nome: colab.nome, horario: colab.horario, funcao: colab.funcao, folgaFixa: colab.folgaFixa, matricula: colab.matricula });
+    const handleWhatsAppContact = (colab, templateIdx = null) => {
+        if (!colab.telefone) {
+            alert('Este colaborador não possui telefone cadastrado.');
+            return;
+        }
+
+        const templates = [
+            `Olá ${colab.nome}, aqui é o gestor ${user.nome} do Assaí Suzano. Gostaria de falar sobre sua escala.`,
+            `Oi ${colab.nome}, confirmando sua folga para amanhã conforme nossa escala 6x1. Até mais!`,
+            `Olá ${colab.nome}, notei que seu ponto ainda está pendente no sistema. Tudo certo por aí?`,
+            `Olá ${colab.nome}, temos uma solicitação de troca de turno que envolve seu horário. Poderia me confirmar se é possível?`
+        ];
+
+        let messageBody = '';
+        if (templateIdx === 'custom') {
+            messageBody = customWAMsg || templates[0];
+        } else if (templateIdx !== null) {
+            messageBody = templates[templateIdx];
+        } else {
+            // Se nenhum template foi passado, abre o modal de escolha
+            setWhatsAppModal(colab);
+            setCustomWAMsg('');
+            return;
+        }
+
+        const message = encodeURIComponent(messageBody);
+        const url = `https://wa.me/${colab.telefone}?text=${message}`;
+        window.open(url, '_blank');
+        setWhatsAppModal(null);
     };
     const handleEditSave = () => {
         setColaboradores(prev => prev.map(c => c.id === editColab.id ? { ...c, ...editForm, folgaFixa: parseInt(editForm.folgaFixa) } : c));
@@ -307,6 +335,48 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
 
     return (
         <>
+            {/* Modal: Mensagens Rápidas WhatsApp */}
+            <Modal isOpen={!!whatsAppModal} onClose={() => setWhatsAppModal(null)} title={`Mensagem para ${whatsAppModal?.nome || ''}`}>
+                {whatsAppModal && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Escolha um modelo ou escreva uma mensagem personalizada:</p>
+                        
+                        {[
+                            { icon: '🕒', label: 'Aviso sobre Escala', text: 'Gostaria de falar sobre sua escala.' },
+                            { icon: '✅', label: 'Confirmar Folga', text: 'Confirmando sua folga para amanhã.' },
+                            { icon: '🚨', label: 'Ponto Pendente', text: 'Notei que seu ponto está pendente.' },
+                            { icon: '🔄', label: 'Troca de Turno', text: 'Temos uma solicitação de troca de turno.' }
+                        ].map((t, idx) => (
+                            <div 
+                                key={idx} 
+                                onClick={() => handleWhatsAppContact(whatsAppModal, idx)}
+                                style={{ padding: '10px 14px', border: '1px solid #eee', borderRadius: '10px', background: '#f9f9f9', cursor: 'pointer', transition: 'all 0.2s' }}
+                                onMouseOver={e => e.currentTarget.style.borderColor = 'var(--assai-orange)'}
+                                onMouseOut={e => e.currentTarget.style.borderColor = '#eee'}
+                            >
+                                <div style={{ fontSize: '13px', fontWeight: '700' }}>{t.icon} {t.label}</div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>"{t.text}"</div>
+                            </div>
+                        ))}
+
+                        <div style={{ marginTop: '8px' }}>
+                            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '6px' }}>Mensagem Personalizada</label>
+                            <textarea 
+                                value={customWAMsg} 
+                                onChange={e => setCustomWAMsg(e.target.value)}
+                                placeholder="Digite sua mensagem aqui..."
+                                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '13px', minHeight: '80px', resize: 'none' }}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <Button variant="outline" style={{ flex: 1 }} onClick={() => setWhatsAppModal(null)}>Cancelar</Button>
+                            <Button variant="primary" style={{ flex: 1 }} onClick={() => handleWhatsAppContact(whatsAppModal, 'custom')}>Enviar Personalizada</Button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
+
             {/* Modal: Alterar Situação do Colaborador */}
             <Modal isOpen={!!editSituacaoColab} onClose={() => setEditSituacaoColab(null)} title={`Situação: ${editSituacaoColab?.nome || ''}`}>
                 {editSituacaoColab && (
@@ -345,6 +415,7 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                         {[
                             { label: 'Nome Completo', key: 'nome', type: 'text' },
                             { label: 'Matrícula', key: 'matricula', type: 'text' },
+                            { label: 'WhatsApp (com DDD)', key: 'telefone', type: 'text' },
                         ].map(f => (
                             <div key={f.key}>
                                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', marginBottom: '6px', color: 'var(--text-secondary)' }}>{f.label}</label>
@@ -684,6 +755,9 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                                             <span style={{ fontSize: '10px', color: 'var(--text-tertiary)' }}>{colab.funcao} · {colab.horario}</span>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <div title="WhatsApp" onClick={e => { e.stopPropagation(); handleWhatsAppContact(colab); }} style={{ cursor: 'pointer', padding: '5px', borderRadius: '6px', background: 'rgba(37,211,102,0.1)', color: '#25D366', display: 'flex', alignItems: 'center' }}>
+                                                <MessageSquare size={14} />
+                                            </div>
                                             <div title="Trocar Turno" onClick={e => { e.stopPropagation(); handleSendSwapRequest(colab); }} style={{ cursor: 'pointer', padding: '5px', borderRadius: '6px', background: 'rgba(255,102,0,0.08)', color: 'var(--assai-orange)', display: 'flex', alignItems: 'center' }}>
                                                 <Users size={14} />
                                             </div>

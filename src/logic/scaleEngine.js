@@ -24,29 +24,26 @@ export const generateScale = (colaboradores, ano, mes) => {
         let domingosTrabalhadosCount = 0;
 
         // Determinar quais domingos este colaborador folga.
-        // Padrão: 2 domingos por mês. 
-        // Claudemir (22) especificou trabalhar 15 e 22 (domingos 3 e 4 do mês).
+        // Claudemir (22) folga 08/03 e 15/03. Trabalha 22 e 29 de Março.
         let domingosFolgaBase;
         if (colab.id === '22' || colab.nome.includes('CLAUDEMIR')) {
-            // Claudemir: hoje (15/03) é o segundo domingo de folga.
-            // Portanto, folgou dia 08 e 15. Trabalha 22 e 29.
-            domingosFolgaBase = [domingos[1], domingos[2]].filter(Boolean);
+            domingosFolgaBase = [domingos[0], domingos[1]].filter(Boolean); // 1º e 2º domingos
         } else {
+            // Rodízio padrão para os demais
             domingosFolgaBase = (parseInt(colab.id) % 2 === 0)
-                ? [domingos[0], domingos[2]].filter(Boolean)
-                : [domingos[1], domingos[3]].filter(Boolean);
+                ? [domingos[1], domingos[3]].filter(Boolean)
+                : [domingos[0], domingos[2]].filter(Boolean);
         }
 
-        // Inicializando diasDesdeFolga para que a primeira folga caia no dia folgaFixa
-        let primeiroDiaSem = new Date(ano, mes - 1, 1).getDay();
-        let offsetFolga = (folgaFixa - primeiroDiaSem + 7) % 7;
-        let diasDesdeFolga = 6 - offsetFolga;
+        // Lógica de contagem de dias trabalhados
+        // Precisamos garantir que a contagem seja contínua.
+        let diasDesdeFolga = 0;
 
         for (let dia = 1; dia <= diasNoMes; dia++) {
             const dataAtual = new Date(ano, mes - 1, dia);
             const diaSemana = dataAtual.getDay();
 
-            // LÓGICA DE TRANSIÇÃO: Reset de Ciclo em 16/03/2026
+            // RESET DE CICLO: 16/03/2026
             // Se hoje é Segunda (16/03), reiniciamos a contagem para alinhar a nova tabela
             if (dia === 16 && mes === 3 && ano === 2026) {
                 diasDesdeFolga = 0; // Começa nova contagem de trabalho
@@ -54,21 +51,19 @@ export const generateScale = (colaboradores, ano, mes) => {
 
             let tipo = SCALE_TYPES.TRABALHO;
 
-            // REGRA 1: Domingo de Folga (Prioritária para garantir rodízio Assai)
+            // REGRA 1: Domingo de Folga (Prioritária)
             if (diaSemana === 0) {
                 if (domingosFolgaBase.includes(dia)) {
                     tipo = SCALE_TYPES.FOLGA;
-                } else {
-                    tipo = SCALE_TYPES.TRABALHO;
-                    domingosTrabalhadosCount++;
                 }
             }
             // REGRA 2: Folga Fixa Semanal
             else if (diaSemana === folgaFixa) {
                 tipo = SCALE_TYPES.FOLGA;
             }
-            // REGRA 3: Segurança 6x1 (Não permitir mais de 6 dias seguidos de trabalho)
-            else if (diasDesdeFolga >= 6) {
+
+            // REGRA 3: Segurança 6x1 (Crítica)
+            if (diasDesdeFolga >= 6) {
                 tipo = SCALE_TYPES.FOLGA;
             }
 
