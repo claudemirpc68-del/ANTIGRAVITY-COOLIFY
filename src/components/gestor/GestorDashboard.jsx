@@ -147,6 +147,8 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
 
     // Dia selecionado para o resumo (inicializa com o dia de hoje)
     const [selectedDayIdx, setSelectedDayIdx] = useState(() => getTodayIndex());
+    const currentMonth = SCALE_START_DATE.getMonth() + 1;
+    const currentYear = SCALE_START_DATE.getFullYear();
     const [justificativas, setJustificativas] = useState([
         { id: 1, nome: 'KAUA PEREIRA', motivo: 'Atestado Médico', obs: 'Consulta de rotina no dentista.', status: 'pendente', temAnexo: true, arquivo: 'atestado_0603.jpg' },
         { id: 2, nome: 'AMANDA PORTO', motivo: 'Transporte', obs: 'Ônibus quebrado na Av. Principal.', status: 'pendente', temAnexo: false }

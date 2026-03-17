@@ -7,6 +7,8 @@ const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
 
 import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR, LOJA_INFO, SCALE_START_DATE } from '../../logic/mockData';
+import { generateScale } from '../../logic/scaleEngine';
+import { Printer, Download, Filter, Info, AlertTriangle, MessageSquare } from 'lucide-react';
 
 const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [], colaboradores: propColaboradores }) => {
     const [searchTerm, setSearchTerm] = useState('');

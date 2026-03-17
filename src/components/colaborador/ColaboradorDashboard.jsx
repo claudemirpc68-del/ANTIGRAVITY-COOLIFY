@@ -230,6 +230,7 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
                     user={user} 
                     messages={messages} 
                     notifications={notifications}
+                    dynamicScale={dynamicScale}
                     onAddMessage={onAddMessage}
                     onMarkRead={onMarkRead}
                 />
