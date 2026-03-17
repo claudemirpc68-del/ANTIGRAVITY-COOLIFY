@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, X, Send, Sparkles } from 'lucide-react';
 import { analyzeScaleIntent } from '../../services/llmScale';
+import { FOLGAS_MANUAIS } from '../../logic/mockData';
 
 const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
@@ -40,17 +41,32 @@ const ZenAssistant = ({ user, colaboradores }) => {
             return `Não encontrei nenhum colaborador com o registro **${matricula}**. Verifique o número e tente novamente, ou me diga o nome para eu buscar de outra forma.`;
         }
 
-        const folgaFixaNome = DIAS_SEMANA[colab.folgaFixa] || 'não definida';
-        const turno = colab.horario === '14:30' ? '2º Turno (14:30 — 22:50)' : '1º Turno (07:30 — 14:30)';
+        // Buscar folgas manuais deste colaborador
+        const hoje = new Date().toISOString().split('T')[0];
+        const folgasColab = (FOLGAS_MANUAIS[colab.id] || [])
+            .filter(d => d >= hoje)
+            .sort()
+            .map(d => {
+                const [y, m, day] = d.split('-');
+                return `${day}/${m}/${y}`;
+            });
 
-        return `📋 **${colab.nome}** — Matrícula ${colab.matricula}
+        const folgasTexto = folgasColab.length > 0
+            ? folgasColab.join(', ')
+            : 'Ainda não definida pela gerência para o período';
 
-🗓️ **Folga fixa:** ${folgaFixaNome}
+        const turno = colab.horario === '14:30' ? '2º Turno (14:30 — 22:50)'
+            : colab.horario === '22:00' ? 'Turno Noturno (22:00 — 06:00)'
+            : '1º Turno (07:30 — 14:30)';
+
+        return `📋 **${colab.nome}** — Mat. ${colab.matricula}
+
 ⏰ **Turno:** ${turno}
 🏷️ **Função:** ${colab.funcao}
-🔄 **Ciclo atual:** 16/03 a 15/04 (6x1)
+🔄 **Regime:** 6x1 (folga definida pela gerência)
+🗓️ **Próximas folgas:** ${folgasTexto}
 
-Clique na aba de escala para ver o calendário completo deste colaborador!`;
+Consulte a grade completa na aba de Escala!`;
     };
 
     const handleSend = async (e) => {

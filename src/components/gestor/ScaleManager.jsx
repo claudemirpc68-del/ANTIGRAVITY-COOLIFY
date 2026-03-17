@@ -296,7 +296,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
                                 <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>MATRÍCULA</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.matricula}</p></div>
                                 <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>FUNÇÃO</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.funcao}</p></div>
                                 <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>TURNO</p><p style={{ margin: 0, fontWeight: '700' }}>{colabDetails.horario}</p></div>
-                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>FOLGA FIXA</p><p style={{ margin: 0, fontWeight: '700' }}>{['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][colabDetails.folgaFixa]}</p></div>
+                                <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>REGIME</p><p style={{ margin: 0, fontWeight: '700' }}>6x1 (folga definida pela gerência)</p></div>
                                 <div><p style={{ margin: 0, fontSize: '11px', color: '#888' }}>SITUAÇÃO</p><p style={{ margin: 0, fontWeight: '700', color: 'var(--status-success)' }}>ATIVO</p></div>
                             </div>
                         </div>

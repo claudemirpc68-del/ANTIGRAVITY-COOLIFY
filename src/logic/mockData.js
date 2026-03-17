@@ -104,3 +104,16 @@ export const IMAGE_GRID = {
     '32': ['', '', '', 'F', '', '', 'F', '', '', '', 'F', '', '', 'F', '', '', '', 'F', '', '', 'F', '', '', '', 'F', '', '', 'F', '', 'F', ''],
     '33': ['', 'F', '', '', '', '', 'F', '', 'F', '', '', '', '', 'F', '', 'F', '', '', '', '', 'F', '', 'F', '', '', '', '', 'F', '', 'F', ''],
 };
+
+/**
+ * Folgas definidas manualmente pela gerência (regime 6x1).
+ * A folga semanal NÃO tem dia fixo — é determinada pela Assaí.
+ * Cada colaborador tem direito a 2 domingos de folga por mês (não necessariamente consecutivos).
+ *
+ * Formato: { [colaborador_id]: ['YYYY-MM-DD', ...] }
+ */
+export const FOLGAS_MANUAIS = {
+    '15': ['2026-03-17', '2026-03-22', '2026-03-29'], // CLAUDEMIR CUBAS — folga 17/03 confirmada; domingos 22 e 29
+    '24': ['2026-03-17', '2026-03-22', '2026-03-29'], // THIAGO DA SILVA — folga 17/03 confirmada
+    // Adicione/atualize folgas aqui conforme a gerência divulgar a escala semanal
+};

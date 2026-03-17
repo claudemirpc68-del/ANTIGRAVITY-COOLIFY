@@ -1,3 +1,7 @@
+import { FOLGAS_MANUAIS } from '../logic/mockData';
+
+const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+
 export const analyzeScaleIntent = (input, colaboradores, user) => {
     const normalized = input.toLowerCase();
 
@@ -20,7 +24,7 @@ export const analyzeScaleIntent = (input, colaboradores, user) => {
     // 2. Memória do Claudemir
     if (normalized.includes('claudemir')) {
         return {
-            text: "CLAUDEMIR CUBAS (Matrícula 7101309): folga nos domingos 08/03 e 15/03, trabalhando nos dias 22/03 e 29/03 para compensar o novo ciclo 6x1. Hoje (17/03) ele está de folga conforme solicitado.",
+            text: "CLAUDEMIR CUBAS (Mat. 7101309): folga confirmada em 17/03. Domingos de folga no período: 22/03 e 29/03 (definidos pela gerência). Regime 6x1 — as próximas folgas semanais serão divulgadas pela loja.",
             type: 'scale_info'
         };
     }
@@ -73,7 +77,19 @@ export const analyzeScaleIntent = (input, colaboradores, user) => {
     };
 };
 
+/**
+ * Retorna as próximas folgas de um colaborador a partir de hoje,
+ * com base no mapa FOLGAS_MANUAIS.
+ */
+export const getProximasFolgasManuais = (colabId) => {
+    const hoje = new Date();
+    const folgas = (FOLGAS_MANUAIS[colabId] || [])
+        .map(d => new Date(d + 'T00:00:00'))
+        .filter(d => d >= hoje)
+        .sort((a, b) => a - b);
+    return folgas;
+};
+
 export const speak = (text) => {
     // TTS desativado por simplificação
-    console.log('TTS desativado.');
 };
