@@ -113,7 +113,7 @@ export const IMAGE_GRID = {
  * Formato: { [colaborador_id]: ['YYYY-MM-DD', ...] }
  */
 export const FOLGAS_MANUAIS = {
-    '15': ['2026-03-17', '2026-03-22', '2026-03-29'], // CLAUDEMIR CUBAS — folga 17/03 confirmada; domingos 22 e 29
-    '24': ['2026-03-17', '2026-03-22', '2026-03-29'], // THIAGO DA SILVA — folga 17/03 confirmada
-    // Adicione/atualize folgas aqui conforme a gerência divulgar a escala semanal
+    '15': ['2026-03-17'], // CLAUDEMIR CUBAS — folga 17/03 confirmada; 2 domingos de folga no mês ainda não confirmados pela gerência
+    '24': ['2026-03-17'], // THIAGO DA SILVA — folga 17/03 confirmada
+    // Para adicionar novo folgas: informe as datas à IA e ela registra aqui após validar a regra 6x1
 };
