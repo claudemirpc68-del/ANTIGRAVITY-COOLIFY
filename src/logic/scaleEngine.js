@@ -57,6 +57,14 @@ export const generateScale = (colaboradores, ano, mes) => {
                 tipo = SCALE_TYPES.FOLGA;
             }
 
+            // EXCEÇÕES MANUAIS (Prioridade sobre lógica de ciclo)
+            // Dia 17/03/2026 (Hoje): Claudemir (15) e Thiago (24) estão de folga.
+            if (dia === 17 && mes === 3 && ano === 2026) {
+                if (colab.id === '15' || colab.id === '24') {
+                    tipo = SCALE_TYPES.FOLGA;
+                }
+            }
+
             // REGRA 3: Segurança 6x1 (Crítica)
             if (diasDesdeFolga >= 6) {
                 tipo = SCALE_TYPES.FOLGA;
