@@ -2,14 +2,11 @@ import React, { useState, useMemo } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR, LOJA_INFO } from '../../logic/mockData';
-import { generateScale } from '../../logic/scaleEngine';
-import { Download, Printer, Search, AlertTriangle, CheckCircle, Info, Calendar, MessageSquare, X, Filter } from 'lucide-react';
-
-// Constantes de data para o mês atual
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
+
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR, LOJA_INFO, SCALE_START_DATE } from '../../logic/mockData';
 
 const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedDayIndex, setSelectedDayIndex: propSetSelectedDayIndex, justificativas = [], historico = [], colaboradores: propColaboradores }) => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +29,7 @@ const ScaleManager = ({ colaboradorId, onExport, selectedDayIndex: propSelectedD
 
     const currentColaboradores = propColaboradores || MOCK_COLABORADORES;
     // Gerar escala dinâmica para o mês corrente
-    const dynamicScale = useMemo(() => generateScale(currentColaboradores, currentYear, currentMonth), [currentColaboradores]);
+    const dynamicScale = useMemo(() => generateScale(currentColaboradores, SCALE_START_DATE, 31), [currentColaboradores]);
 
     // Transformar em grid para compatibilidade
     const dynamicGrid = useMemo(() => {

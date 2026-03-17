@@ -1,14 +1,12 @@
 
 import { generateScale } from './scaleEngine.js';
-import { MOCK_COLABORADORES } from './mockData.js';
+import { MOCK_COLABORADORES, SCALE_START_DATE } from './mockData.js';
 import { SCALE_TYPES } from './constants.js';
 
 function testScaleLogic() {
     console.log('🚀 Iniciando testes de lógica de escala...');
     
-    const ano = 2025;
-    const mes = 3; // Março 2025
-    const escala = generateScale(MOCK_COLABORADORES, ano, mes);
+    const escala = generateScale(MOCK_COLABORADORES, SCALE_START_DATE, 31);
 
     const erros = [];
 

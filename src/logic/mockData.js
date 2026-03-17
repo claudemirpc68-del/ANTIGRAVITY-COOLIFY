@@ -58,10 +58,11 @@ export const LOJA_INFO = {
 
 const DIAS_SEMANA_SHORT = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
 
+export const SCALE_START_DATE = new Date(2026, 2, 16); // 16 de março (Mês 2)
+
 export const DIAS_IMAGEM = Array.from({ length: 31 }, (_, i) => {
-    const start = new Date(2026, 2, 16);
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
+    const d = new Date(SCALE_START_DATE);
+    d.setDate(SCALE_START_DATE.getDate() + i);
     return {
         dia: d.getDate(),
         sem: DIAS_SEMANA_SHORT[d.getDay()]

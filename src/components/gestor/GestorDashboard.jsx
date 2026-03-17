@@ -4,7 +4,7 @@ import Button from '../common/Button';
 import ScaleManager from './ScaleManager';
 import Modal from '../common/Modal';
 import CommunicationCenter from '../common/CommunicationCenter';
-import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR, SCALE_START_DATE } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { SCALE_TYPES } from '../../logic/constants';
 import { Users, Calendar as CalendarIcon, AlertCircle, ChevronDown, ChevronUp, Paperclip, CheckCircle2, XCircle, FileText, Pencil, AlertTriangle, Umbrella, HeartPulse, UserX, CheckCircle, Clock, Flag, MessageSquare, Share2 } from 'lucide-react';
@@ -154,10 +154,7 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
 
 
 
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-
-    const dynamicScale = useMemo(() => generateScale(colaboradores, currentYear, currentMonth), [colaboradores, currentYear, currentMonth]);
+    const dynamicScale = useMemo(() => generateScale(colaboradores, SCALE_START_DATE, 31), [colaboradores]);
     const dynamicGrid = useMemo(() => {
         const grid = {};
         dynamicScale.forEach(entry => {
@@ -566,6 +563,7 @@ const GestorDashboard = ({ user, messages, notifications, historico, pontosBatid
                         user={user} 
                         messages={messages} 
                         notifications={notifications}
+                        dynamicScale={dynamicScale}
                         onAddMessage={onAddMessage}
                         onAddNotification={onAddNotification}
                         onMarkRead={onMarkRead}

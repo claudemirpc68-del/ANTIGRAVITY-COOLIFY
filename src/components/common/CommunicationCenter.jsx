@@ -5,7 +5,7 @@ import Modal from './Modal';
 import { MessageSquare, Share2, CheckCircle, Loader, AlertCircle } from 'lucide-react';
 import { DIAS_IMAGEM } from '../../logic/mockData';
 
-const CommunicationCenter = ({ user }) => {
+const CommunicationCenter = ({ user, dynamicScale = [] }) => {
   const [selectedRecipient, setSelectedRecipient] = useState('');
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null); // { success, message }
@@ -19,7 +19,6 @@ const CommunicationCenter = ({ user }) => {
   const gestor = window.MOCK_GESTOR || { nome: 'EDERSON CUBAS', telefone: '5511974154868' };
 
   const generateScaleSummary = (colab) => {
-    const dynamicScale = window.dynamicScale || [];
     const grade = {};
     dynamicScale.forEach(entry => {
       if (entry.colaborador_id === colab.id) {

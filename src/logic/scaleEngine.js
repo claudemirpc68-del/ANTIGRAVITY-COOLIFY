@@ -8,47 +8,52 @@
 
 import { SCALE_TYPES } from './constants.js';
 
-export const generateScale = (colaboradores, ano, mes) => {
+export const generateScale = (colaboradores, startDate, numDays = 31) => {
     const escala = [];
-    const diasNoMes = new Date(ano, mes, 0).getDate();
+    const mainStartDate = new Date(startDate);
 
-    // Identificar domingos do mês
+    // Identificar domingos no período de interesse
     const domingos = [];
-    for (let d = 1; d <= diasNoMes; d++) {
-        const date = new Date(ano, mes - 1, d);
-        if (date.getDay() === 0) domingos.push(d);
+    for (let d = 0; d < 60; d++) { // Olhar uma janela maior para pegar domingos relevantes
+        const date = new Date(mainStartDate.getFullYear(), mainStartDate.getMonth(), 1);
+        date.setDate(date.getDate() + d - 15); // Pegar domingos ao redor do mês
+        if (date.getDay() === 0) domingos.push(date.getDate());
     }
 
     colaboradores.forEach(colab => {
         const folgaFixa = colab.folgaFixa; // 0=Dom, 1=Seg...
-        let domingosTrabalhadosCount = 0;
-
+        
         // Determinar quais domingos este colaborador folga.
-        let domingosFolgaBase;
-        // Rodízio padrão
-        domingosFolgaBase = (parseInt(colab.id) % 2 === 0)
-            ? [domingos[1], domingos[3]].filter(Boolean)
-            : [domingos[0], domingos[2]].filter(Boolean);
+        // Lógica de rodízio baseada no ID
+        // Simplified: even IDs get 2nd/4th Sundays, odd IDs get 1st/3rd
+        let domingosFolgaBase = [];
+        if (parseInt(colab.id) % 2 === 0) {
+            domingosFolgaBase = [2, 4]; // Aproximado
+        } else {
+            domingosFolgaBase = [1, 3];
+        }
 
-        // Lógica de contagem de dias trabalhados
-        // Precisamos garantir que a contagem seja contínua.
+        // Para consistência com a contagem 6x1, precisamos saber o estado antes do dia 16
+        // Mas para simplicidade, vamos assumir que o ciclo reseta ou se alinha no dia 16.
         let diasDesdeFolga = 0;
 
-        for (let dia = 1; dia <= diasNoMes; dia++) {
-            const dataAtual = new Date(ano, mes - 1, dia);
+        for (let i = 0; i < numDays; i++) {
+            const dataAtual = new Date(mainStartDate);
+            dataAtual.setDate(mainStartDate.getDate() + i);
+            
+            const dia = dataAtual.getDate();
+            const mes = dataAtual.getMonth() + 1;
+            const ano = dataAtual.getFullYear();
             const diaSemana = dataAtual.getDay();
-
-            // RESET DE CICLO: 16/03/2026
-            // Se hoje é Segunda (16/03), reiniciamos a contagem para alinhar a nova tabela
-            if (dia === 16 && mes === 3 && ano === 2026) {
-                diasDesdeFolga = 0; 
-            }
 
             let tipo = SCALE_TYPES.TRABALHO;
 
             // REGRA 1: Domingo de Folga (Prioritária)
             if (diaSemana === 0) {
-                if (domingosFolgaBase.includes(dia)) {
+                // Cálculo de qual domingo do mês este é
+                const primeiroDiaMes = new Date(ano, mes - 1, 1);
+                const qualDomingo = Math.ceil((dia + primeiroDiaMes.getDay()) / 7);
+                if (domingosFolgaBase.includes(qualDomingo)) {
                     tipo = SCALE_TYPES.FOLGA;
                 }
             }
@@ -57,8 +62,8 @@ export const generateScale = (colaboradores, ano, mes) => {
                 tipo = SCALE_TYPES.FOLGA;
             }
 
-            // EXCEÇÕES MANUAIS (Prioridade sobre lógica de ciclo)
-            // Dia 17/03/2026 (Hoje): Claudemir (15) e Thiago (24) estão de folga.
+            // EXCEÇÕES MANUAIS (Prioridade Máxima)
+            // Dia 17/03/2026: Claudemir (15) e Thiago (24) estão de folga.
             if (dia === 17 && mes === 3 && ano === 2026) {
                 if (colab.id === '15' || colab.id === '24') {
                     tipo = SCALE_TYPES.FOLGA;

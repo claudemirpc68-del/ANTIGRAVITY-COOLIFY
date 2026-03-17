@@ -7,7 +7,7 @@ import Modal from '../common/Modal';
 import CommunicationCenter from '../common/CommunicationCenter';
 
 
-import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR } from '../../logic/mockData';
+import { MOCK_COLABORADORES, DIAS_IMAGEM, MOCK_GESTOR, SCALE_START_DATE } from '../../logic/mockData';
 import { generateScale } from '../../logic/scaleEngine';
 import { STORE_CONFIG } from '../../logic/constants';
 import WhatsAppModal from '../common/WhatsAppModal';
@@ -21,9 +21,11 @@ const getShiftDisplay = (horario) => {
 
 const getTodayIndex = () => {
     const hoje = new Date();
-    const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1); // 1º dia do mês atual
-    const diffDias = Math.floor((hoje - inicio) / (1000 * 60 * 60 * 24));
-    return diffDias >= 0 ? diffDias : 0;
+    const diaAtual = hoje.getDate();
+    // Encontrar índice baseado na data real comparada à SCALE_START_DATE
+    const diffTime = Math.abs(hoje - SCALE_START_DATE);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays < 31 ? diffDays : 0;
 };
 
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -94,11 +96,8 @@ const ColaboradorDashboard = ({ user, messages, notifications, historico, pontos
     const [waModalOpen, setWaModalOpen] = useState(false);
     const [waTemplate, setWaTemplate] = useState('');
 
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-
-    // Gerar escala dinâmica para o mês atual
-    const dynamicScale = React.useMemo(() => generateScale(MOCK_COLABORADORES, currentYear, currentMonth), [currentYear, currentMonth]);
+    // Gerar escala dinâmica para o período (16/03 a 15/04)
+    const dynamicScale = React.useMemo(() => generateScale(MOCK_COLABORADORES, SCALE_START_DATE, 31), []);
 
     const dynamicGrid = React.useMemo(() => {
         const grid = {};
