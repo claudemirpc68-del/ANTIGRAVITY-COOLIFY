@@ -15,7 +15,7 @@ export const MOCK_COLABORADORES = [
     { id: '12', nome: 'FABRICIO SOUZA', matricula: '6789358', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00', folgaFixa: 1, telefone: '5511977776666' },
     { id: '13', nome: 'FLAVIO REZENDE', matricula: '6513042', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '08:00', folgaFixa: 3, telefone: '5511966665555' },
     { id: '14', nome: 'VALDEMIR LOURENÇO', matricula: '7095783', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 2, telefone: '5511944443333' },
-    { id: '15', nome: 'CLAUDEMIR', matricula: '0', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 5, telefone: '5511961909818' },
+    { id: '15', nome: 'CLAUDEMIR CUBAS', matricula: '7101309', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 5, telefone: '5511961909818' },
     { id: '16', nome: 'JOSE MANOEL', matricula: '4581008', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 1, telefone: '5511988887777' },
     { id: '17', nome: 'ALEXSANDER FREIRE', matricula: '4581008', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 0, telefone: '5511955554444' },
     { id: '18', nome: 'KAUA PEREIRA', matricula: '6199917', role: ROLES.COLABORADOR, funcao: 'OP. LOJA', horario: '14:30', folgaFixa: 2, telefone: '5511999998888' },
