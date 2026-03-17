@@ -113,7 +113,39 @@ export const IMAGE_GRID = {
  * Formato: { [colaborador_id]: ['YYYY-MM-DD', ...] }
  */
 export const FOLGAS_MANUAIS = {
-    '15': ['2026-03-17'], // CLAUDEMIR CUBAS — folga 17/03 confirmada; 2 domingos de folga no mês ainda não confirmados pela gerência
+    '10': ['2026-03-22', '2026-03-29', '2026-04-05', '2026-04-12'], // CLEONICE SANTOS — folga em TODOS os domingos do período
+    '20': ['2026-03-22', '2026-03-29', '2026-04-05', '2026-04-12'], // ANA MARIA — folga em TODOS os domingos do período
+    '15': ['2026-03-17'], // CLAUDEMIR CUBAS — folga 17/03 confirmada; 2 domingos ainda não confirmados pelos gerência
     '24': ['2026-03-17'], // THIAGO DA SILVA — folga 17/03 confirmada
-    // Para adicionar novo folgas: informe as datas à IA e ela registra aqui após validar a regra 6x1
+    // Para adicionar novas folgas: informe as datas à IA e ela registra aqui após validar a regra 6x1
 };
+
+/**
+ * Horários especiais de DOMINGO para cada grupo de turno.
+ * Regras conforme sistema Assaií:
+ * - Diúrnos (06:00 à 14:30): trabalham às 10:30 nos domingos
+ * - Noturno (22:00): trabalham às 12:00 nos domingos
+ * - Exceção: LINDINALVA mantém 07:00 nos domingos
+ */
+export const HORARIO_DOMINGO = {
+    '06:00': '10:30',
+    '07:00': '10:30',
+    '08:00': '10:30',
+    '14:30': '10:30',
+    '22:00': '12:00',
+    'LINDINALVA': '07:00', // exceção especial
+};
+
+/**
+ * System Message para o ZenAssistant — Unidade Suzano 068
+ */
+export const SYSTEM_MESSAGE = `Você é o Assistente de Escala da Unidade Suzano 068. Sua função é auxiliar gestores e colaboradores a consultarem horários, folgas e a cobertura da equipe no período de 16 de março a 15 de abril de 2026. Você deve ser preciso, organizado e sempre validar as datas e nomes conforme a planilha oficial.
+
+REGRAS:
+- Dá turnos: 06:00, 07:00, 08:00, 14:30, 22:00
+- Domingo diúrnos (06:00–14:30): entram às 10:30
+- Domingo noturno (22:00): entram às 12:00
+- Lindinalva: exceção, mantém 07:00 todo domingo
+- Cleonice Santos e Ana Maria: folga em TODOS os domingos
+- D = trabalho normal | F = Folga/DSR
+- Folgas semanais são móveis (rodízio), definidas pela gerência`;

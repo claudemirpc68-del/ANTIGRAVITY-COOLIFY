@@ -9,7 +9,7 @@ const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
 const ZenAssistant = ({ user, colaboradores }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { role: 'bot', text: `Olá ${user.nome}! 👋 Sou o Assistente Assaí. Posso consultar a escala de qualquer colaborador pelo registro. Como posso te ajudar?` }
+        { role: 'bot', text: `Olá! Sou o Assistente de Escala da Unidade Suzano 068.\n\nPosso te ajudar com:\n• Quem trabalha/folga hoje?\n• Escala e folgas pelo nº de registro\n• Horários de domingo\n• Legenda D e F\n\nO que deseja saber?` }
     ]);
     const [input, setInput] = useState('');
     const [isThinking, setIsThinking] = useState(false);
