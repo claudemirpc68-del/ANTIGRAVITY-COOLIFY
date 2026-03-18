@@ -1,4 +1,4 @@
-import { FOLGAS_MANUAIS, MOCK_COLABORADORES, HORARIO_DOMINGO, SYSTEM_MESSAGE, SCALE_START_DATE } from '../logic/mockData';
+import { FOLGAS_MANUAIS, MOCK_COLABORADORES, HORARIO_DOMINGO, SYSTEM_MESSAGE, SCALE_START_DATE } from '../logic/mockData.js';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
