@@ -43,7 +43,7 @@ export const analyzeScaleIntent = (input, colaboradores, user) => {
         // RESTRIÇÃO: Apenas Gestor vê a cobertura completa da equipe
         if (user.role !== 'gestor') {
             return {
-                text: `🔒 **Acesso Restrito:** A consulta de cobertura da equipe é exclusiva para gestores. \n\nVocê pode consultar sua própria folga informando seu registro abaixo!`,
+                text: `🔒 **Acesso Restrito:** A consulta de cobertura da equipe (quem trabalha ou folga hoje) é exclusiva para gestores. \n\nVocê pode consultar sua própria folga informando seu registro abaixo! 👇`,
                 type: 'error'
             };
         }
@@ -112,12 +112,20 @@ export const analyzeScaleIntent = (input, colaboradores, user) => {
         };
     }
 
-    // ── 5. Claudemir ──────────────────────────────────────────────────────
+    // ── 5. Claudemir (Exemplo de consulta direta) ────────────────────────
     if (norm.includes('claudemir')) {
-        return {
-            text: 'CLAUDEMIR CUBAS (Mat. 7101309): folga confirmada em 17/03. Regime 6x1 — próximas folgas e os 2 domingos mensais serão definidos pela gerência e registrados aqui.',
-            type: 'scale_info'
-        };
+        // Se for o próprio Claudemir ou o Gestor, mostra. Senão, bloqueia.
+        if (user.id === '15' || user.role === 'gestor') {
+            return {
+                text: 'CLAUDEMIR CUBAS (Mat. 7101309): folga confirmada em 17/03. Regime 6x1 — próximas folgas e os 2 domingos mensais serão definidos pela gerência e registrados aqui.',
+                type: 'scale_info'
+            };
+        } else {
+            return {
+                text: '🔒 **Acesso Restrito:** Você não tem permissão para consultar a escala de outros colegas por nome. Utilize a consulta por matrícula apenas para o seu registro oficial.',
+                type: 'error'
+            };
+        }
     }
 
     // ── 6. WhatsApp ───────────────────────────────────────────────────────
