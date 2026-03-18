@@ -59,6 +59,14 @@ const ZenAssistant = ({ user, colaboradores }) => {
             return `Não encontrei nenhum colaborador com o registro **${matricula}**. Verifique o número e tente novamente.`;
         }
 
+        // RESTRIÇÃO: Colaborador só vê a própria matrícula
+        if (user.role === 'colaborador') {
+            const myData = colaboradores.find(c => c.id === user.id);
+            if (!myData || myData.matricula !== colab.matricula) {
+                return `🔒 **Acesso Restrito:** Você só tem permissão para consultar informações do seu próprio registro (**${myData?.matricula || 'N/A'}**).`;
+            }
+        }
+
         const hoje = new Date().toISOString().split('T')[0];
         const folgasColab = (FOLGAS_MANUAIS[colab.id] || [])
             .filter(d => d >= hoje)

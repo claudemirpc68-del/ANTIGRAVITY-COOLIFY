@@ -40,6 +40,14 @@ export const analyzeScaleIntent = (input, colaboradores, user) => {
         norm.includes('quem folga hoje') ||
         norm.includes('de folga hoje')
     ) {
+        // RESTRIÇÃO: Apenas Gestor vê a cobertura completa da equipe
+        if (user.role !== 'gestor') {
+            return {
+                text: `🔒 **Acesso Restrito:** A consulta de cobertura da equipe é exclusiva para gestores. \n\nVocê pode consultar sua própria folga informando seu registro abaixo!`,
+                type: 'error'
+            };
+        }
+
         const emFolga = colaboradores.filter(c => isFolgaHoje(c.id, dataHoje));
         const trabalhando = colaboradores.filter(c => !isFolgaHoje(c.id, dataHoje));
 
