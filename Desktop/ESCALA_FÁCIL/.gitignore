@@ -1,0 +1,5 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+skill_config/escala_gerada.json

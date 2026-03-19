@@ -1,0 +1,211 @@
+"""
+ESCALA_FÁCIL - Servidor Flask / Webhook Twilio
+Recebe mensagens do WhatsApp via Twilio e responde com a lógica do bot.
+"""
+
+import os
+import sys
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
+from dotenv import load_dotenv
+
+# Adiciona o diretório raiz ao path para importar os scripts
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from sessions import SessionManager
+from scripts.api_mock import (
+    identificar_usuario,
+    get_escala_semanal,
+    get_proxima_folga,
+    get_domingos_folga,
+    get_resumo_equipe,
+)
+
+load_dotenv()
+
+app = Flask(__name__)
+sessions = SessionManager()
+
+# -----------------------------------------------------------------------
+# Menus
+# -----------------------------------------------------------------------
+
+MENU_COLABORADOR = (
+    "Olá, *{nome}*! Como posso ajudar?\n\n"
+    "1 - Ver minha escala semanal\n"
+    "2 - Consultar minha próxima folga\n"
+    "3 - Ver domingos de folga do mês\n"
+    "4 - Solicitar troca de turno/folga\n"
+    "5 - Justificar ausência ou atraso\n"
+    "6 - Solicitar mudança de setor/horário\n"
+    "7 - Reportar problema ou conflito\n"
+    "8 - Falar diretamente com o gestor\n\n"
+    "Digite o número da opção desejada."
+)
+
+MENU_GESTOR = (
+    "Bem-vindo, *{nome}* (Gestor)!\n\n"
+    "1 - Resumo da equipe hoje\n"
+    "2 - Validar justificativas de ausência/atraso\n"
+    "3 - Autorizar mudança de setor/horário\n"
+    "4 - Ajustar escala da equipe\n"
+    "5 - Resolver problemas ou conflitos\n"
+    "6 - Gerar relatórios da equipe\n"
+    "7 - Enviar comunicado aos colaboradores\n\n"
+    "Digite o número da opção desejada."
+)
+
+MSG_PEDIR_MATRICULA = (
+    "Olá! Eu sou o *AssaiBot* 🤖\n"
+    "_Organizando sua escala, sempre com o gestor ao lado._\n\n"
+    "Por favor, informe sua *matrícula* para acessar o sistema:"
+)
+
+MSG_NAO_ENCONTRADO = (
+    "❌ Matrícula não encontrada. Verifique o número e tente novamente.\n"
+    "Ou digite *REINICIAR* para começar de novo."
+)
+
+MSG_OPCAO_INVALIDA = (
+    "⚠️ Opção inválida. Por favor, digite o número correspondente à opção desejada.\n"
+    "Ou digite *MENU* para ver as opções novamente."
+)
+
+MSG_EM_BREVE = (
+    "⏳ Esta funcionalidade estará disponível em breve.\n"
+    "Digite *MENU* para voltar ao menu principal."
+)
+
+# -----------------------------------------------------------------------
+# Processamento de mensagens
+# -----------------------------------------------------------------------
+
+def processar_mensagem(numero_telefone: str, texto: str) -> str:
+    """Processa a mensagem recebida e retorna a resposta do bot."""
+    texto = texto.strip()
+    sessao = sessions.get(numero_telefone)
+
+    # Comandos especiais
+    if texto.upper() in ("REINICIAR", "RESTART", "OI", "OLÁ", "OLA", "INICIO", "START"):
+        sessions.clear(numero_telefone)
+        return MSG_PEDIR_MATRICULA
+
+    if texto.upper() == "MENU":
+        if sessao and sessao.get("nome"):
+            if sessao.get("tipo") == "gestor":
+                return MENU_GESTOR.format(nome=sessao["nome"])
+            else:
+                return MENU_COLABORADOR.format(nome=sessao["nome"])
+        sessions.clear(numero_telefone)
+        return MSG_PEDIR_MATRICULA
+
+    # Etapa 1: ainda não tem matrícula → tudo que chega é tentativa de matrícula
+    if not sessao or not sessao.get("matricula"):
+        usuario = identificar_usuario(texto)
+
+        if usuario["tipo"] == "nao_encontrado":
+            return MSG_NAO_ENCONTRADO
+
+        # Salva a sessão
+        sessions.set(numero_telefone, {
+            "matricula": texto,
+            "nome": usuario["nome"],
+            "tipo": usuario["tipo"],
+        })
+
+        if usuario["tipo"] == "gestor":
+            return MENU_GESTOR.format(nome=usuario["nome"])
+        else:
+            return MENU_COLABORADOR.format(nome=usuario["nome"])
+
+    # Etapa 2: usuário já identificado — processa opcão do menu
+    matricula = sessao["matricula"]
+    tipo = sessao["tipo"]
+    nome = sessao["nome"]
+
+    if tipo == "colaborador":
+        return _processar_colaborador(texto, matricula, nome)
+    elif tipo == "gestor":
+        return _processar_gestor(texto, nome)
+
+    return MSG_OPCAO_INVALIDA
+
+
+def _processar_colaborador(opcao: str, matricula: str, nome: str) -> str:
+    """Processa uma opção do menu de colaborador."""
+    opcoes = {
+        "1": lambda: get_escala_semanal(matricula),
+        "2": lambda: get_proxima_folga(matricula),
+        "3": lambda: get_domingos_folga(matricula),
+        "4": lambda: MSG_EM_BREVE,
+        "5": lambda: MSG_EM_BREVE,
+        "6": lambda: MSG_EM_BREVE,
+        "7": lambda: MSG_EM_BREVE,
+        "8": lambda: "📞 Sua mensagem foi encaminhada ao gestor responsável.\n\n⚠️ _O gestor tem a última palavra e pode alterar em caso de necessidade operacional._",
+    }
+
+    handler = opcoes.get(opcao)
+    if handler:
+        resposta = handler()
+        if callable(resposta):
+            return resposta
+        return f"{resposta}\n\nDigite *MENU* para voltar ao menu principal."
+
+    return MSG_OPCAO_INVALIDA
+
+
+def _processar_gestor(opcao: str, nome: str) -> str:
+    """Processa uma opção do menu de gestor."""
+    opcoes = {
+        "1": lambda: get_resumo_equipe(),
+        "2": lambda: MSG_EM_BREVE,
+        "3": lambda: MSG_EM_BREVE,
+        "4": lambda: MSG_EM_BREVE,
+        "5": lambda: MSG_EM_BREVE,
+        "6": lambda: MSG_EM_BREVE,
+        "7": lambda: MSG_EM_BREVE,
+    }
+
+    handler = opcoes.get(opcao)
+    if handler:
+        resposta = handler()
+        if callable(resposta):
+            return resposta
+        return f"{resposta}\n\nDigite *MENU* para ver as opções novamente."
+
+    return MSG_OPCAO_INVALIDA
+
+
+# -----------------------------------------------------------------------
+# Webhook Twilio
+# -----------------------------------------------------------------------
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    """Endpoint que recebe mensagens do Twilio."""
+    numero = request.form.get("From", "")
+    texto = request.form.get("Body", "").strip()
+
+    resposta_texto = processar_mensagem(numero, texto)
+
+    resp = MessagingResponse()
+    msg = resp.message()
+    msg.body(resposta_texto)
+
+    return str(resp), 200
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    """Health check para o Coolify."""
+    return {"status": "ok", "bot": "AssaiBot - ESCALA_FÁCIL"}, 200
+
+
+# -----------------------------------------------------------------------
+# Execução local para testes
+# -----------------------------------------------------------------------
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    print(f"[AssaiBot] Servidor rodando na porta {port}...")
+    app.run(host="0.0.0.0", port=port, debug=True)

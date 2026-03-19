@@ -1,0 +1,22 @@
+ESCALA_FÁCIL/
+│
+├── 📄 skill_config/
+│   ├── skill_escala.json           → Regras, intents, menus e permissões
+│   └── colaboradores.json          → Cadastro completo dos colaboradores
+│
+├── 📄 assets/
+│   ├── avatar_assaibot.png         → Imagem do bot (já gerada)
+│   └── identidade_visual.md        → Manual de identidade (cores, tom de voz, slogan)
+│
+├── 📄 conversas_exemplo/
+│   ├── colaborador_fluxo.md        → Exemplo de conversa com colaborador
+│   └── gestor_fluxo.md             → Exemplo de conversa com gestor
+│
+├── 📄 docs/
+│   ├── apresentacao_gerente.md     → Texto base para apresentação do projeto
+│   └── fluxograma_bot.png          → Organograma visual do fluxo de decisões
+│
+├── 📄 planilhas/
+│   └── escala_original.xlsx        → Planilha original da escala (importada da fonte)
+│
+└── 📄 README.md                    → Visão geral do projeto, objetivos e instruções

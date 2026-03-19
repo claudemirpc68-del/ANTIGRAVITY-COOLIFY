@@ -1,0 +1,14 @@
+# Arquivos sensíveis
+.env
+*.pyc
+__pycache__/
+*.pyo
+
+# Node (caso existam)
+node_modules/
+
+# Dados gerados automaticamente (serão criados no container)
+skill_config/escala_gerada.json
+
+# Logs
+*.log
