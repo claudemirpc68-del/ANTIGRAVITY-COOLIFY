@@ -222,6 +222,12 @@ def health():
     return {"status": "ok", "bot": "AssaiBot - ESCALA_FÁCIL"}, 200
 
 
+@app.route("/", methods=["GET"])
+def index():
+    """Serve a interface web do simulador (frontend)."""
+    return send_from_directory(".", "simulator.html")
+
+
 @app.route("/assets/<path:path>")
 def send_assets(path):
     """Serve arquivos da pasta assets para o simulador."""
