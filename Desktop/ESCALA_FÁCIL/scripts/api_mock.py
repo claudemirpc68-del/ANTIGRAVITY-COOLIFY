@@ -6,7 +6,7 @@ Simula as intents do bot: consulta de escala, próxima folga e domingos de folga
 
 import json
 import os
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 # -----------------------------------------------------------------------
@@ -16,6 +16,7 @@ from datetime import date, timedelta
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ESCALA_PATH = os.path.join(BASE_DIR, "skill_config", "escala_gerada.json")
 COLABORADORES_PATH = os.path.join(BASE_DIR, "skill_config", "colaboradores.json")
+SOLICITACOES_PATH = os.path.join(BASE_DIR, "skill_config", "solicitacoes.json")
 GESTORES = {"101010", "101011", "101012", "101013"}
 GESTORES_NOMES = {
     "101010": "Anderson Cubas",
@@ -37,6 +38,46 @@ def _carregar_escala() -> dict:
 def _carregar_colaboradores() -> list:
     with open(COLABORADORES_PATH, encoding="utf-8") as f:
         return json.load(f)["colaboradores"]
+
+
+def _carregar_solicitacoes() -> dict:
+    if not os.path.exists(SOLICITACOES_PATH):
+        return {"solicitacoes": []}
+    with open(SOLICITACOES_PATH, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: str) -> bool:
+    dados = _carregar_solicitacoes()
+    nova_solicitacao = {
+        "id": len(dados.get("solicitacoes", [])) + 1,
+        "matricula": matricula,
+        "nome": nome,
+        "tipo": tipo_solicitacao,
+        "texto": texto,
+        "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "status": "PENDENTE"
+    }
+    dados.setdefault("solicitacoes", []).append(nova_solicitacao)
+    with open(SOLICITACOES_PATH, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+    return True
+
+
+def listar_solicitacoes_pendentes() -> str:
+    dados = _carregar_solicitacoes()
+    pendentes = [s for s in dados.get("solicitacoes", []) if s.get("status") == "PENDENTE"]
+    
+    if not pendentes:
+        return "✅ Todas as solicitações estão em dia. Não há itens pendentes."
+        
+    linhas = [f"📋 *Você tem {len(pendentes)} solicitações pendentes:*\n"]
+    for s in pendentes:
+        linhas.append(f"🔹 *ID {s['id']}* - {s['tipo']} de {s['nome']}")
+        linhas.append(f"   💬 \"{s['texto']}\"\n")
+        
+    linhas.append("Para aprovar ou rejeitar, fale diretamente com o colaborador por enquanto.")
+    return "\n".join(linhas)
 
 
 # -----------------------------------------------------------------------

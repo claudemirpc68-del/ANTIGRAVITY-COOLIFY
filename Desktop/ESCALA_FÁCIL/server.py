@@ -19,6 +19,8 @@ from scripts.api_mock import (
     get_proxima_folga,
     get_domingos_folga,
     get_resumo_equipe,
+    salvar_solicitacao,
+    listar_solicitacoes_pendentes,
 )
 
 load_dotenv()
@@ -123,24 +125,41 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
     tipo = sessao["tipo"]
     nome = sessao["nome"]
 
+    # Verifica se há um estado ativo aguardando texto livre
+    estado = sessao.get("estado")
+    if estado:
+        tipo_solicitacao = sessao.get("tipo_solicitacao", "Solicitação")
+        salvar_solicitacao(matricula, nome, tipo_solicitacao, texto)
+        sessions.update(numero_telefone, estado=None, tipo_solicitacao=None)
+        return (
+            f"✅ Sua solicitação de *{tipo_solicitacao}* foi registrada com sucesso!\n\n"
+            "O gestor foi notificado e avaliará o mais breve possível.\n"
+            "Digite *MENU* para voltar às opções."
+        )
+
     if tipo == "colaborador":
-        return _processar_colaborador(texto, matricula, nome)
+        return _processar_colaborador(texto, matricula, nome, numero_telefone)
     elif tipo == "gestor":
-        return _processar_gestor(texto, nome)
+        return _processar_gestor(texto, nome, numero_telefone)
 
     return MSG_OPCAO_INVALIDA
 
 
-def _processar_colaborador(opcao: str, matricula: str, nome: str) -> str:
+def _processar_colaborador(opcao: str, matricula: str, nome: str, numero_telefone: str) -> str:
     """Processa uma opção do menu de colaborador."""
+    
+    def pedir_solicitacao(tipo_solicitacao: str, mensagem_prompt: str) -> str:
+        sessions.update(numero_telefone, estado="aguardando_texto", tipo_solicitacao=tipo_solicitacao)
+        return mensagem_prompt
+
     opcoes = {
         "1": lambda: get_escala_semanal(matricula),
         "2": lambda: get_proxima_folga(matricula),
         "3": lambda: get_domingos_folga(matricula),
-        "4": lambda: MSG_EM_BREVE,
-        "5": lambda: MSG_EM_BREVE,
-        "6": lambda: MSG_EM_BREVE,
-        "7": lambda: MSG_EM_BREVE,
+        "4": lambda: pedir_solicitacao("Troca de Turno/Folga", "Por favor, digite os detalhes da sua solicitação de troca de turno ou folga (quais dias e se já alinhou com alguém):"),
+        "5": lambda: pedir_solicitacao("Justificativa de Ausência/Atraso", "Por favor, digite o motivo da sua ausência ou atraso (caso possua atestado, entregue via RH):"),
+        "6": lambda: pedir_solicitacao("Mudança de Setor/Horário", "Qual setor ou horário você gostaria de solicitar e por qual motivo?"),
+        "7": lambda: pedir_solicitacao("Problema ou Conflito", "Por favor, descreva brevemente o problema ou conflito para que possamos ajudar:"),
         "8": lambda: "📞 Sua mensagem foi encaminhada ao gestor responsável.\n\n⚠️ _O gestor tem a última palavra e pode alterar em caso de necessidade operacional._",
     }
 
@@ -154,16 +173,16 @@ def _processar_colaborador(opcao: str, matricula: str, nome: str) -> str:
     return MSG_OPCAO_INVALIDA
 
 
-def _processar_gestor(opcao: str, nome: str) -> str:
+def _processar_gestor(opcao: str, nome: str, numero_telefone: str) -> str:
     """Processa uma opção do menu de gestor."""
     opcoes = {
         "1": lambda: get_resumo_equipe(),
-        "2": lambda: MSG_EM_BREVE,
-        "3": lambda: MSG_EM_BREVE,
-        "4": lambda: MSG_EM_BREVE,
-        "5": lambda: MSG_EM_BREVE,
-        "6": lambda: MSG_EM_BREVE,
-        "7": lambda: MSG_EM_BREVE,
+        "2": lambda: listar_solicitacoes_pendentes(),
+        "3": lambda: listar_solicitacoes_pendentes(),
+        "4": lambda: listar_solicitacoes_pendentes(),
+        "5": lambda: listar_solicitacoes_pendentes(),
+        "6": lambda: "📈 Relatórios gerenciais estarão disponíveis no painel web em breve.",
+        "7": lambda: "📣 A função de envio em massa de comunicados será liberada via painel web.",
     }
 
     handler = opcoes.get(opcao)
