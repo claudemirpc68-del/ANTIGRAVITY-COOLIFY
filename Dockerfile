@@ -1,23 +1,25 @@
-# Dockerfile na raiz do repositório (ESCALA_FÁCIL via Coolify)
 FROM python:3.11-slim
 
-# Diretório de trabalho padrão
 WORKDIR /app
 
-# Copia os arquivos do subdiretório específico para o container
-# Note que o caminho é relativo à raiz do repositório (onde este Dockerfile está)
-# Usando aspas para lidar com caracteres especiais se necessário
+# Instalar dependências de sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar requisitos e instalar
 COPY "Desktop/ESCALA_FÁCIL/requirements.txt" .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia todo o projeto da pasta do Desktop
+# Copiar o código do projeto para /app
 COPY "Desktop/ESCALA_FÁCIL" .
 
-# Gera a escala
-RUN python scripts/generator.py
+# Garantir que o simulator.html esteja acessível
+RUN ls -la /app
 
-# Expõe a porta
-EXPOSE 5000
+# Expor a porta 80 (padrão)
+EXPOSE 80
 
-# Sobe com Gunicorn (produção)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "120", "server:app"]
+# Comando para rodar o Gunicorn na porta 80
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]
