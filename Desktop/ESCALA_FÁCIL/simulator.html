@@ -34,8 +34,9 @@
         }
 
         .phone-container {
-            width: 380px;
-            height: 700px;
+            width: 100%;
+            max-width: 450px;
+            height: 90vh;
             background: #fff;
             border-radius: 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -44,6 +45,20 @@
             flex-direction: column;
             border: 8px solid #333;
             position: relative;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .phone-container {
+                width: 100%;
+                height: 100vh;
+                max-width: none;
+                border-radius: 0;
+                border: none;
+            }
+            body {
+                background: var(--chat-bg);
+            }
         }
 
         .header {
@@ -213,7 +228,8 @@ Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
 
     <script>
         let currentNumber = "+5511999990001";
-        const WEBHOOK_URL = "http://localhost:5000/webhook";
+        // Usa a URL do servidor atual (mesmo host)
+        const WEBHOOK_URL = window.location.origin + "/webhook";
 
         function toggleNumber() {
             currentNumber = currentNumber === "+5511999990001" ? "+5511888880000" : "+5511999990001";
