@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssaiBot - Simulador Oficial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --assai-blue: #004a99;
+            --assai-orange: #ff8200;
+            --whatsapp-green: #25D366;
+            --whatsapp-dark: #075E54;
+            --chat-bg: #E5DDD5;
+            --bubble-left: #FFFFFF;
+            --bubble-right: #DCF8C6;
+            --text-main: #303030;
+            --text-muted: #999;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--assai-blue) 0%, var(--assai-orange) 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 380px;
+            height: 700px;
+            background: #fff;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 8px solid #333;
+            position: relative;
+        }
+
+        .header {
+            background: var(--assai-blue);
+            color: #fff;
+            padding: 40px 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid var(--assai-orange);
+        }
+
+        .header .avatar {
+            width: 48px;
+            height: 48px;
+            background: #fff;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        .header .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header .info h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header .info p {
+            font-size: 10px;
+            opacity: 0.9;
+            font-style: italic;
+            max-width: 220px;
+        }
+
+        .chat-window {
+            flex: 1;
+            background: var(--chat-bg);
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            background: var(--bubble-left);
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+        }
+
+        .message.user {
+            background: var(--bubble-right);
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+        }
+
+        .input-area {
+            background: #f0f0f0;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        button {
+            background: var(--assai-blue);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background: var(--assai-orange);
+        }
+
+        .config-bar {
+            background: #f8f8f8;
+            padding: 8px 15px;
+            font-size: 10px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+        }
+
+        strong { font-weight: 600; }
+        em { font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="header">
+            <div class="avatar">
+                <img src="http://localhost:5000/assets/avatar_assaibot.png" alt="AssaiBot">
+            </div>
+            <div class="info">
+                <h2>AssaiBot</h2>
+                <p>"Organizando sua escala, sempre com o gestor ao lado."</p>
+            </div>
+        </div>
+
+        <div class="config-bar">
+            <span>Simulando: <strong id="current-number">+5511999990001</strong></span>
+            <a href="#" onclick="toggleNumber()" style="color: var(--assai-blue); font-weight: 600; text-decoration: none;">Trocar Perfil</a>
+        </div>
+
+        <div class="chat-window" id="chat">
+            <div class="message bot">Olá! Eu sou o <strong>AssaiBot</strong> 🤖
+Bem-vindo ao simulador oficial.
+
+Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Digite uma mensagem..." onkeypress="handleKey(event)">
+            <button onclick="sendMessage()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentNumber = "+5511999990001";
+        const WEBHOOK_URL = "http://localhost:5000/webhook";
+
+        function toggleNumber() {
+            currentNumber = currentNumber === "+5511999990001" ? "+5511888880000" : "+5511999990001";
+            document.getElementById('current-number').innerText = currentNumber;
+            const perfil = currentNumber === "+5511888880000" ? "Gestor" : "Colaborador";
+            addMessage("bot", `Perfil trocado para: <strong>${perfil}</strong> (${currentNumber}).\nDigite <strong>REINICIAR</strong> para começar.`);
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addMessage("user", text);
+            input.value = '';
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('From', 'whatsapp:' + currentNumber);
+                formData.append('Body', text);
+
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Falha no servidor');
+
+                const twiml = await response.text();
+                const botResponse = extractBody(twiml);
+                addMessage("bot", botResponse);
+            } catch (error) {
+                console.error(error);
+                addMessage("bot", "❌ <strong>Erro de Conexão</strong>\nCertifique-se de que o servidor Flask está rodando na porta 5000.");
+            }
+        }
+
+        function extractBody(twiml) {
+            const match = twiml.match(/<Body>(.*?)<\/Body>/s);
+            if (match && match[1]) {
+                let text = match[1]
+                    .replace(/&quot;/g, '"')
+                    .replace(/&apos;/g, "'")
+                    .replace(/&gt;/g, ">")
+                    .replace(/&lt;/g, "<")
+                    .replace(/&amp;/g, "&");
+                
+                // Formatação WhatsApp -> HTML
+                text = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+                text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+                
+                return text;
+            }
+            return "Recebi uma resposta vazia do servidor.";
+        }
+
+        function addMessage(type, text) {
+            const chat = document.getElementById('chat');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = text;
+            chat.appendChild(div);
+            // Scroll suave para o final
+            chat.scrollTo({
+                top: chat.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>

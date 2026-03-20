@@ -5,7 +5,8 @@ Recebe mensagens do WhatsApp via Twilio e responde com a lógica do bot.
 
 import os
 import sys
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
+from flask_cors import CORS
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
 
@@ -13,7 +14,7 @@ from dotenv import load_dotenv
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from sessions import SessionManager
-from scripts.api_mock import (
+from scripts.api_supabase import (
     identificar_usuario,
     get_escala_semanal,
     get_proxima_folga,
@@ -26,6 +27,7 @@ from scripts.api_mock import (
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app) # Permite que o simulador web acesse o webhook
 sessions = SessionManager()
 
 # -----------------------------------------------------------------------
@@ -218,6 +220,12 @@ def webhook():
 def health():
     """Health check para o Coolify."""
     return {"status": "ok", "bot": "AssaiBot - ESCALA_FÁCIL"}, 200
+
+
+@app.route("/assets/<path:path>")
+def send_assets(path):
+    """Serve arquivos da pasta assets para o simulador."""
+    return send_from_directory("assets", path)
 
 
 # -----------------------------------------------------------------------
