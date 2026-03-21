@@ -27,7 +27,7 @@ from scripts.api_supabase import (
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='assets', static_url_path='/assets')
 CORS(app) # Permite que o simulador web acesse o webhook
 sessions = SessionManager()
 
@@ -263,18 +263,14 @@ def health():
     return {"status": "ok", "bot": "ESCALA_FÁCIL"}, 200
 
 
+# -----------------------------------------------------------------------
+# Rotas de Interface
+# -----------------------------------------------------------------------
+
 @app.route("/", methods=["GET"])
 def index():
     """Serve a interface web do simulador (frontend)."""
     return send_from_directory(".", "simulator.html")
-
-
-@app.route("/assets/<path:path>")
-def send_assets(path):
-    """Serve arquivos da pasta assets para o simulador."""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    assets_dir = os.path.join(base_dir, "assets")
-    return send_from_directory(assets_dir, path)
 
 
 # -----------------------------------------------------------------------
