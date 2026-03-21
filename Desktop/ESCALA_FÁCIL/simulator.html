@@ -258,20 +258,26 @@
 <body>
 
     <div class="phone-container">
-        <div class="header">
-            <div class="avatar">
-                <img src="assets/avatar_assaibot.png" alt="ESCALA_FÁCIL">
+        <div class="header" style="flex-wrap: wrap; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="avatar">
+                    <img src="assets/avatar_escala_facil.png" alt="ESCALA_FÁCIL">
+                </div>
+                <div class="info">
+                    <h2 style="display: flex; align-items: center; gap: 8px;">
+                        ESCALA_FÁCIL 
+                        <span id="perfil-badge" class="badge" style="font-size: 9px; padding: 2px 6px;">Colaborador</span>
+                    </h2>
+                    <p>"Organizando sua escala para que você faça toda a diferença!"</p>
+                </div>
             </div>
-            <div class="info">
-                <h2>ESCALA_FÁCIL</h2>
-                <p>"Organizando sua escala, sempre com o gestor ao lado."</p>
-            </div>
+            <a href="#" onclick="toggleNumber()" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 10px; font-weight: 600; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 20px; margin-top: 5px;">ALTERAR PERFIL</a>
         </div>
 
-        <div class="config-bar">
-            <span>Simulando: <strong id="current-number">+5511999990001</strong> <span id="perfil-badge" class="badge">Colaborador</span></span>
-            <a href="#" onclick="toggleNumber()" style="color: var(--assai-blue); font-weight: 700; text-decoration: none; font-size: 10px;">TROCAR PERFIL</a>
+        <div id="debug-info" style="display: none;">
+            <span id="current-number">+5511999990001</span>
         </div>
+
 
         <div class="chat-window" id="chat">
             <div class="message bot">Olá! Eu sou o <strong>ESCALA_FÁCIL</strong> 🤖
@@ -280,9 +286,9 @@ Bem-vindo ao simulador oficial.
 Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
         </div>
 
-        <div style="padding: 10px; display: flex; justify-content: flex-end;">
-            <button onclick="sendMenu()" style="background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); border-radius: 20px; padding: 5px 15px; font-size: 11px; color: var(--assai-blue); cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; transition: all 0.3s ease;">
-                <span>↩️</span> Voltar ao Menu
+        <div style="padding: 10px; display: flex; justify-content: flex-end; position: absolute; bottom: 85px; right: 20px; z-index: 10;">
+            <button onclick="sendMenu()" title="Voltar ao Menu" style="background: var(--assai-blue); border: none; border-radius: 50%; width: 40px; height: 40px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                <span style="font-size: 18px;">↩️</span>
             </button>
         </div>
 

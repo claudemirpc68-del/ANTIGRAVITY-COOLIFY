@@ -43,7 +43,7 @@ ESCALA_FÁCIL/
 ## 🤖 Identidade do Bot
 - **Nome:** ESCALA_FÁCIL  
 - **Avatar:** `avatar_escala_facil.png`  
-- **Slogan:** *"Organizando sua escala, sempre com o gestor ao lado."*  
+- **Slogan:** *"Organizando sua escala para que você faça toda a diferença!"*  
 - **Tom de voz:** Amigável, claro e objetivo, sempre reforçando que o gestor tem a última palavra.
 
 ---

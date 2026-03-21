@@ -4,7 +4,7 @@
 ESCALA_FÁCIL
 
 ## Slogan
-"Organizando sua escala, sempre com o gestor ao lado."
+"Organizando sua escala para que você faça toda a diferença!"
 
 ## Avatar
 O avatar oficial é uma ilustração em estilo 3D de um jovem funcionário amigável e sorridente. 

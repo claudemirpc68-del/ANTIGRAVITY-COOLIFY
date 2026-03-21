@@ -62,7 +62,7 @@ MENU_GESTOR = (
 
 MSG_PEDIR_MATRICULA = (
     "Olá! Eu sou o *ESCALA_FÁCIL* 🤖\n"
-    "_Organizando sua escala, sempre com o gestor ao lado._\n\n"
+    "_Organizando sua escala para que você faça toda a diferença!_\n\n"
     "Por favor, informe sua *matrícula* para acessar o sistema:"
 )
 
