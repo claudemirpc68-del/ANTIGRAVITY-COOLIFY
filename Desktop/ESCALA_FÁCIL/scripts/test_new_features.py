@@ -14,7 +14,7 @@ from scripts.api_supabase import (
 )
 
 def testar_novas_funcionalidades():
-    print("🚀 Testando Novas Funcionalidades do AssaiBot\n")
+    print("🚀 Testando Novas Funcionalidades do ESCALA_FÁCIL\n")
 
     # 1. Testar Identificação
     print("--- 1. Identificação ---")

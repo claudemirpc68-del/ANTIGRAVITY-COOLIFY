@@ -2,9 +2,8 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# Carrega as variáveis de ambiente no início do módulo
 load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SYSTEM_PROMPT = """
 Você é o assistente inteligente do sistema ESCALA_FÁCIL. 
@@ -24,13 +23,20 @@ CONTEXTO ATUAL:
 def processar_texto_ia(texto, usuario_info):
     """
     Processa o texto usando GPT-3.5/4 para entender a intenção e responder.
-    Se a API Key não estiver configurada, retorna uma resposta amigável de fallback.
+    Garante que a API Key seja lida do ambiente no momento da execução.
     """
+    # Recarrega para garantir que pegamos a chave do .env se mudou
+    load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or "your_api_key" in api_key:
-        return None # Indica que deve usar o fallback local
+    
+    if not api_key or "your_api_key" in api_key or len(api_key) < 20:
+        print("⚠️ OpenAI API Key não configurada corretamente.")
+        return None
 
     try:
+        # Inicializa o cliente localmente para evitar erros de inicialização global
+        client = OpenAI(api_key=api_key)
+        
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[

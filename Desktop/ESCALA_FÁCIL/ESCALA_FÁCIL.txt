@@ -5,7 +5,7 @@ ESCALA_FÁCIL/
 │   └── colaboradores.json          → Cadastro completo dos colaboradores
 │
 ├── 📄 assets/
-│   ├── avatar_assaibot.png         → Imagem do bot (já gerada)
+│   ├── avatar_escala_facil.png     → Imagem do bot (já gerada)
 │   └── identidade_visual.md        → Manual de identidade (cores, tom de voz, slogan)
 │
 ├── 📄 conversas_exemplo/

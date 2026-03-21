@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Tag, Percent, Zap, TrendingDown } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Tag, Percent, Zap, TrendingDown } from 'lucide-react';
 import { promotions, products } from '../services/mockData';
 
 const Promotions = ({ onBack, onConsultProduct }) => {
@@ -45,17 +45,17 @@ const Promotions = ({ onBack, onConsultProduct }) => {
             </div>
 
             <div>
-              <h2 style={{ fontSize: '2.2rem', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '10px', lineHeight: '1.1' }}>
+              <h2 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '10px', lineHeight: '1.1' }}>
                 {promo.title}
               </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.3rem', fontWeight: '500' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '1.4rem', fontWeight: '500' }}>
                 {promo.description}
               </p>
             </div>
 
             <button 
               className="btn-primary" 
-              style={{ width: '100%', padding: '25px', fontSize: '1.4rem', marginTop: 'auto' }}
+              style={{ width: '100%', padding: '25px', fontSize: '1.5rem', marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}
               onClick={() => {
                 const firstProduct = products.find(p => p.category === promo.targetCategory);
                 if (firstProduct) onConsultProduct(firstProduct.barcode);
@@ -96,6 +96,23 @@ const Promotions = ({ onBack, onConsultProduct }) => {
           ))}
         </div>
       </div>
+      
+      <button 
+        className="btn-primary" 
+        onClick={onBack}
+        style={{ 
+          position: 'fixed', 
+          bottom: '40px', 
+          left: '40px', 
+          background: 'rgba(255,255,255,0.1)', 
+          backdropFilter: 'blur(10px)',
+          border: '1px solid var(--glass-border)',
+          padding: '20px 40px',
+          fontSize: '1.2rem'
+        }}
+      >
+        <ArrowLeft size={24} /> Voltar
+      </button>
     </div>
   );
 };

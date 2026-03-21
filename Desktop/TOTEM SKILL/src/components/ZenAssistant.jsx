@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Search, MapPin, Tag, ShoppingCart, User, Bot, ArrowRight, MicOff } from 'lucide-react';
+import { Mic, Search, MapPin, Tag, ShoppingCart, User, Bot, ArrowRight, MicOff, Home } from 'lucide-react';
 import { analyzeIntent, speak } from '../services/llm';
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
@@ -62,16 +62,19 @@ const ZenAssistant = ({ onShowLocation, onBack }) => {
         <button 
           onClick={onBack}
           style={{ 
-            background: 'transparent', 
-            border: '2px solid var(--accent-orange)', 
-            color: 'var(--accent-orange)',
-            padding: '8px 16px',
+            background: 'var(--accent-orange)', 
+            border: 'none', 
+            color: 'white',
+            padding: '10px 20px',
             borderRadius: '12px',
-            fontWeight: 'bold',
-            cursor: 'pointer'
+            fontWeight: '900',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}
         >
-          Voltar
+          <Home size={20} /> INÍCIO
         </button>
       </div>
 

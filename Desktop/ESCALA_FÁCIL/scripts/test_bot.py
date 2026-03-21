@@ -20,7 +20,7 @@ def enviar_mensagem(numero, texto):
         print(f"❌ Erro {response.status_code}: {response.text}")
 
 def simular_fluxo_gestor():
-    print("🚀 Iniciando Simulação do AssaiBot")
+    print("🚀 Iniciando Simulação do ESCALA_FÁCIL")
     
     # Limpa sessões anteriores
     enviar_mensagem("+5511999990001", "REINICIAR")

@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar todo o código do repositório para o container
 COPY . .
 
-# Expor a porta 5000
-EXPOSE 5000
+# Expor a porta 80 (padrão do Traefik/Coolify)
+EXPOSE 80
 
-# Comando para rodar o Gunicorn na porta 5000
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]
+# Comando para rodar o Gunicorn na porta 80
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]

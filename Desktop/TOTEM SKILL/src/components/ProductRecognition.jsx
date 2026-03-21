@@ -39,9 +39,9 @@ const ProductRecognition = ({ onBack, onShowLocation, onConsultProduct }) => {
         <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '900' }}>Reconhecimento de Produto</h1>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-        {/* Lado Esquerdo: Área da Câmera */}
-        <div className="glass-card" style={{ padding: '20px', position: 'relative', overflow: 'hidden', minHeight: '500px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '40px', alignItems: 'start' }}>
+        {/* Lado Esquerdo: Área da Câmera (Menor) */}
+        <div className="glass-card" style={{ padding: '20px', position: 'relative', overflow: 'hidden', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ 
             flex: 1, 
             background: '#000', 
