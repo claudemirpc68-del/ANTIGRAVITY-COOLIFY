@@ -115,28 +115,62 @@ def get_domingos_folga(matricula: str) -> str:
     )
 
 def get_resumo_equipe() -> str:
-    """Retorna um resumo da equipe para o gestor via Supabase."""
+    """Retorna um resumo detalhado da equipe para o gestor via Supabase."""
     supabase = get_supabase()
     hoje = str(date.today())
     
-    # Total de colaboradores
+    # 1. Total de colaboradores
     total_res = supabase.table("colaboradores").select("matricula", count="exact").eq("tipo", "colaborador").execute()
     total = total_res.count if total_res.count is not None else 0
     
-    # Trabalhando hoje
-    trabalhando_res = supabase.table("escalas").select("matricula", count="exact").eq("data", hoje).eq("status", "TRABALHA").execute()
-    trabalhando = trabalhando_res.count if trabalhando_res.count is not None else 0
+    # 2. Trabalhando hoje (com nomes)
+    trabalhando_res = (supabase.table("escalas")
+                       .select("matricula, colaboradores(nome)")
+                       .eq("data", hoje)
+                       .eq("status", "TRABALHA")
+                       .execute())
+    trabalhando_lista = [e["colaboradores"]["nome"] for e in trabalhando_res.data]
     
-    # De folga hoje
-    de_folga_res = supabase.table("escalas").select("matricula", count="exact").eq("data", hoje).eq("status", "FOLGA").execute()
-    de_folga = de_folga_res.count if de_folga_res.count is not None else 0
+    # 3. De folga hoje (com nomes e motivos)
+    de_folga_res = (supabase.table("escalas")
+                    .select("matricula, tipo_folga, colaboradores(nome)")
+                    .eq("data", hoje)
+                    .eq("status", "FOLGA")
+                    .execute())
+    de_folga_lista = [f"{e['colaboradores']['nome']} ({e.get('tipo_folga') or 'Folga'})" for e in de_folga_res.data]
 
-    return (
-        f"📊 *Resumo da Equipe - {hoje}*\n"
-        f"  👥 Total de colaboradores: {total}\n"
-        f"  ✅ Trabalhando hoje: {trabalhando}\n"
-        f"  🟡 De folga hoje: {de_folga}"
-    )
+    # 4. Justificativas de ausência para hoje
+    # (Solicitações do tipo 'Justificativa' criadas hoje ou com menção a hoje)
+    justificativas_res = (supabase.table("solicitacoes")
+                          .select("nome, texto")
+                          .ilike("tipo", "%Justificativa%")
+                          .gte("data_criacao", hoje)
+                          .execute())
+    justificativas_lista = [f"{j['nome']}: {j['texto']}" for j in justificativas_res.data]
+
+    # Montando a resposta
+    linhas = [f"📊 *Resumo Detalhado - {hoje}*\n"]
+    linhas.append(f"👥 *Total da Equipe:* {total}")
+    
+    linhas.append(f"\n✅ *Presentes ({len(trabalhando_lista)}):*")
+    if trabalhando_lista:
+        linhas.append(f"  → {', '.join(trabalhando_lista)}")
+    else:
+        linhas.append("  → Nenhum colaborador escalado para hoje.")
+
+    linhas.append(f"\n🟡 *Folgas ({len(de_folga_lista)}):*")
+    if de_folga_lista:
+        for f in de_folga_lista:
+            linhas.append(f"  → {f}")
+    else:
+        linhas.append("  → Nenhuma folga hoje.")
+
+    if justificativas_lista:
+        linhas.append(f"\n⚠️ *Justificativas de Ausência/Atraso:*")
+        for j in justificativas_lista:
+            linhas.append(f"  → {j}")
+
+    return "\n".join(linhas)
 
 def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: str) -> bool:
     """Salva uma nova solicitação no Supabase."""
@@ -154,23 +188,97 @@ def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: 
         print(f"❌ Erro ao salvar solicitação: {e}")
         return False
 
-def listar_solicitacoes_pendentes() -> str:
-    """Lista solicitações pendentes para o gestor via Supabase."""
+def listar_solicitacoes_pendentes(tipo_filtro: Optional[str] = None) -> str:
+    """Lista solicitações pendentes para o gestor via Supabase, opcionalmente filtradas por tipo."""
     supabase = get_supabase()
-    response = (supabase.table("solicitacoes")
-                .select("*")
-                .eq("status", "PENDENTE")
-                .order("id")
-                .execute())
+    query = supabase.table("solicitacoes").select("*").eq("status", "PENDENTE")
+    
+    if tipo_filtro:
+        # Busca aproximada para tipos como 'Justificativa', 'Troca', etc.
+        query = query.ilike("tipo", f"%{tipo_filtro}%")
+        
+    response = query.order("id").execute()
     
     pendentes = response.data
     if not pendentes:
-        return "✅ Todas as solicitações estão em dia. Não há itens pendentes."
+        msg = "✅ Não há solicitações pendentes"
+        if tipo_filtro:
+            msg += f" do tipo *{tipo_filtro}*."
+        else:
+            msg += "."
+        return msg
         
-    linhas = [f"📋 *Você tem {len(pendentes)} solicitações pendentes:*\n"]
+    titulo = f"📋 *Pendentes: {len(pendentes)}*"
+    if tipo_filtro:
+        titulo = f"📋 *{tipo_filtro} Pendentes: {len(pendentes)}*"
+        
+    linhas = [f"{titulo}\n"]
     for s in pendentes:
         linhas.append(f"🔹 *ID {s['id']}* - {s['tipo']} de {s['nome']}")
         linhas.append(f"   💬 \"{s['texto']}\"\n")
         
     linhas.append("Para aprovar ou rejeitar, use o painel administrativo.")
     return "\n".join(linhas)
+
+def get_relatorio_mensal_equipe() -> str:
+    """Gera um relatório estatístico simples do mês atual via Supabase."""
+    supabase = get_supabase()
+    hoje = date.today()
+    inicio_mes = hoje.replace(day=1)
+    
+    # Busca todas as escalas do mês para estatísticas
+    response = (supabase.table("escalas")
+                .select("status")
+                .gte("data", str(inicio_mes))
+                .lte("data", str(hoje)) # Até hoje
+                .execute())
+    
+    escalas = response.data
+    if not escalas:
+        return "📊 Sem dados de escala suficientes para gerar o relatório do mês."
+
+    trabalhados = sum(1 for e in escalas if e["status"] == "TRABALHA")
+    folgas = sum(1 for e in escalas if e["status"] == "FOLGA")
+    total = len(escalas)
+    
+    # Busca solicitações aprovadas/rejeitadas no mês
+    solic_res = (supabase.table("solicitacoes")
+                 .select("status")
+                 .gte("data_criacao", str(inicio_mes))
+                 .execute())
+    
+    solics = solic_res.data
+    aprovadas = sum(1 for s in solics if s["status"] == "APROVADO")
+    pendentes = sum(1 for s in solics if s["status"] == "PENDENTE")
+
+    mes_nome = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
+                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][hoje.month - 1]
+
+    return (
+        f"📈 *Relatório Mensal - {mes_nome}*\n\n"
+        f"📍 *Cobertura da Equipe:*\n"
+        f"  ✅ Dias trabalhados: {trabalhados}\n"
+        f"  🟡 Folgas realizadas: {folgas}\n"
+        f"  📊 Taxa de ocupação: {(trabalhados/total)*100:.1f}%\n\n"
+        f"📍 *Gestão de Pedidos:*\n"
+        f"  ✔️ Solicitções aprovadas: {aprovadas}\n"
+        f"  ⏳ Ainda pendentes: {pendentes}\n\n"
+        "Relatório gerado automaticamente pelo ESCALA_FÁCIL."
+    )
+
+def salvar_mensagem_direta(matricula: str, nome: str, texto: str) -> bool:
+    """Salva uma mensagem de texto livre (não menu) no Supabase."""
+    supabase = get_supabase()
+    dados = {
+        "matricula": matricula,
+        "nome": nome,
+        "tipo": "Mensagem Direta",
+        "texto": texto,
+        "status": "RECEBIDO"
+    }
+    try:
+        supabase.table("solicitacoes").insert(dados).execute()
+        return True
+    except Exception as e:
+        print(f"❌ Erro ao salvar mensagem direta: {e}")
+        return False

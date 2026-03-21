@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AssaiBot - Simulador Oficial</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>ESCALA_FÁCIL - Simulador Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --assai-blue: #004a99;
             --assai-orange: #ff8200;
+            --assai-gradient: linear-gradient(135deg, #004a99 0%, #002a5a 100%);
             --whatsapp-green: #25D366;
             --whatsapp-dark: #075E54;
-            --chat-bg: #E5DDD5;
-            --bubble-left: #FFFFFF;
-            --bubble-right: #DCF8C6;
-            --text-main: #303030;
-            --text-muted: #999;
+            --chat-bg: #f8f9fa;
+            --bubble-left: #ffffff;
+            --bubble-right: #e3f2fd;
+            --text-main: #1a1a1a;
+            --text-muted: #6c757d;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
         }
 
         * {
@@ -26,26 +29,34 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--assai-blue) 0%, var(--assai-orange) 100%);
+            background: radial-gradient(circle at top left, #ff8200 0%, #004a99 100%);
+            background-attachment: fixed;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .phone-container {
             width: 100%;
-            max-width: 450px;
-            height: 90vh;
-            background: #fff;
-            border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 420px;
+            height: 85vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 45px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 8px solid #333;
+            border: 1px solid var(--glass-border);
             position: relative;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
+        }
+
+        .phone-container:hover {
+            transform: translateY(-5px);
         }
 
         @media (max-width: 600px) {
@@ -56,31 +67,45 @@
                 border-radius: 0;
                 border: none;
             }
-            body {
-                background: var(--chat-bg);
-            }
         }
 
         .header {
-            background: var(--assai-blue);
+            background: var(--assai-gradient);
             color: #fff;
-            padding: 40px 20px 15px;
+            padding: 45px 25px 20px;
             display: flex;
             align-items: center;
             gap: 15px;
-            border-bottom: 3px solid var(--assai-orange);
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--assai-orange), transparent);
         }
 
         .header .avatar {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             background: #fff;
-            border-radius: 50%;
+            border-radius: 18px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid white;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border: 2px solid rgba(255,255,255,0.8);
+            transform: rotate(-3deg);
+            transition: all 0.3s ease;
+        }
+
+        .header .avatar:hover {
+            transform: rotate(0deg) scale(1.05);
         }
 
         .header .avatar img {
@@ -90,105 +115,144 @@
         }
 
         .header .info h2 {
-            font-size: 16px;
-            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .header .info p {
-            font-size: 10px;
-            opacity: 0.9;
-            font-style: italic;
-            max-width: 220px;
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: 400;
+            margin-top: 2px;
         }
 
         .chat-window {
             flex: 1;
-            background: var(--chat-bg);
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            padding: 20px;
+            background: #f0f2f5;
+            padding: 25px 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        .chat-window::-webkit-scrollbar {
+            width: 5px;
+        }
+        .chat-window::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-window::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
         }
 
         .message {
-            max-width: 85%;
-            padding: 10px 15px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.4;
+            max-width: 82%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14.5px;
+            line-height: 1.5;
             position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             white-space: pre-wrap;
-            animation: fadeIn 0.3s ease-out;
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .message.bot {
             background: var(--bubble-left);
+            color: var(--text-main);
             align-self: flex-start;
-            border-top-left-radius: 2px;
+            border-bottom-left-radius: 5px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .message.user {
-            background: var(--bubble-right);
+            background: var(--assai-gradient);
+            color: white;
             align-self: flex-end;
-            border-top-right-radius: 2px;
+            border-bottom-right-radius: 5px;
         }
 
         .input-area {
-            background: #f0f0f0;
-            padding: 15px;
+            background: white;
+            padding: 20px 25px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
 
         input {
             flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
+            padding: 14px 22px;
+            background: #f1f3f4;
+            border: 1px solid transparent;
+            border-radius: 30px;
             outline: none;
             font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            background: white;
+            border-color: var(--assai-blue);
+            box-shadow: 0 0 0 4px rgba(0, 74, 153, 0.1);
         }
 
         button {
-            background: var(--assai-blue);
+            background: var(--assai-gradient);
             color: white;
             border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            border-radius: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 15px rgba(0, 74, 153, 0.2);
         }
 
         button:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(5deg);
             background: var(--assai-orange);
+            box-shadow: 0 12px 20px rgba(255, 130, 0, 0.3);
         }
 
         .config-bar {
-            background: #f8f8f8;
-            padding: 8px 15px;
-            font-size: 10px;
-            color: #666;
+            background: rgba(255,255,255,0.5);
+            padding: 10px 20px;
+            font-size: 11px;
+            color: var(--text-muted);
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #ddd;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        strong { font-weight: 600; }
-        em { font-style: italic; }
+        .badge {
+            background: var(--assai-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        strong { font-weight: 600; color: inherit; }
+        em { font-style: italic; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -196,24 +260,30 @@
     <div class="phone-container">
         <div class="header">
             <div class="avatar">
-                <img src="assets/avatar_assaibot.png" alt="AssaiBot">
+                <img src="assets/avatar_assaibot.png" alt="ESCALA_FÁCIL">
             </div>
             <div class="info">
-                <h2>AssaiBot</h2>
+                <h2>ESCALA_FÁCIL</h2>
                 <p>"Organizando sua escala, sempre com o gestor ao lado."</p>
             </div>
         </div>
 
         <div class="config-bar">
-            <span>Simulando: <strong id="current-number">+5511999990001</strong></span>
-            <a href="#" onclick="toggleNumber()" style="color: var(--assai-blue); font-weight: 600; text-decoration: none;">Trocar Perfil</a>
+            <span>Simulando: <strong id="current-number">+5511999990001</strong> <span id="perfil-badge" class="badge">Colaborador</span></span>
+            <a href="#" onclick="toggleNumber()" style="color: var(--assai-blue); font-weight: 700; text-decoration: none; font-size: 10px;">TROCAR PERFIL</a>
         </div>
 
         <div class="chat-window" id="chat">
-            <div class="message bot">Olá! Eu sou o <strong>AssaiBot</strong> 🤖
+            <div class="message bot">Olá! Eu sou o <strong>ESCALA_FÁCIL</strong> 🤖
 Bem-vindo ao simulador oficial.
 
 Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
+        </div>
+
+        <div style="padding: 10px; display: flex; justify-content: flex-end;">
+            <button onclick="sendMenu()" style="background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); border-radius: 20px; padding: 5px 15px; font-size: 11px; color: var(--assai-blue); cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; transition: all 0.3s ease;">
+                <span>↩️</span> Voltar ao Menu
+            </button>
         </div>
 
         <div class="input-area">
@@ -228,18 +298,42 @@ Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
 
     <script>
         let currentNumber = "+5511999990001";
-        // Usa a URL do servidor atual (mesmo host)
         const WEBHOOK_URL = window.location.origin + "/webhook";
 
         function toggleNumber() {
             currentNumber = currentNumber === "+5511999990001" ? "+5511888880000" : "+5511999990001";
             document.getElementById('current-number').innerText = currentNumber;
-            const perfil = currentNumber === "+5511888880000" ? "Gestor" : "Colaborador";
-            addMessage("bot", `Perfil trocado para: <strong>${perfil}</strong> (${currentNumber}).\nDigite <strong>REINICIAR</strong> para começar.`);
+            
+            const isGestor = currentNumber === "+5511888880000";
+            updateUIProfile(isGestor ? "Gestor" : "Colaborador");
+            
+            addMessage("bot", `Perfil trocado para: <strong>${isGestor ? "Gestor" : "Colaborador"}</strong>\nDigite <strong>REINICIAR</strong> para carregar o menu correspondente.`);
+        }
+
+        function updateUIProfile(perfil) {
+            const badge = document.getElementById('perfil-badge');
+            const isGestor = perfil.toLowerCase().includes("gestor");
+            
+            badge.innerText = isGestor ? "Gestor" : "Colaborador";
+            badge.style.background = isGestor ? 'var(--assai-orange)' : 'var(--assai-blue)';
+            
+            // Sincroniza o número simulado se a detecção for automática
+            if (isGestor && currentNumber !== "+5511888880000") {
+                currentNumber = "+5511888880000";
+                document.getElementById('current-number').innerText = currentNumber;
+            } else if (!isGestor && currentNumber !== "+5511999990001") {
+                currentNumber = "+5511999990001";
+                document.getElementById('current-number').innerText = currentNumber;
+            }
         }
 
         function handleKey(e) {
             if (e.key === 'Enter') sendMessage();
+        }
+
+        function sendMenu() {
+            document.getElementById('userInput').value = 'MENU';
+            sendMessage();
         }
 
         async function sendMessage() {
@@ -268,9 +362,20 @@ Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
                 const twiml = await response.text();
                 const botResponse = extractBody(twiml);
                 addMessage("bot", botResponse);
+
+                // --- Sincronização Dinâmica do Perfil ---
+                if (botResponse.includes("Gestor")) {
+                    updateUIProfile("Gestor");
+                } else if (botResponse.includes("Bem-vindo") || botResponse.includes("Olá, *")) {
+                    // Se for uma saudação sem "Gestor", assumimos Colaborador
+                    // Exceto se a mensagem for apenas texto livre sem identificação
+                    if (!botResponse.includes("Gestor")) {
+                         updateUIProfile("Colaborador");
+                    }
+                }
             } catch (error) {
                 console.error(error);
-                addMessage("bot", "❌ <strong>Erro de Conexão</strong>\nCertifique-se de que o servidor Flask está rodando na porta 5000.");
+                addMessage("bot", "❌ <strong>Erro de Conexão</strong>\nCertifique-se de que o servidor Flask está rodando.");
             }
         }
 
@@ -284,7 +389,6 @@ Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
                     .replace(/&lt;/g, "<")
                     .replace(/&amp;/g, "&");
                 
-                // Formatação WhatsApp -> HTML
                 text = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
                 text = text.replace(/_(.*?)_/g, '<em>$1</em>');
                 
@@ -299,7 +403,7 @@ Por favor, informe sua <strong>matrícula</strong> para acessar o sistema:</div>
             div.className = `message ${type}`;
             div.innerHTML = text;
             chat.appendChild(div);
-            // Scroll suave para o final
+            
             chat.scrollTo({
                 top: chat.scrollHeight,
                 behavior: 'smooth'

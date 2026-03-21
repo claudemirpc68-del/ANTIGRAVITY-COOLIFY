@@ -22,6 +22,7 @@ from scripts.api_supabase import (
     get_resumo_equipe,
     salvar_solicitacao,
     listar_solicitacoes_pendentes,
+    get_relatorio_mensal_equipe,
 )
 
 load_dotenv()
@@ -60,7 +61,7 @@ MENU_GESTOR = (
 )
 
 MSG_PEDIR_MATRICULA = (
-    "Olá! Eu sou o *AssaiBot* 🤖\n"
+    "Olá! Eu sou o *ESCALA_FÁCIL* 🤖\n"
     "_Organizando sua escala, sempre com o gestor ao lado._\n\n"
     "Por favor, informe sua *matrícula* para acessar o sistema:"
 )
@@ -72,7 +73,7 @@ MSG_NAO_ENCONTRADO = (
 
 MSG_OPCAO_INVALIDA = (
     "⚠️ Opção inválida. Por favor, digite o número correspondente à opção desejada.\n"
-    "Ou digite *MENU* para ver as opções novamente."
+    "Ou digite *MENU* para ver as opções novamente. ↩️"
 )
 
 MSG_EM_BREVE = (
@@ -93,6 +94,13 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
     if texto.upper() in ("REINICIAR", "RESTART", "OI", "OLÁ", "OLA", "INICIO", "START"):
         sessions.clear(numero_telefone)
         return MSG_PEDIR_MATRICULA
+
+    # Inteligência de Resete: Se o usuário digitar algo que parece uma matrícula (6+ dígitos), 
+    # forçamos o resete da sessão para logar novamente, mesmo que já exista uma sessão ativa.
+    # Isso evita o erro de "Olção Inválida" quando o usuário tenta logar de novo.
+    if texto.isdigit() and len(texto) >= 6:
+        sessions.clear(numero_telefone)
+        sessao = None
 
     if texto.upper() == "MENU":
         if sessao and sessao.get("nome"):
@@ -136,7 +144,7 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
         return (
             f"✅ Sua solicitação de *{tipo_solicitacao}* foi registrada com sucesso!\n\n"
             "O gestor foi notificado e avaliará o mais breve possível.\n"
-            "Digite *MENU* para voltar às opções."
+            "Digite *MENU* para voltar às opções. ↩️"
         )
 
     if tipo == "colaborador":
@@ -170,7 +178,25 @@ def _processar_colaborador(opcao: str, matricula: str, nome: str, numero_telefon
         resposta = handler()
         if callable(resposta):
             return resposta
-        return f"{resposta}\n\nDigite *MENU* para voltar ao menu principal."
+        return f"{resposta}\n\nDigite *MENU* para voltar ao menu principal. ↩️"
+
+    # --- SUPORTE A TEXTO LIVRE INTELIGENTE ---
+    from scripts.api_openai import processar_texto_ia
+    from scripts.api_supabase import salvar_mensagem_direta
+    
+    resposta_ia = processar_texto_ia(opcao, {"matricula": matricula, "nome": nome})
+    if resposta_ia:
+        salvar_mensagem_direta(matricula, nome, f"IA Answer: {resposta_ia} | Original: {opcao}")
+        return f"{resposta_ia}\n\nDigite *MENU* para voltar. ↩️"
+
+    # Fallback se a IA falhar ou não estiver disponível
+    sucesso = salvar_mensagem_direta(matricula, nome, opcao)
+    if sucesso:
+        return (
+            "Recebi sua mensagem! 📩\n\n"
+            "Como ela não corresponde a uma opção do menu, eu a encaminhei para análise do gestor.\n\n"
+            "Deseja algo mais? Digite o número ou **MENU**."
+        )
 
     return MSG_OPCAO_INVALIDA
 
@@ -179,11 +205,11 @@ def _processar_gestor(opcao: str, nome: str, numero_telefone: str) -> str:
     """Processa uma opção do menu de gestor."""
     opcoes = {
         "1": lambda: get_resumo_equipe(),
-        "2": lambda: listar_solicitacoes_pendentes(),
-        "3": lambda: listar_solicitacoes_pendentes(),
-        "4": lambda: listar_solicitacoes_pendentes(),
-        "5": lambda: listar_solicitacoes_pendentes(),
-        "6": lambda: "📈 Relatórios gerenciais estarão disponíveis no painel web em breve.",
+        "2": lambda: listar_solicitacoes_pendentes("Justificativa"),
+        "3": lambda: listar_solicitacoes_pendentes("Mudança"),
+        "4": lambda: listar_solicitacoes_pendentes("Troca"),
+        "5": lambda: listar_solicitacoes_pendentes("Problema"),
+        "6": lambda: get_relatorio_mensal_equipe(),
         "7": lambda: "📣 A função de envio em massa de comunicados será liberada via painel web.",
     }
 
@@ -192,9 +218,24 @@ def _processar_gestor(opcao: str, nome: str, numero_telefone: str) -> str:
         resposta = handler()
         if callable(resposta):
             return resposta
-        return f"{resposta}\n\nDigite *MENU* para ver as opções novamente."
+        return f"{resposta}\n\nDigite *MENU* para ver as opções novamente. ↩️"
 
-    return MSG_OPCAO_INVALIDA
+    # --- SUPORTE A TEXTO LIVRE INTELIGENTE (GESTOR) ---
+    from scripts.api_openai import processar_texto_ia
+    from scripts.api_supabase import salvar_mensagem_direta
+
+    resposta_ia = processar_texto_ia(opcao, {"matricula": "GESTOR", "nome": nome})
+    if resposta_ia:
+        salvar_mensagem_direta("GESTOR", nome, f"IA Answer: {resposta_ia} | Original: {opcao}")
+        return f"{resposta_ia}\n\nDigite *MENU* para voltar. ↩️"
+
+    # Fallback
+    salvar_mensagem_direta("GESTOR", nome, opcao)
+    return (
+        "Mensagem anotada, Gestor! 📝\n\n"
+        "Estou processando seu pedido de texto livre. Em breve poderei responder dúvidas complexas usando IA.\n\n"
+        "Por enquanto, você pode usar as opções numéricas ou digitar **MENU**."
+    )
 
 
 # -----------------------------------------------------------------------
@@ -219,7 +260,7 @@ def webhook():
 @app.route("/health", methods=["GET"])
 def health():
     """Health check para o Coolify."""
-    return {"status": "ok", "bot": "AssaiBot - ESCALA_FÁCIL"}, 200
+    return {"status": "ok", "bot": "ESCALA_FÁCIL"}, 200
 
 
 @app.route("/", methods=["GET"])
@@ -240,5 +281,5 @@ def send_assets(path):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    print(f"[AssaiBot] Servidor rodando na porta {port}...")
+    print(f"[ESCALA_FÁCIL] Servidor rodando na porta {port}...")
     app.run(host="0.0.0.0", port=port, debug=True)

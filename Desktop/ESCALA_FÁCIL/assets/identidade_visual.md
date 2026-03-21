@@ -1,7 +1,7 @@
-# Identidade Visual e Persona - AssaiBot (ESCALA_FÁCIL)
+# Identidade Visual e Persona - ESCALA_FÁCIL
 
 ## Nome
-AssaiBot (Projeto ESCALA_FÁCIL)
+ESCALA_FÁCIL
 
 ## Slogan
 "Organizando sua escala, sempre com o gestor ao lado."
@@ -11,7 +11,7 @@ O avatar oficial é uma ilustração em estilo 3D de um jovem funcionário amig�
 **Características do Avatar:**
 - **Vestuário**: Camisa polo azul com detalhes em laranja nas mangas e ombros.
 - **Acessórios**: Boné azul e laranja com a inscrição "ASSAÍ" em destaque. Usa um headset preto de atendimento do lado esquerdo.
-- **Crachá**: Usa um crachá vermelho no peito esquerdo com a inscrição "AssaiBot".
+- **Crachá**: Usa um crachá vermelho no peito esquerdo com a inscrição "ESCALA_FÁCIL".
 - **Elemento interativo**: Ele segura na mão direita um pequeno calendário de mesa nas cores branco e vermelho, com vários dias marcados com um check verde (✔️) e um dia circulado em vermelho com um check verde dentro, simbolizando o controle e organização das escalas e folgas.
 - **Fundo**: Fundo arredondado em tons de amarelo e laranja (gradiente quente), transmitindo energia, proximidade e simpatia.
 
