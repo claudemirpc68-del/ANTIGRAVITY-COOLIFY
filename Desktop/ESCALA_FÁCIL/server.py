@@ -272,7 +272,9 @@ def index():
 @app.route("/assets/<path:path>")
 def send_assets(path):
     """Serve arquivos da pasta assets para o simulador."""
-    return send_from_directory("assets", path)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    assets_dir = os.path.join(base_dir, "assets")
+    return send_from_directory(assets_dir, path)
 
 
 # -----------------------------------------------------------------------
