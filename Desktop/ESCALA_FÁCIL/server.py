@@ -263,9 +263,10 @@ def health():
     return {"status": "ok", "bot": "ESCALA_FÁCIL"}, 200
 
 
-# -----------------------------------------------------------------------
-# Rotas de Interface
-# -----------------------------------------------------------------------
+@app.route("/logo.png", methods=["GET"])
+def logo():
+    """Serve o arquivo de logo da raiz."""
+    return send_from_directory(".", "logo.png")
 
 @app.route("/", methods=["GET"])
 def index():
