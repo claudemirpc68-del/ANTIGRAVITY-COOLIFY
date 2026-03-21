@@ -19,8 +19,8 @@ COPY "Desktop/ESCALA_FÁCIL" .
 # Garantir que o simulator.html esteja acessível
 RUN ls -la /app
 
-# Expor a porta 80 (padrão)
-EXPOSE 80
+# Expor a porta 5000
+EXPOSE 5000
 
-# Comando para rodar o Gunicorn na porta 80
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]
+# Comando para rodar o Gunicorn na porta 5000
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]
