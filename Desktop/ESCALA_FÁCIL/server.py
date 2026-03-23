@@ -60,6 +60,14 @@ MENU_GESTOR = (
     "Digite o número da opção desejada."
 )
 
+MENU_GESTOR_SECUNDARIO = (
+    "Bem-vindo, *{nome}* (Gestor Administrativo)!\n\n"
+    "1 - Resumo da equipe hoje\n"
+    "6 - Gerar relatórios da equipe\n"
+    "7 - Enviar comunicado aos colaboradores\n\n"
+    "Digite o número da opção desejada."
+)
+
 MSG_PEDIR_MATRICULA = (
     "Olá! Eu sou o *ESCALA_FÁCIL* 🤖\n"
     "_Organizando sua escala, para que você faça toda a diferença.!_\n\n"
@@ -105,7 +113,11 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
     if texto.upper() == "MENU":
         if sessao and sessao.get("nome"):
             if sessao.get("tipo") == "gestor":
-                return MENU_GESTOR.format(nome=sessao["nome"])
+                # Gestores principais: Ederson (101010) e Antonio (202020)
+                if sessao.get("matricula") in ("101010", "202020"):
+                    return MENU_GESTOR.format(nome=sessao["nome"])
+                else:
+                    return MENU_GESTOR_SECUNDARIO.format(nome=sessao["nome"])
             else:
                 return MENU_COLABORADOR.format(nome=sessao["nome"])
         sessions.clear(numero_telefone)
@@ -126,7 +138,10 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
         })
 
         if usuario["tipo"] == "gestor":
-            return MENU_GESTOR.format(nome=usuario["nome"])
+            if texto in ("101010", "202020"):
+                return MENU_GESTOR.format(nome=usuario["nome"])
+            else:
+                return MENU_GESTOR_SECUNDARIO.format(nome=usuario["nome"])
         else:
             return MENU_COLABORADOR.format(nome=usuario["nome"])
 
@@ -203,6 +218,18 @@ def _processar_colaborador(opcao: str, matricula: str, nome: str, numero_telefon
 
 def _processar_gestor(opcao: str, nome: str, numero_telefone: str) -> str:
     """Processa uma opção do menu de gestor."""
+    sessao = sessions.get(numero_telefone)
+    matricula = sessao.get("matricula") if sessao else None
+    
+    # Restrição para gestores secundários (apenas 1, 6, 7)
+    if matricula and matricula not in ("101010", "202020"):
+        if opcao not in ("1", "6", "7"):
+            return (
+                "⚠️ *Acesso Restrito*\n"
+                "Desculpe, sua conta de Gestor Administrativo não possui permissão para esta função.\n"
+                "Por favor, entre em contato com Ederson Cubas para solicitações de escala ou ajustes operacionais."
+            )
+
     opcoes = {
         "1": lambda: get_resumo_equipe(),
         "2": lambda: listar_solicitacoes_pendentes("Justificativa"),

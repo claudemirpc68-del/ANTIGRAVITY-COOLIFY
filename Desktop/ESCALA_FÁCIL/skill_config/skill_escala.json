@@ -40,11 +40,11 @@
     },
     "gestores": {
       "users": [
-        { "name": "Anderson Cubas", "employee_id": "101010" },
+        { "name": "Ederson Cubas", "employee_id": "101010" },
+        { "name": "Antonio", "employee_id": "202020" },
         { "name": "John", "employee_id": "111111" },
         { "name": "Leonardo", "employee_id": "121212" },
-        { "name": "Ivan", "employee_id": "131313" },
-        { "name": "Antonio", "employee_id": "101012" }
+        { "name": "Ivan", "employee_id": "131313" }
       ],
       "menu": [
         "1 - Aprovar/Rejeitar trocas de turno",

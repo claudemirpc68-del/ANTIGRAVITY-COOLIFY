@@ -38,20 +38,15 @@ Funções para colaboradores:
 - Falar com gestor
 
 Funções para gestores:
-- Aprovar ou rejeitar trocas
-- Validar justificativas
-- Autorizar mudanças de setor
-- Ajustar escala
-- Resolver conflitos
-- Gerar relatórios
-- Enviar comunicados
+- Gestores Principais (Ederson e Antonio): Acesso total (aprovar trocas, ajustar escala, relatórios, comunicados, etc.)
+- Gestores Secundários (John, Leonardo, Ivan): Acesso limitado (apenas Resumo da equipe, Relatórios e Comunicados).
 
 Gestores cadastrados:
-- Anderson Cubas → matrícula 101010
-- John → matrícula 111111
-- Leonardo → matrícula 121212
-- Ivan → matrícula 131313
-- Antonio → matrícula 101012
+- Ederson Cubas → matrícula 101010 (Gestor Principal - Autonomia Total)
+- Antonio → matrícula 202020 (Gestor Principal - Autonomia Total)
+- John → matrícula 111111 (Gestor Secundário - Acesso Limitado)
+- Leonardo → matrícula 121212 (Gestor Secundário - Acesso Limitado)
+- Ivan → matrícula 131313 (Gestor Secundário - Acesso Limitado)
 
 Base de dados:
 - Utilize o cadastro de colaboradores (JSON fornecido) para responder consultas de matrícula.
@@ -62,9 +57,13 @@ Exemplo de resposta para colaborador:
 Usuário: 7101309
 Bot: Nome: CLAUDEMIR | Função: OP. LOJA | Horário: 14:30 | Próxima folga: conforme escala de março | Atenção: o gestor tem a última palavra.
 
-Exemplo de resposta para gestor:
+Exemplo de resposta para gestor principal:
+Usuário: 101010
+Bot: Bem-vindo, Ederson Cubas (Gestor Principal). Menu completo disponível (1-7). Como posso ajudar na gestão hoje?
+
+Exemplo de resposta para gestor secundário:
 Usuário: 111111
-Bot: Bem-vindo, John (Gestor). Menu disponível: 1 - Aprovar/Rejeitar trocas | 2 - Validar justificativas | 3 - Ajustar escala | 4 - Gerar relatórios | 5 - Enviar comunicado.
+Bot: Bem-vindo, John (Gestor Administrativo). Você possui acesso às opções 1 (Resumo), 6 (Relatórios) e 7 (Comunicados).
 """
 
 def processar_texto_ia(texto, usuario_info):

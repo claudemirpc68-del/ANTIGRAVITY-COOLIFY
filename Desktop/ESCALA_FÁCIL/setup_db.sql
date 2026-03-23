@@ -74,9 +74,9 @@ CREATE TRIGGER update_sessoes_updated_at
 -- ============================================================
 INSERT INTO colaboradores (matricula, nome, tipo) 
 VALUES 
-    ('101010', 'Anderson Cubas', 'gestor'),
+    ('101010', 'Ederson Cubas', 'gestor'),
     ('111111', 'John', 'gestor'),
     ('121212', 'Leonardo', 'gestor'),
     ('131313', 'Ivan', 'gestor'),
-    ('101012', 'Antonio', 'gestor')
+    ('202020', 'Antonio', 'gestor')
 ON CONFLICT (matricula) DO NOTHING;
