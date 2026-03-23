@@ -172,7 +172,7 @@ def get_resumo_equipe() -> str:
 
     return "\n".join(linhas)
 
-def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: str) -> bool:
+def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: str, media_url: str = None) -> bool:
     """Salva uma nova solicitação no Supabase."""
     supabase = get_supabase()
     try:
@@ -181,6 +181,7 @@ def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: 
             "nome": nome,
             "tipo": tipo_solicitacao,
             "texto": texto,
+            "media_url": media_url,
             "status": "PENDENTE"
         }).execute()
         return True
@@ -266,7 +267,7 @@ def get_relatorio_mensal_equipe() -> str:
         "Relatório gerado automaticamente pelo ESCALA_FÁCIL."
     )
 
-def salvar_mensagem_direta(matricula: str, nome: str, texto: str) -> bool:
+def salvar_mensagem_direta(matricula: str, nome: str, texto: str, media_url: str = None) -> bool:
     """Salva uma mensagem de texto livre (não menu) no Supabase."""
     supabase = get_supabase()
     dados = {
@@ -274,6 +275,7 @@ def salvar_mensagem_direta(matricula: str, nome: str, texto: str) -> bool:
         "nome": nome,
         "tipo": "Mensagem Direta",
         "texto": texto,
+        "media_url": media_url,
         "status": "RECEBIDO"
     }
     try:

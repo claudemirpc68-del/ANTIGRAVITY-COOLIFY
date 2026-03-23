@@ -93,7 +93,7 @@ MSG_EM_BREVE = (
 # Processamento de mensagens
 # -----------------------------------------------------------------------
 
-def processar_mensagem(numero_telefone: str, texto: str) -> str:
+def processar_mensagem(numero_telefone: str, texto: str, media_url: str = None) -> str:
     """Processa a mensagem recebida e retorna a resposta do bot."""
     texto = texto.strip()
     sessao = sessions.get(numero_telefone)
@@ -154,7 +154,7 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
     estado = sessao.get("estado")
     if estado:
         tipo_solicitacao = sessao.get("tipo_solicitacao", "Solicitação")
-        salvar_solicitacao(matricula, nome, tipo_solicitacao, texto)
+        salvar_solicitacao(matricula, nome, tipo_solicitacao, texto, media_url=media_url)
         sessions.update(numero_telefone, estado=None, tipo_solicitacao=None)
         return (
             f"✅ Sua solicitação de *{tipo_solicitacao}* foi registrada com sucesso!\n\n"
@@ -163,14 +163,14 @@ def processar_mensagem(numero_telefone: str, texto: str) -> str:
         )
 
     if tipo == "colaborador":
-        return _processar_colaborador(texto, matricula, nome, numero_telefone)
+        return _processar_colaborador(texto, matricula, nome, numero_telefone, media_url=media_url)
     elif tipo == "gestor":
-        return _processar_gestor(texto, nome, numero_telefone)
+        return _processar_gestor(texto, nome, numero_telefone, media_url=media_url)
 
     return MSG_OPCAO_INVALIDA
 
 
-def _processar_colaborador(opcao: str, matricula: str, nome: str, numero_telefone: str) -> str:
+def _processar_colaborador(opcao: str, matricula: str, nome: str, numero_telefone: str, media_url: str = None) -> str:
     """Processa uma opção do menu de colaborador."""
     
     def pedir_solicitacao(tipo_solicitacao: str, mensagem_prompt: str) -> str:
@@ -216,7 +216,7 @@ def _processar_colaborador(opcao: str, matricula: str, nome: str, numero_telefon
     return MSG_OPCAO_INVALIDA
 
 
-def _processar_gestor(opcao: str, nome: str, numero_telefone: str) -> str:
+def _processar_gestor(opcao: str, nome: str, numero_telefone: str, media_url: str = None) -> str:
     """Processa uma opção do menu de gestor."""
     sessao = sessions.get(numero_telefone)
     matricula = sessao.get("matricula") if sessao else None
@@ -257,7 +257,7 @@ def _processar_gestor(opcao: str, nome: str, numero_telefone: str) -> str:
         return f"{resposta_ia}\n\nDigite *MENU* para voltar. ↩️"
 
     # Fallback
-    salvar_mensagem_direta("GESTOR", nome, opcao)
+    salvar_mensagem_direta("GESTOR", nome, opcao, media_url=media_url)
     return (
         "Mensagem anotada, Gestor! 📝\n\n"
         "Estou processando seu pedido de texto livre. Em breve poderei responder dúvidas complexas usando IA.\n\n"
@@ -274,8 +274,9 @@ def webhook():
     """Endpoint que recebe mensagens do Twilio."""
     numero = request.form.get("From", "")
     texto = request.form.get("Body", "").strip()
+    media_url = request.form.get("MediaUrl0") # Captura a URL da primeira imagem, se houver
 
-    resposta_texto = processar_mensagem(numero, texto)
+    resposta_texto = processar_mensagem(numero, texto, media_url=media_url)
 
     resp = MessagingResponse()
     msg = resp.message()
