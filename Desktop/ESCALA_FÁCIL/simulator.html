@@ -284,7 +284,7 @@
                     <div class="info">
                         <h2 style="display: flex; align-items: center; gap: 8px; font-size: 18px;">
                             ESCALA_FÁCIL 
-                            <span id="perfil-badge" class="badge">Colaborador</span>
+                            <span id="perfil-badge" class="badge" style="background: #ccc; color: #666;">Aguardando...</span>
                         </h2>
                     </div>
                 </div>
@@ -324,7 +324,7 @@ Por favor, informe sua <strong>matrícula</strong> para continuar.</div>
     </div>
 
     <script>
-        let currentNumber = "+5511999990001";
+        let currentNumber = "+5511000000000"; // Número neutro inicial
         const WEBHOOK_URL = window.location.origin + "/webhook";
 
         function toggleNumber() {
@@ -341,7 +341,16 @@ Por favor, informe sua <strong>matrícula</strong> para continuar.</div>
             const badge = document.getElementById('perfil-badge');
             const isGestor = perfil.toLowerCase().includes("gestor");
             
-            badge.innerText = isGestor ? "Gestor" : "Colaborador";
+            badge.innerText = perfil;
+            
+            if (perfil === "Aguardando...") {
+                badge.style.background = '#ccc';
+                badge.style.color = '#666';
+                return;
+            }
+
+            const isGestor = perfil.toLowerCase().includes("gestor");
+            badge.style.color = 'white';
             badge.style.background = isGestor ? 'var(--assai-orange)' : 'var(--assai-blue)';
             
             // Sincroniza o número simulado se a detecção for automática
