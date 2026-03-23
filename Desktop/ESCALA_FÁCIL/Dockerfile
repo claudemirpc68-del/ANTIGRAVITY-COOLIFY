@@ -16,6 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar todo o código do repositório para o container
 COPY . .
 
+# Garantir permissões de leitura para os assets
+RUN chmod -R 755 assets simulator.html
+
 # Expor a porta 80 (padrão do Traefik/Coolify)
 EXPOSE 80
 
