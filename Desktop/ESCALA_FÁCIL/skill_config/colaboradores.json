@@ -32,7 +32,6 @@
     { "matricula": "7107293", "nome": "ABNER DE SOUZA", "funcao": "OP. LOJA", "horario": "22:00" },
     { "matricula": "5925479", "nome": "RENATO ARAUJO", "funcao": "OP. LOJA", "horario": "22:00" },
     { "matricula": "6973647", "nome": "DANIEL SILVA", "funcao": "OP. LOJA", "horario": "22:00" },
-    { "matricula": "6580408", "nome": "MAURICIO ALMEIDA", "funcao": "OP. LOJA", "horario": "22:00" },
-    { "matricula": "111111", "nome": "JOHN", "funcao": "GESTOR", "horario": "08:00" }
+    { "matricula": "6580408", "nome": "MAURICIO ALMEIDA", "funcao": "OP. LOJA", "horario": "22:00" }
   ]
 }
