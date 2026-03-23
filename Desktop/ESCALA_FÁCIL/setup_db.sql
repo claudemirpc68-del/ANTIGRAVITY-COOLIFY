@@ -78,7 +78,5 @@ VALUES
     ('111111', 'John', 'gestor'),
     ('121212', 'Leonardo', 'gestor'),
     ('131313', 'Ivan', 'gestor'),
-    ('101012', 'Antonio', 'gestor'),
-    ('10452327', 'CLAUDEMIR', 'gestor'),
-    ('13543621', 'CARLOS', 'gestor')
+    ('101012', 'Antonio', 'gestor')
 ON CONFLICT (matricula) DO NOTHING;

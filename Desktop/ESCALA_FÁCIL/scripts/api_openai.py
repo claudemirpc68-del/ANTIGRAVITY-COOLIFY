@@ -52,8 +52,6 @@ Gestores cadastrados:
 - Leonardo → matrícula 121212
 - Ivan → matrícula 131313
 - Antonio → matrícula 101012
-- CLAUDEMIR → matrícula 10452327
-- CARLOS → matrícula 13543621
 
 Base de dados:
 - Utilize o cadastro de colaboradores (JSON fornecido) para responder consultas de matrícula.
