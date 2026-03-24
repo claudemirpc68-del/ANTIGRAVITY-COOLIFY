@@ -32,16 +32,23 @@ bot_service = BotService()
 # -----------------------------------------------------------------------
 
 def validate_twilio_request(f):
-    """Decorador para validar se a requisição partiu realmente do Twilio."""
+    """Decorador para validar se a requisição partiu realmente do Twilio ou do Simulador."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # Se for do simulador (mesmo origin), permitimos
+        # Nota: Em produção real, poderíamos usar um token específico para o simulador
+        is_simulator = request.referrer and request.host in request.referrer
+        
+        if is_simulator:
+            return f(*args, **kwargs)
+
         validator = RequestValidator(os.environ.get("TWILIO_AUTH_TOKEN"))
         url = request.url
         signature = request.headers.get("X-Twilio-Signature", "")
         params = request.form.to_dict()
 
         if not validator.validate(url, params, signature) and not app.debug:
-            print("⚠️ Tentativa de acesso não autorizado ao Webhook bloqueada.")
+            print(f"⚠️ Acesso bloqueado (Signature Mismatch). URL: {url}")
             return "Unauthorized", 403
         return f(*args, **kwargs)
     return decorated_function
