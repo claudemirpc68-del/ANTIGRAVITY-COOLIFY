@@ -36,12 +36,14 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            height: 100dvh; /* Mobile fix */
             overflow: hidden;
         }
 
         .app-wrapper {
             width: 100%;
             height: 100vh;
+            height: 100dvh; /* Mobile fix */
             background: white;
             display: flex;
             flex-direction: column;
@@ -190,7 +192,7 @@
         /* INPUT AREA */
         .input-dock {
             background: var(--bg-chat);
-            padding: 10px 15px 20px;
+            padding: 10px 15px calc(20px + env(safe-area-inset-bottom));
             display: flex;
             align-items: flex-end;
             gap: 12px;
