@@ -67,7 +67,12 @@ class BotService:
                 return self._processar_opcao_menu(phone, session, text, media_url)
 
             # 5. Fallback: Inteligência Artificial
-            return api_openai.obter_resposta_ia(text, session.get("nome", "Usuário"), session.get("tipo", "colaborador"))
+            usuario_info = {
+                "nome": session.get("nome", "Usuário"),
+                "matricula": session.get("matricula", "000000"),
+                "tipo": session.get("tipo", "colaborador")
+            }
+            return api_openai.processar_texto_ia(text, usuario_info)
 
         except Exception as e:
             print(f"❌ Erro no BotService: {e}")

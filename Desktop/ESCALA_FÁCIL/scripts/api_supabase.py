@@ -129,7 +129,7 @@ def get_resumo_equipe() -> str:
                        .eq("data", hoje)
                        .eq("status", "TRABALHA")
                        .execute())
-    trabalhando_lista = [e["colaboradores"]["nome"] for e in trabalhando_res.data]
+    trabalhando_lista = [e["colaboradores"]["nome"] for e in trabalhando_res.data if e.get("colaboradores")]
     
     # 3. De folga hoje (com nomes e motivos)
     de_folga_res = (supabase.table("escalas")
@@ -137,7 +137,7 @@ def get_resumo_equipe() -> str:
                     .eq("data", hoje)
                     .eq("status", "FOLGA")
                     .execute())
-    de_folga_lista = [f"{e['colaboradores']['nome']} ({e.get('tipo_folga') or 'Folga'})" for e in de_folga_res.data]
+    de_folga_lista = [f"{e['colaboradores']['nome']} ({e.get('tipo_folga') or 'Folga'})" for e in de_folga_res.data if e.get("colaboradores")]
 
     # 4. Justificativas de ausência para hoje
     # (Solicitações do tipo 'Justificativa' criadas hoje ou com menção a hoje)
