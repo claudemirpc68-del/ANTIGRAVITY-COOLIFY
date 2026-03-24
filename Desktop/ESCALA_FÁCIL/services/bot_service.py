@@ -17,8 +17,10 @@ MENU_COLABORADOR = (
     "3️⃣ Domingos de folga no mês\n"
     "4️⃣ Solicitar Troca de Dia\n"
     "5️⃣ Enviar Justificativa/Atestado\n"
-    "6️⃣ Falar com o RH/Dúvida\n\n"
-    "Digite o número da opção desejada:"
+    "6️⃣ Falar com o RH/Dúvida\n"
+    "0️⃣ Sair / Voltar\n\n"
+    "Digite o número da opção desejada:\n\n"
+    "⚠️ _Lembre-se: o gestor tem a palavra final e pode acionar você em caso de necessidade operacional._"
 )
 
 MENU_GESTOR = (
@@ -28,7 +30,8 @@ MENU_GESTOR = (
     "3️⃣ Enviar comunicado geral\n"
     "4️⃣ Relatório mensal estatístico\n"
     "5️⃣ Ver apenas Justificativas\n"
-    "6️⃣ Ver apenas Pedidos de Troca\n\n"
+    "6️⃣ Ver apenas Pedidos de Troca\n"
+    "0️⃣ Sair / Voltar\n\n"
     "Digite o número da opção desejada:"
 )
 
