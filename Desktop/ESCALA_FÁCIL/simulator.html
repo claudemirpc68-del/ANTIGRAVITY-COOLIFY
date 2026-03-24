@@ -312,7 +312,8 @@
         function toggleRole() {
             currentNumber = currentNumber === "+5511999990001" ? "+5511888880000" : "+5511999990001";
             document.getElementById('curr-phone').innerText = currentNumber;
-            addMessage("bot", "PERFIL TROCADO. ENVIE MATRÍCULA OU COMANDO.");
+            document.getElementById('chat').innerHTML = ''; // Limpa histórico
+            addMessage("bot", "PERFIL TROCADO. HISTÓRICO LIMPO.\nENVIE SUA MATRÍCULA.");
         }
 
         async function sendMessage() {
@@ -336,6 +337,13 @@
 
                 const twiml = await response.text();
                 const botResponse = extractBody(twiml);
+                
+                // Se o comando foi REINICIAR, limpamos o chat local antes de mostrar a resposta
+                if (text.toUpperCase() === 'REINICIAR' || text.toUpperCase() === 'RESTART') {
+                    document.getElementById('chat').innerHTML = '';
+                    addMessage("bot", "Sessão reiniciada. Histórico limpo.");
+                }
+
                 addMessage("bot", botResponse);
 
                 // Auto-detection

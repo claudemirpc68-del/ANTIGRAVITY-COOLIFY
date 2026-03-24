@@ -42,7 +42,12 @@ class BotService:
         session = self.sessions.get(phone)
 
         try:
-            # 1. Fluxo de Identificação (Nova Sessão)
+            # 1. Comandos de Reinicialização e Boas-vindas
+            if text.upper() in ["REINICIAR", "RESTART", "OI", "OLÁ", "START", "INICIO"]:
+                self.sessions.clear(phone)
+                return MSG_BEM_VINDO
+
+            # 2. Fluxo de Identificação (Se não estiver logado)
             if not session:
                 if text.isdigit():
                     return self._identificar_usuario(phone, text)
@@ -53,15 +58,15 @@ class BotService:
                 self.sessions.update(phone, estado="menu", tipo_solicitacao=None)
                 return self._mostrar_menu_correto(session)
 
-            # 2. Fluxo de Entrada de Dados (Aguardando Texto/Mídia)
+            # 3. Fluxo de Entrada de Dados (Aguardando Texto/Mídia)
             if session.get("estado") == "aguardando_texto":
                 return self._processar_input_usuario(phone, session, text, media_url)
 
-            # 3. Fluxo de Menu (Digitando Opção)
+            # 4. Fluxo de Menu (Digitando Opção)
             if text.isdigit():
                 return self._processar_opcao_menu(phone, session, text, media_url)
 
-            # 4. Fallback: Inteligência Artificial (Se não for opção numérica e já estiver logado)
+            # 5. Fallback: Inteligência Artificial
             return api_openai.obter_resposta_ia(text, session.get("nome", "Usuário"), session.get("tipo", "colaborador"))
 
         except Exception as e:
