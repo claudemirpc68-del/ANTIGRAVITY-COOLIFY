@@ -26,7 +26,7 @@ def migrate():
         print("\n   ALTER TABLE solicitacoes ADD COLUMN IF NOT EXISTS media_url TEXT;\n")
         
         # Teste de inserção para ver se já existe
-        res = supabase.table("solicitacoes").insert({
+        supabase.table("solicitacoes").insert({
             "matricula": "TESTE",
             "nome": "TESTE",
             "tipo": "TESTE",

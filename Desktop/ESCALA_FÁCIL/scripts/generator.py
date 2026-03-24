@@ -5,7 +5,7 @@ Gerador de escala 6x1 com 2 domingos de folga por mês para cada colaborador.
 
 import json
 import calendar
-from datetime import date, timedelta
+from datetime import date
 
 # -----------------------------------------------------------------------
 # Configurações
@@ -89,7 +89,6 @@ def gerar_escala(colaboradores: list, ano: int, mes: int) -> dict:
 
         for dia in dias:
             dia_str = str(dia)
-            dia_semana = dia.strftime("%A")  # Day of week in English
             dia_semana_pt = traduzir_dia(dia.weekday())
 
             # É domingo de folga?

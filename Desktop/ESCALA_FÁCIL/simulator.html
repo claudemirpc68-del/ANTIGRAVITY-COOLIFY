@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESCALA_FÁCIL - Simulador Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>ESCALA_FÁCIL - Brutalist Hub</title>
+    <meta name="description" content="Gestão Radical de Escalas - Assaí.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --assai-blue: #004a99;
-            --assai-orange: #ff8200;
-            --assai-gradient: linear-gradient(135deg, #004a99 0%, #002a5a 100%);
-            --whatsapp-green: #25D366;
-            --whatsapp-dark: #075E54;
-            --chat-bg: #f8f9fa;
-            --bubble-left: #ffffff;
-            --bubble-right: #e3f2fd;
-            --text-main: #1a1a1a;
-            --text-muted: #6c757d;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.4);
+            --primary: #FF4D00; /* Signal Orange */
+            --bg: #000000;
+            --surface: #111111;
+            --text: #FFFFFF;
+            --text-dim: #888888;
+            --accent: #FFFFFF;
+            --error: #FF0000;
         }
 
         * {
@@ -26,383 +22,297 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background: radial-gradient(circle at top left, #ff8200 0%, #004a99 100%);
-            background-attachment: fixed;
+            background-color: var(--bg);
+            color: var(--text);
             height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
-        }
-
-        .phone-container {
-            width: 100%;
-            max-width: 420px;
-            height: 85vh;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 45px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--glass-border);
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-
-        .phone-container:hover {
-            transform: translateY(-5px);
-        }
-
-        @media (max-width: 600px) {
-            .phone-container {
-                width: 100%;
-                height: 100dvh; /* Usa dynamic viewport height se disponível */
-                max-width: none;
-                border-radius: 0;
-                border: none;
-                display: flex;
-                flex-direction: column;
-            }
-        }
-
-        .header {
-            background: var(--assai-gradient);
-            color: #fff;
-            padding: 25px 25px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
             position: relative;
         }
 
-        .header .banner-logo {
-            width: 140px;
-            margin-bottom: 5px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-            animation: fadeInDown 0.6s ease-out;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header::after {
-            content: '';
+        /* Background Typography */
+        .bg-text {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, var(--assai-orange), transparent);
+            font-family: 'Outfit', sans-serif;
+            font-size: 25vw;
+            line-height: 0.8;
+            color: rgba(255, 77, 0, 0.03);
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            font-weight: 900;
         }
 
-        .header .avatar {
-            width: 56px;
-            height: 56px;
-            background: #fff;
-            border-radius: 18px;
-            overflow: hidden;
+        /* Side Info (Asymmetric 10%) */
+        .side-info {
+            width: 15vw;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid #222;
+            z-index: 10;
+        }
+
+        .side-info h1 {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+
+        .side-info .status-box {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid #333;
+            padding: 10px;
+        }
+
+        /* Main Stage */
+        .stage {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-            border: 2px solid rgba(255,255,255,0.8);
-            transform: rotate(0deg);
-            transition: all 0.3s ease;
+            position: relative;
+            z-index: 5;
         }
 
-        .header .avatar:hover {
-            transform: scale(1.05);
-        }
-
-        .header .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .header .info h2 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .header .info p {
-            font-size: 11px;
-            opacity: 0.8;
-            font-weight: 400;
-            margin-top: 2px;
-        }
-
-        .chat-window {
-            flex: 1;
-            background: #f0f2f5;
-            padding: 25px 20px;
-            overflow-y: auto;
+        /* The Phone (Brutalist Container) */
+        .phone-mock {
+            width: 380px;
+            height: 80vh;
+            background: var(--surface);
+            border: 2px solid var(--accent);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            scroll-behavior: smooth;
-        }
-
-        /* Custom Scrollbar */
-        .chat-window::-webkit-scrollbar {
-            width: 5px;
-        }
-        .chat-window::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .chat-window::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-
-        .message {
-            max-width: 82%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 14.5px;
-            line-height: 1.5;
             position: relative;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            white-space: pre-wrap;
-            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: stageIn 0.8s cubic-bezier(0.2, 1, 0.2, 1);
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+        @keyframes stageIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .message.bot {
-            background: var(--bubble-left);
-            color: var(--text-main);
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .message.user {
-            background: var(--assai-gradient);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-
-        .input-area {
-            background: white;
-            padding: 20px 25px calc(20px + env(safe-area-inset-bottom, 10px));
+        /* Header */
+        .header {
+            padding: 30px;
+            background: var(--primary);
+            color: black;
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .header .status {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            display: flex;
             align-items: center;
-            border-top: 1px solid rgba(0,0,0,0.05);
+            gap: 5px;
+        }
+
+        .header .status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: black;
+            display: block;
+        }
+
+        /* Chat */
+        .chat-flow {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scrollbar-width: none;
+        }
+
+        .chat-flow::-webkit-scrollbar { display: none; }
+
+        .msg {
+            max-width: 90%;
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+            animation: msgIn 0.4s ease-out both;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .msg.bot {
+            background: #222;
+            color: #ddd;
+            align-self: flex-start;
+            border-left: 3px solid var(--primary);
+        }
+
+        .msg.user {
+            background: var(--text);
+            color: black;
+            align-self: flex-end;
+            font-weight: 700;
+            border-right: 3px solid var(--primary);
+            animation: msgUserIn 0.4s ease-out both;
+        }
+
+        @keyframes msgUserIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Input Zone */
+        .input-zone {
+            padding: 20px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 10px;
         }
 
         input {
             flex: 1;
-            padding: 14px 22px;
-            background: #f1f3f4;
-            border: 1px solid transparent;
-            border-radius: 30px;
+            background: transparent;
+            border: 1px solid #444;
+            padding: 15px;
+            color: white;
+            font-size: 12px;
             outline: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s;
         }
 
-        input:focus {
-            background: white;
-            border-color: var(--assai-blue);
-            box-shadow: 0 0 0 4px rgba(0, 74, 153, 0.1);
-        }
+        input:focus { border-color: var(--primary); }
 
         button {
-            background: var(--assai-gradient);
-            color: white;
+            background: var(--primary);
             border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 18px;
+            padding: 0 25px;
+            font-weight: 900;
+            font-size: 10px;
+            text-transform: uppercase;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover { background: white; color: black; }
+
+        /* Actions Bar */
+        .actions-bar {
+            position: absolute;
+            top: 30px;
+            right: -60px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--accent);
+            background: var(--bg);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 8px 15px rgba(0, 74, 153, 0.2);
+            cursor: pointer;
+            font-size: 16px;
         }
 
-        button:hover {
-            transform: scale(1.1) rotate(5deg);
-            background: var(--assai-orange);
-            box-shadow: 0 12px 20px rgba(255, 130, 0, 0.3);
+        .action-btn:hover { background: var(--primary); color: black; }
+
+        @media (max-width: 900px) {
+            .side-info { display: none; }
+            .bg-text { font-size: 40vw; }
+            .phone-mock { width: 100vw; height: 100vh; border: none; }
+            .actions-bar { right: 20px; top: 120px; }
         }
 
-        .config-bar {
-            background: rgba(255,255,255,0.5);
-            padding: 10px 20px;
-            font-size: 11px;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .badge {
-            background: var(--assai-blue);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 9px;
-            text-transform: uppercase;
-        }
-
-        strong { font-weight: 600; color: inherit; }
-        em { font-style: italic; opacity: 0.8; }
-
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 12px 18px;
-            background: white;
-            border-radius: 20px;
-            border-bottom-left-radius: 5px;
-            align-self: flex-start;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .dot {
-            width: 7px;
-            height: 7px;
-            background: #cbd5e0;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out;
-        }
-
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; } to { opacity: 1; }
-        }
+        /* Markdown elements */
+        strong { color: var(--primary); }
+        em { color: var(--text-dim); }
     </style>
 </head>
 <body>
 
-    <div class="phone-container">
-        <div class="header">
-            <img src="logo.png" alt="Logo ESCALA_FÁCIL" class="banner-logo">
-            
-            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="avatar" style="width: 42px; height: 42px; border-radius: 12px;">
-                        <img src="logo.png" alt="ESCALA_FÁCIL">
-                    </div>
-                    <div class="info">
-                        <h2 style="display: flex; align-items: center; gap: 8px; font-size: 18px;">
-                            ESCALA_FÁCIL 
-                            <span id="perfil-badge" class="badge" style="background: #ccc; color: #666;">Aguardando...</span>
-                        </h2>
-                    </div>
-                </div>
-                <a href="#" onclick="toggleNumber()" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 10px; font-weight: 600; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 20px;">ALTERAR PERFIL</a>
+    <div class="bg-text">ESCALA</div>
+
+    <div class="side-info">
+        <div>
+            <h1>ESCALA_FÁCIL</h1>
+            <p style="font-size: 9px; margin-top: 10px; color: var(--text-dim)">PRECISÃO BRUTALISTA NA SUA PALMA.</p>
+        </div>
+        
+        <div class="status-box">
+            <p style="color: var(--primary)">SESSION: <span id="sess-stat">ACTIVE</span></p>
+            <p id="curr-phone" style="margin-top: 5px;">+5511000000000</p>
+        </div>
+    </div>
+
+    <div class="stage">
+        <h1 style="display: none;">ESCALA_FÁCIL - Brutalist Interface</h1>
+        
+        <div class="phone-mock">
+            <div class="header">
+                <h2>ESCALA_FÁCIL</h2>
+                <div class="status">Bot System Operational</div>
+                <div id="perfil-tag" style="background: black; color: white; display: inline-block; padding: 2px 6px; font-size: 8px; font-weight: 900; letter-spacing: 1px;">IDENTIFICANDO...</div>
             </div>
-            <p style="font-size: 10px; opacity: 0.8; width: 100%; text-align: left; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-                "Organizando sua escala, para que você faça toda a diferença.!"
-            </p>
-        </div>
 
-        <div id="debug-info" style="display: none;">
-            <span id="current-number">+5511999990001</span>
-        </div>
+            <div class="chat-flow" id="chat">
+                <div class="msg bot">Bem-vindo ao <strong>ESCALA_FÁCIL</strong>.<br>Para autenticar seu acesso, informe sua <strong>MATRÍCULA</strong>.</div>
+            </div>
 
+            <div class="actions-bar">
+                <div class="action-btn" onclick="toggleRole()" title="Switch Role">🔄</div>
+                <div class="action-btn" onclick="sendCmd('MENU')" title="Open Menu">📜</div>
+                <div class="action-btn" onclick="sendCmd('REINICIAR')" title="Clear Session">⚡</div>
+            </div>
 
-        <div class="chat-window" id="chat">
-            <div class="message bot">Olá! Eu sou o <strong>ESCALA_FÁCIL</strong> 🤖
-Bem-vindo ao simulador oficial.
-
-Por favor, informe sua <strong>matrícula</strong> para continuar.</div>
-        </div>
-
-        <div style="padding: 10px; display: flex; justify-content: flex-end; position: absolute; bottom: calc(85px + env(safe-area-inset-bottom, 10px)); right: 20px; z-index: 10;">
-            <button onclick="sendMenu()" title="Voltar ao Menu" style="background: var(--assai-blue); border: none; border-radius: 50%; width: 40px; height: 40px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
-                <span style="font-size: 18px;">↩️</span>
-            </button>
-        </div>
-
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="Digite uma mensagem..." onkeypress="handleKey(event)">
-            <button onclick="sendMessage()">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-                </svg>
-            </button>
+            <div class="input-zone">
+                <input type="text" id="userInput" placeholder="COMMAND LINE" onkeypress="handleKey(event)">
+                <button onclick="sendMessage()">SEND</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let currentNumber = "+5511000000000"; // Número neutro inicial
+        let currentNumber = "+5511999990001";
         const WEBHOOK_URL = window.location.origin + "/webhook";
 
-        function toggleNumber() {
-            currentNumber = currentNumber === "+5511999990001" ? "+5511888880000" : "+5511999990001";
-            document.getElementById('current-number').innerText = currentNumber;
-            
-            const isGestor = currentNumber === "+5511888880000";
-            updateUIProfile(isGestor ? "Gestor" : "Colaborador");
-            
-            addMessage("bot", `Perfil trocado para: <strong>${isGestor ? "Gestor" : "Colaborador"}</strong>\nDigite <strong>REINICIAR</strong> para carregar o menu correspondente.`);
-        }
+        function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
 
-        function updateUIProfile(perfil) {
-            const badge = document.getElementById('perfil-badge');
-            const isGestor = perfil.toLowerCase().includes("gestor");
-            
-            badge.innerText = perfil;
-            
-            if (perfil === "Aguardando...") {
-                badge.style.background = '#ccc';
-                badge.style.color = '#666';
-                return;
-            }
-
-            badge.style.color = 'white';
-            badge.style.background = isGestor ? 'var(--assai-orange)' : 'var(--assai-blue)';
-            
-            // Sincroniza o número simulado se a detecção for automática
-            if (isGestor && currentNumber !== "+5511888880000") {
-                currentNumber = "+5511888880000";
-                document.getElementById('current-number').innerText = currentNumber;
-            } else if (!isGestor && currentNumber !== "+5511999990001") {
-                currentNumber = "+5511999990001";
-                document.getElementById('current-number').innerText = currentNumber;
-            }
-        }
-
-        function handleKey(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        function sendMenu() {
-            document.getElementById('userInput').value = 'MENU';
+        function sendCmd(cmd) {
+            document.getElementById('userInput').value = cmd;
             sendMessage();
+        }
+
+        function toggleRole() {
+            currentNumber = currentNumber === "+5511999990001" ? "+5511888880000" : "+5511999990001";
+            document.getElementById('curr-phone').innerText = currentNumber;
+            addMessage("bot", "PERFIL TROCADO. ENVIE MATRÍCULA OU COMANDO.");
         }
 
         async function sendMessage() {
@@ -412,7 +322,6 @@ Por favor, informe sua <strong>matrícula</strong> para continuar.</div>
 
             addMessage("user", text);
             input.value = '';
-            showTyping();
 
             try {
                 const formData = new URLSearchParams();
@@ -422,32 +331,19 @@ Por favor, informe sua <strong>matrícula</strong> para continuar.</div>
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 });
 
-                if (!response.ok) throw new Error('Falha no servidor');
-
                 const twiml = await response.text();
-                hideTyping();
                 const botResponse = extractBody(twiml);
                 addMessage("bot", botResponse);
 
-                // --- Sincronização Dinâmica do Perfil ---
-                if (botResponse.includes("Gestor")) {
-                    updateUIProfile("Gestor");
-                } else if (botResponse.includes("Bem-vindo") || botResponse.includes("Olá, *")) {
-                    // Se for uma saudação sem "Gestor", assumimos Colaborador
-                    // Exceto se a mensagem for apenas texto livre sem identificação
-                    if (!botResponse.includes("Gestor")) {
-                         updateUIProfile("Colaborador");
-                    }
-                }
+                // Auto-detection
+                if (botResponse.includes("Gestor")) updateTag("GESTOR");
+                else if (botResponse.includes("Colaborador")) updateTag("COLABORADOR");
+
             } catch (error) {
-                console.error(error);
-                hideTyping();
-                addMessage("bot", "❌ <strong>Erro de Conexão</strong>\nCertifique-se de que o servidor Flask está rodando.");
+                addMessage("bot", "SYSTEM ERROR: FAILED TO CONNECT WEBHOOK.");
             }
         }
 
@@ -463,38 +359,25 @@ Por favor, informe sua <strong>matrícula</strong> para continuar.</div>
                 
                 text = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
                 text = text.replace(/_(.*?)_/g, '<em>$1</em>');
-                
                 return text;
             }
-            return "Recebi uma resposta vazia do servidor.";
+            return "NULL RESPONSE.";
         }
 
         function addMessage(type, text) {
             const chat = document.getElementById('chat');
             const div = document.createElement('div');
-            div.className = `message ${type}`;
+            div.className = `msg ${type}`;
             div.innerHTML = text;
             chat.appendChild(div);
-            
-            chat.scrollTo({
-                top: chat.scrollHeight,
-                behavior: 'smooth'
-            });
+            chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
         }
 
-        function showTyping() {
-            const chat = document.getElementById('chat');
-            const div = document.createElement('div');
-            div.className = 'typing-indicator';
-            div.id = 'typing-indicator';
-            div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        function hideTyping() {
-            const indicator = document.getElementById('typing-indicator');
-            if (indicator) indicator.remove();
+        function updateTag(role) {
+            const tag = document.getElementById('perfil-tag');
+            tag.innerText = role;
+            tag.style.background = role === "GESTOR" ? "white" : "black";
+            tag.style.color = role === "GESTOR" ? "black" : "white";
         }
     </script>
 </body>

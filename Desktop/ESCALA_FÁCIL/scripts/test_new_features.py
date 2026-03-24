@@ -1,6 +1,5 @@
 import os
 import sys
-from datetime import date
 
 # Adiciona o diretório raiz ao path para importar os scripts
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -5,7 +5,6 @@ Este script faz o seeding dos contatos do grupo no Supabase e envia uma mensagem
 
 import os
 import sys
-import json
 from twilio.rest import Client
 from dotenv import load_dotenv
 
@@ -51,7 +50,7 @@ def integrar_contatos():
                 "nome": nome,
                 "tipo": tipo
             }).execute()
-            print(f"  ✅ Tabela 'colaboradores' atualizada.")
+            print("  ✅ Tabela 'colaboradores' atualizada.")
         except Exception as e:
             print(f"  ❌ Erro ao atualizar 'colaboradores': {e}")
 
@@ -64,7 +63,7 @@ def integrar_contatos():
                 "tipo": tipo,
                 "estado": None
             }).execute()
-            print(f"  ✅ Sessão de auto-login criada em 'sessoes'.")
+            print("  ✅ Sessão de auto-login criada em 'sessoes'.")
         except Exception as e:
             print(f"  ❌ Erro ao atualizar 'sessoes': {e}")
 

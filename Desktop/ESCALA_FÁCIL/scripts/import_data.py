@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-from datetime import date
 from dotenv import load_dotenv
 
 # Adiciona o diretório raiz ao path
@@ -24,7 +23,7 @@ def importar_dados():
         colaboradores = json.load(f)["colaboradores"]
     
     for c in colaboradores:
-        res = supabase.table("colaboradores").upsert({
+        supabase.table("colaboradores").upsert({
             "matricula": c["matricula"],
             "nome": c["nome"],
             "funcao": c.get("funcao"),

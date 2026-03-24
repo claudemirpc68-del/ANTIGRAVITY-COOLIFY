@@ -4,7 +4,7 @@ Interface de consulta de escala usando PostgreSQL/Supabase.
 Substitui o scripts/api_mock.py.
 """
 
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 from typing import Optional
 from supabase_client import get_supabase
 
@@ -166,7 +166,7 @@ def get_resumo_equipe() -> str:
         linhas.append("  → Nenhuma folga hoje.")
 
     if justificativas_lista:
-        linhas.append(f"\n⚠️ *Justificativas de Ausência/Atraso:*")
+        linhas.append("\n⚠️ *Justificativas de Ausência/Atraso:*")
         for j in justificativas_lista:
             linhas.append(f"  → {j}")
 

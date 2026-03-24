@@ -8,7 +8,7 @@ account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 whatsapp_number = os.environ.get('TWILIO_WHATSAPP_NUMBER')
 
-print(f"🔍 Analisando credenciais Twilio...")
+print("🔍 Analisando credenciais Twilio...")
 print(f"SID: {account_sid[:5]}...")
 print(f"Number: {whatsapp_number}")
 
