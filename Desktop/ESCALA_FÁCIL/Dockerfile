@@ -19,8 +19,8 @@ COPY . .
 # Garantir permissões de leitura para os assets
 RUN chmod -R 755 assets simulator.html
 
-# Expor a porta 80 (padrão do Traefik/Coolify)
-EXPOSE 80
+# Expor a porta 5000 (padrão do Coolify para este projeto)
+EXPOSE 5000
 
-# Comando para rodar o Gunicorn na porta 80
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]
+# Comando para rodar o Gunicorn na porta 5000
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "8", "--timeout", "0", "server:app"]
