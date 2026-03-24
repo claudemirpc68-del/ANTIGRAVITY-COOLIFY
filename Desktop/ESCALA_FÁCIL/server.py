@@ -43,13 +43,18 @@ def validate_twilio_request(f):
             return f(*args, **kwargs)
 
         validator = RequestValidator(os.environ.get("TWILIO_AUTH_TOKEN"))
-        url = request.url
+        
+        # FIX PROXY: O Coolify/Traefik passa a requisição como http:// internamente, 
+        # mas o Twilio assina como https://. Forçamos a conversão.
+        url = request.url.replace("http://", "https://", 1) if "http://" in request.url else request.url
+        
         signature = request.headers.get("X-Twilio-Signature", "")
         params = request.form.to_dict()
 
         if not validator.validate(url, params, signature) and not app.debug:
-            print(f"⚠️ Acesso bloqueado (Signature Mismatch). URL: {url}")
+            print(f"⚠️ Acesso bloqueado (Signature Mismatch). URL: {url} | Signature: {signature}")
             return "Unauthorized", 403
+        
         return f(*args, **kwargs)
     return decorated_function
 
