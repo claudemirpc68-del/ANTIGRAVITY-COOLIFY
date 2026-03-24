@@ -89,9 +89,7 @@ def health():
     return {"status": "ok", "project": "ESCALA_FÁCIL"}, 200
 
 
-@app.route("/logo.png", methods=["GET"])
-def logo():
-    return send_from_directory(".", "logo.png")
+# Ativos estáticos são servidos automaticamente via Flask static_folder='assets'
 
 
 # -----------------------------------------------------------------------
