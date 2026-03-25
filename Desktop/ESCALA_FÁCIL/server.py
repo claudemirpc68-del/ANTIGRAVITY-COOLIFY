@@ -8,6 +8,12 @@ import os
 import sys
 from typing import Optional
 from functools import wraps
+
+import platform
+if platform.system() == "Windows":
+    TWILIO_LIB_PATH = r"C:\twilio_lib"
+    if TWILIO_LIB_PATH not in sys.path:
+        sys.path.insert(0, TWILIO_LIB_PATH)
 from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from twilio.twiml.messaging_response import MessagingResponse
