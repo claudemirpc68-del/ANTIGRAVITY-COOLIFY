@@ -4,7 +4,7 @@ Orquestrador central do fluxo de conversas.
 """
 from typing import Optional
 from sessions import SessionManager
-from scripts import api_supabase, api_openai
+from scripts import api_supabase, api_groq
 from services.menu_handler import MenuHandler
 
 MSG_ERRO_GERAL = "⚠️ Sinto muito, tive um problema técnico ao processar sua mensagem. Tente novamente em instantes."
@@ -75,7 +75,7 @@ class BotService:
                 "matricula": session.get("matricula", "000000"),
                 "tipo": session.get("tipo", "colaborador")
             }
-            return api_openai.processar_texto_ia(text, usuario_info)
+            return api_groq.processar_texto_groq(text, usuario_info) or MSG_ERRO_GERAL
 
         except Exception as e:
             print(f"❌ Erro no BotService: {e}")

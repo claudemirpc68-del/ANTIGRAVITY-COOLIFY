@@ -3,7 +3,7 @@ ESCALA_FÁCIL - Menu Handler Service
 Lógica de tratamento das opções de menu.
 """
 from typing import Optional
-from scripts import api_supabase, api_openai
+from scripts import api_supabase, api_groq
 
 MSG_OPCAO_INVALIDA = "❌ Opção inválida. Escolha uma das opções do menu ou digite 'MENU'."
 
