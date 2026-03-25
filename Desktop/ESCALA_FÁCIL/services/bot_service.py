@@ -50,8 +50,10 @@ class BotService:
                 self.sessions.clear(phone)
                 return MSG_BEM_VINDO
 
-            # 2. Fluxo de Identificação (Se não estiver logado)
-            if not session:
+            # 2. Fluxo de Identificação (Se não estiver logado ou se digitar matrícula de 6 dígitos)
+            if not session or (text.isdigit() and len(text) == 6):
+                if text.isdigit() and len(text) == 6:
+                    self.sessions.clear(phone)  # Limpa sessão anterior se for matrícula
                 if text.isdigit():
                     return self._identificar_usuario(phone, text)
                 return MSG_BEM_VINDO
