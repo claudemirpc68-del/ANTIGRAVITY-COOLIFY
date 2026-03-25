@@ -68,7 +68,7 @@ def processar_texto_groq(texto, usuario_info):
         client = Groq(api_key=api_key)
         
         response = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT + f"\n\nUSUÁRIO ATUAL: {usuario_info.get('nome', 'Desconhecido')} (Matrícula: {usuario_info.get('matricula', 'N/A')})"},
                 {"role": "user", "content": texto}
