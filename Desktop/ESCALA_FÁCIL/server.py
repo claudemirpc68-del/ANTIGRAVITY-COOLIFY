@@ -68,10 +68,17 @@ def validate_twilio_request(f):
 # Rotas
 # -----------------------------------------------------------------------
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 @app.route("/", methods=["GET"])
 def index():
     """Serve a interface web do simulador (frontend)."""
-    return send_from_directory(".", "simulator.html")
+    return send_from_directory(BASE_DIR, "simulator.html")
+
+@app.route("/simulator.html", methods=["GET"])
+def simulator():
+    """Serve o simulador."""
+    return send_from_directory(BASE_DIR, "simulator.html")
 
 
 @app.route("/webhook", methods=["POST"])
