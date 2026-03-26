@@ -176,14 +176,17 @@ def salvar_solicitacao(matricula: str, nome: str, tipo_solicitacao: str, texto: 
     """Salva uma nova solicitação no Supabase."""
     supabase = get_supabase()
     try:
-        supabase.table("solicitacoes").insert({
+        data = {
             "matricula": matricula,
             "nome": nome,
             "tipo": tipo_solicitacao,
             "texto": texto,
-            "media_url": media_url,
             "status": "PENDENTE"
-        }).execute()
+        }
+        if media_url:
+            data["texto"] = f"{texto}\n\n📎 Anexo: {media_url}"
+        
+        supabase.table("solicitacoes").insert(data).execute()
         return True
     except Exception as e:
         print(f"❌ Erro ao salvar solicitação: {e}")
@@ -275,9 +278,10 @@ def salvar_mensagem_direta(matricula: str, nome: str, texto: str, media_url: str
         "nome": nome,
         "tipo": "Mensagem Direta",
         "texto": texto,
-        "media_url": media_url,
         "status": "RECEBIDO"
     }
+    if media_url:
+        dados["texto"] = f"{texto}\n\n📎 Anexo: {media_url}"
     try:
         supabase.table("solicitacoes").insert(dados).execute()
         return True

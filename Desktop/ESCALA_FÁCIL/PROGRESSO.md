@@ -41,3 +41,28 @@
 1. Testar o bot via WhatsApp (enviar 101010)
 2. Verificar se o Groq está respondendo corretamente
 3. Ajustar o system prompt se necessário
+
+## Verificações Realizadas em 26/03/2026
+
+### 1. Teste Post-Deploy ✓
+- Mensagens enviadas via Twilio API
+- Sequência: OI → 7101309 → MENU → 2
+- Status: Todas enviadas com sucesso (HTTP 200/201)
+
+### 2. Groq API ✓
+- Teste direto: "Qual é minha próxima folga?"
+- Resposta: Retornou corretamente a data da folga
+- Modelo: llama-3.3-70b-versatile
+
+### 3. Servidor Produção ✓
+- URL: https://assai-bot.72.61.130.70.sslip.io/
+- Status HTTP: 200 (online)
+
+### Conclusão
+Sistema operacional em produção. Todas as verificações passaram.
+
+### Teste com Imagens (26/03/2026) ✓
+- Problema: Coluna `media_url` não existia no banco
+- Solução: Incluir URL da imagem no campo `texto` como anexo
+- Teste: Fluxo completo (menu → justificativa → imagem) ✓
+- Status: Funcional

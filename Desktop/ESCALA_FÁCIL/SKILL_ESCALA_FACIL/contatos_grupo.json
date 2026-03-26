@@ -1,0 +1,16 @@
+{
+  "contatos": [
+    {
+      "nome": "Claudemir",
+      "matricula": "7101309",
+      "whatsapp": "+5511961909818",
+      "tipo": "colaborador"
+    },
+    {
+      "nome": "Ederson Cubas",
+      "matricula": "101010",
+      "whatsapp": "+5511999999999",
+      "tipo": "gestor"
+    }
+  ]
+}
