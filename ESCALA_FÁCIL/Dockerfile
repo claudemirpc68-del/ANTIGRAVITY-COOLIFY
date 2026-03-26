@@ -2,8 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copiar subdiretório ESCALA_FÁCIL
-COPY Desktop/ESCALA_FÁCIL/* .
+# Copiar arquivos do projeto
+COPY . .
 
 # Instalar dependências
 RUN apt-get update && apt-get install -y \
