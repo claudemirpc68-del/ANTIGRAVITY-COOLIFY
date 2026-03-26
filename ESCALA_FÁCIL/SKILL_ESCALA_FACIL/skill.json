@@ -39,7 +39,7 @@
     },
     "multimidia": {
       "atestado": "Colaborador envia foto → Bot registra justificativa → Gestor recebe notificação para aprovar ou rejeitar.",
-      "audio": "Colaborador envia áudio → Bot transcreve e encaminhha ao gestor."
+      "audio": "Colaborador envia áudio → Bot transcreve e encaminha ao gestor."
     }
   },
   "data_sources": {
