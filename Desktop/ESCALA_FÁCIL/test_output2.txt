@@ -1,0 +1,15 @@
+2. Login (101010):
+✅ Identificado: *EDERSON CUBAS* (Gestor)
+
+📊 *Menu Gestor - EDERSON CUBAS*
+
+1️⃣ Resumo da equipe hoje
+2️⃣ Ver todas solicitações pendentes
+3️⃣ Enviar comunicado geral
+4️⃣ Relatório mensal estatístico
+5️⃣ Ver apenas Justificativas
+6️⃣ Ver apenas Pedidos de Troca
+0️⃣ Sair / Voltar
+
+Digite o número da opção desejada:
+
