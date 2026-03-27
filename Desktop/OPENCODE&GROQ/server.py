@@ -27,7 +27,7 @@ from services.bot_service import BotService
 
 load_dotenv()
 
-app = Flask(__name__, static_folder='assets', static_url_path='/assets')
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets'), static_url_path='/assets')
 CORS(app)
 
 # Inicializa o orquestrador do bot
