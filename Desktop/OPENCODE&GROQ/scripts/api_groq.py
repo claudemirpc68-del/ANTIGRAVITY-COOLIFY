@@ -78,5 +78,7 @@ def processar_texto_groq(texto, usuario_info):
         )
         return response.choices[0].message.content
     except Exception as e:
-        print(f"❌ Erro Groq: {e}")
-        return None
+        import traceback
+        print(f"❌ Erro na Chamada Groq: {e}")
+        traceback.print_exc()
+        return "⚠️ O assistente de IA está temporariamente indisponível. Por favor, tente as opções do menu ou aguarde um momento."

@@ -50,13 +50,17 @@ class BotService:
                 self.sessions.clear(phone)
                 return MSG_BEM_VINDO
 
-            # 2. Fluxo de Identificação (Se não estiver logado ou se digitar matrícula de 6 dígitos)
-            if not session or (text.isdigit() and len(text) == 6):
-                if text.isdigit() and len(text) == 6:
-                    self.sessions.clear(phone)  # Limpa sessão anterior se for matrícula
-                if text.isdigit():
+            # 2. Fluxo de Identificação (Se não estiver logado ou se digitar matrícula de 6 a 10 dígitos)
+            is_matricula = text.isdigit() and 6 <= len(text) <= 10
+            
+            if not session or is_matricula:
+                if is_matricula:
+                    self.sessions.clear(phone)  # Limpa sessão anterior para nova identificação
                     return self._identificar_usuario(phone, text)
-                return MSG_BEM_VINDO
+                
+                # Se não tem sessão e não digitou matrícula, pede identificação
+                if not session:
+                    return MSG_BEM_VINDO
 
             # Se o usuário pedir o menu a qualquer momento
             if text.upper() in ["MENU", "0", "VOLTAR", "SAIR"]:
@@ -80,7 +84,9 @@ class BotService:
             return api_groq.processar_texto_groq(text, usuario_info) or MSG_ERRO_GERAL
 
         except Exception as e:
-            print(f"❌ Erro no BotService: {e}")
+            import traceback
+            print(f"❌ Erro crítico no BotService: {e}")
+            traceback.print_exc()
             return MSG_ERRO_GERAL
 
     def _identificar_usuario(self, phone: str, matricula: str) -> str:
