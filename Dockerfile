@@ -10,11 +10,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requisitos e instalar
-COPY "Desktop/ESCALA_FÁCIL/requirements.txt" .
+COPY "Desktop/OPENCODE&GROQ/requirements.txt" .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar o código do projeto para /app
-COPY "Desktop/ESCALA_FÁCIL" .
+COPY "Desktop/OPENCODE&GROQ" .
 
 # Garantir que o simulator.html esteja acessível
 RUN ls -la /app
