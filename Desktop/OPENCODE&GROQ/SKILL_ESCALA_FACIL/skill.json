@@ -1,0 +1,49 @@
+{
+  "name": "escala_facil_interacao",
+  "description": "Skill para interação fluida entre gestores e colaboradores no ESCALA_FÁCIL, integrando WhatsApp via Twilio e JSON de contatos.",
+  "version": "1.0",
+  "author": "CLAUDEMIR",
+  "settings": {
+    "identity": {
+      "bot_name": "ESCALA_FÁCIL",
+      "avatar": "avatar_escala_facil.png",
+      "slogan": "Organizando sua escala, para que você faça toda a diferença.!"
+    },
+    "rules": {
+      "escala": "6x1",
+      "folgas": "2 domingos por mês",
+      "restricoes": "não permitir domingos consecutivos",
+      "autoridade": "gestor tem sempre a última palavra"
+    }
+  },
+  "interaction": {
+    "fluxo_inicial": "Bot identifica automaticamente o usuário pelo número do WhatsApp (via JSON). Se não encontrar, solicita matrícula.",
+    "colaborador": {
+      "mensagem_boas_vindas": "Oi {{nome}}, já reconheci você. Hoje você entra às {{horario}}. Sua próxima folga será {{folga}}.",
+      "opcoes": [
+        "Consultar escala semanal",
+        "Justificar ausência",
+        "Solicitar troca de turno",
+        "Reportar problema"
+      ]
+    },
+    "gestor": {
+      "mensagem_boas_vindas": "Olá {{nome}}, você tem {{pendencias}} solicitações pendentes.",
+      "opcoes": [
+        "Aprovar/Rejeitar trocas",
+        "Validar justificativas",
+        "Ajustar escala",
+        "Gerar relatórios",
+        "Enviar comunicado"
+      ]
+    },
+    "multimidia": {
+      "atestado": "Colaborador envia foto → Bot registra justificativa → Gestor recebe notificação para aprovar ou rejeitar.",
+      "audio": "Colaborador envia áudio → Bot transcreve e encaminhha ao gestor."
+    }
+  },
+  "data_sources": {
+    "json_contatos": "contatos_grupo.json",
+    "escala_atual": "escala_marco.json"
+  }
+}

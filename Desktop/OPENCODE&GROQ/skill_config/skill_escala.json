@@ -1,0 +1,111 @@
+{
+  "skill_name": "ESCALA_FÁCIL",
+  "description": "Assistente virtual para gestão de escala 6x1 com 2 domingos de folga/mês, consultas de colaboradores e funções administrativas de gestores.",
+  "identity": {
+    "bot_name": "ESCALA_FÁCIL",
+    "avatar": "avatar_escala_facil.png",
+    "slogan": "Organizando sua escala, para que você faça toda a diferença.!"
+  },
+  "rules": {
+    "work_pattern": "6x1",
+    "sunday_offs_per_month": 2,
+    "sunday_consecutive": false,
+    "manager_override": true,
+    "manager_override_message": "Atenção: esta escala é programada, mas o gestor tem a última palavra e pode alterar em caso de necessidade operacional.",
+    "identification_method": "employee_id",
+    "identification_message": "Por favor, informe sua matrícula para acessar o sistema."
+  },
+  "roles": {
+    "colaboradores": {
+      "menu": [
+        "1 - Ver minha escala semanal",
+        "2 - Consultar minha próxima folga",
+        "3 - Ver domingos de folga do mês",
+        "4 - Solicitar troca de turno/folga",
+        "5 - Justificar ausência ou atraso",
+        "6 - Solicitar mudança de setor/horário",
+        "7 - Reportar problema ou conflito",
+        "8 - Falar diretamente com o gestor"
+      ],
+      "permissions": [
+        "consultar_escala_semanal",
+        "consultar_proxima_folga",
+        "consultar_domingos_folga",
+        "solicitar_troca_turno",
+        "justificar_ausencia",
+        "solicitar_mudanca_setor",
+        "reportar_problema",
+        "falar_com_gestor"
+      ]
+    },
+    "gestores": {
+      "users": [
+        { "name": "Ederson Cubas", "employee_id": "101010" },
+        { "name": "Antonio", "employee_id": "202020" },
+        { "name": "John", "employee_id": "111111" },
+        { "name": "Leonardo", "employee_id": "121212" },
+        { "name": "Ivan", "employee_id": "131313" }
+      ],
+      "menu": [
+        "1 - Aprovar/Rejeitar trocas de turno",
+        "2 - Validar justificativas de ausência/atraso",
+        "3 - Autorizar mudança de setor/horário",
+        "4 - Ajustar escala da equipe",
+        "5 - Resolver problemas ou conflitos",
+        "6 - Gerar relatórios da equipe",
+        "7 - Enviar comunicado aos colaboradores"
+      ],
+      "permissions": [
+        "aprovar_troca_turno",
+        "validar_justificativa",
+        "autorizar_mudanca_setor",
+        "ajustar_escala",
+        "resolver_conflito",
+        "gerar_relatorios",
+        "enviar_comunicado"
+      ]
+    }
+  },
+  "intents": {
+    "consultar_escala_semanal": {
+      "description": "Exibe a escala semanal do colaborador.",
+      "input_required": "employee_id",
+      "response_template": "Sua escala desta semana é: {{dias}}. {{manager_override_message}}"
+    },
+    "consultar_proxima_folga": {
+      "description": "Mostra a próxima folga prevista.",
+      "input_required": "employee_id",
+      "response_template": "Sua próxima folga está prevista para {{data}}. {{manager_override_message}}"
+    },
+    "consultar_domingos_folga": {
+      "description": "Lista os dois domingos de folga do mês.",
+      "input_required": "employee_id",
+      "response_template": "Neste mês você tem direito a 2 domingos de folga: {{datas}}. {{manager_override_message}}"
+    },
+    "solicitar_troca_turno": {
+      "description": "Solicita troca de turno ou folga com outro colaborador.",
+      "input_required": "employee_id",
+      "response_template": "Seu pedido de troca foi registrado: {{detalhes}}. {{manager_override_message}}"
+    },
+    "justificar_ausencia": {
+      "description": "Permite justificar ausência ou atraso.",
+      "input_required": "employee_id",
+      "response_template": "Sua justificativa foi registrada: {{motivo}}. {{manager_override_message}}"
+    },
+    "solicitar_mudanca_setor": {
+      "description": "Solicita mudança de setor ou horário.",
+      "input_required": "employee_id",
+      "response_template": "Sua solicitação de mudança foi registrada: {{detalhes}}. {{manager_override_message}}"
+    },
+    "reportar_problema": {
+      "description": "Reporta problema ou conflito ao gestor.",
+      "input_required": "employee_id",
+      "response_template": "Seu relato foi encaminhado ao gestor: {{descricao}}. {{manager_override_message}}"
+    },
+    "falar_com_gestor": {
+      "description": "Encaminha mensagem diretamente ao gestor.",
+      "input_required": "employee_id",
+      "response_template": "Sua mensagem foi enviada ao gestor. {{manager_override_message}}"
+    }
+  }
+}
