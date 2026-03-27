@@ -64,7 +64,13 @@ def processar_texto_groq(texto, usuario_info):
         print("⚠️ Groq API Key não configurada corretamente.")
         return None
 
+    # Limpa variáveis de proxy que podem causar erro de inicialização em alguns ambientes Docker/Coolify
+    for env_var in ["HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"]:
+        if env_var in os.environ:
+            del os.environ[env_var]
+
     try:
+        # Inicializa o cliente de forma simples
         client = Groq(api_key=api_key)
         
         response = client.chat.completions.create(
