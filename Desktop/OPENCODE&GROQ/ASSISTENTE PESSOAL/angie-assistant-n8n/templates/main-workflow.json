@@ -1,0 +1,703 @@
+{
+  "name": "Angie Assistant - Main Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [250, 300],
+      "webhookId": "angie-assistant",
+      "webhookMethod": "GET",
+      "credentials": {
+        "telegramApi": "telegram-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const message = $input.first().json.message;\n\nif (message.audio) {\n  return {\n    json: {\n      type: 'audio',\n      file_id: message.audio.file_id,\n      chat_id: message.chat.id\n    }\n  };\n} else if (message.text) {\n  return {\n    json: {\n      type: 'text',\n      text: message.text,\n      chat_id: message.chat.id,\n      user_id: message.from.id\n    }\n  };\n} else {\n  return {\n    json: {\n      type: 'unsupported',\n      chat_id: message.chat.id\n    }\n  };\n}"
+      },
+      "id": "check-message-type",
+      "name": "Check Message Type",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.type }}",
+              "value2": "audio"
+            }
+          ]
+        }
+      },
+      "id": "if-audio",
+      "name": "If Audio",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [650, 250]
+    },
+    {
+      "parameters": {
+        "fileId": "={{ $json.file_id }}",
+        "download": true
+      },
+      "id": "get-audio-file",
+      "name": "Get Audio File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 3,
+      "position": [850, 150],
+      "credentials": {
+        "telegramApi": "telegram-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "transcribe",
+        "audioFile": "={{ $binary.data }}",
+        "language": "pt-BR",
+        "model": "whisper-1",
+        "additionalFields": {
+          "response_format": "json"
+        }
+      },
+      "id": "transcribe-audio",
+      "name": "Transcribe Audio",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 3,
+      "position": [1050, 150],
+      "credentials": {
+        "openAiApi": "openai-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  json: {\n    user_message: $input.first().json.text || $input.first().json.transcription,\n    chat_id: $input.item.json.chat_id,\n    original_type: $input.item.json.type\n  }\n};"
+      },
+      "id": "prepare-message",
+      "name": "Prepare Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.openai.com/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $credentials.openai_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-4"
+            },
+            {
+              "name": "messages",
+              "value": [
+                {
+                  "role": "system",
+                  "content": "Você é a Angie, uma assistente pessoal útil e amigável. Responda de forma clara e concisa em português. Use as ferramentas disponíveis para buscar informações quando necessário."
+                },
+                {
+                  "role": "user",
+                  "content": "={{ $json.user_message }}"
+                }
+              ]
+            },
+            {
+              "name": "tools",
+              "value": [
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "get_emails",
+                    "description": "Buscar e-mails recentes do Gmail",
+                    "parameters": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "description": "Data no formato YYYY-MM-DD"
+                        }
+                      },
+                      "required": ["date"]
+                    }
+                  }
+                },
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "get_calendar",
+                    "description": "Buscar eventos do Google Calendar",
+                    "parameters": {
+                      "type": "object",
+                      "properties": {
+                        "startDate": {
+                          "type": "string",
+                          "description": "Data de início ISO 8601"
+                        },
+                        "endDate": {
+                          "type": "string",
+                          "description": "Data de fim ISO 8601"
+                        }
+                      },
+                      "required": ["startDate", "endDate"]
+                    }
+                  }
+                },
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "get_tasks",
+                    "description": "Buscar tarefas pendentes do Baserow",
+                    "parameters": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  }
+                },
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "get_contacts",
+                    "description": "Buscar contatos no Baserow",
+                    "parameters": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Nome do contato para buscar"
+                        }
+                      },
+                      "required": ["name"]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "tool_choice",
+              "value": "auto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "openai-function-call",
+      "name": "AI Function Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "object": [
+            {
+              "value1": "={{ $json.tool_calls }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "if-tools-called",
+      "name": "If Tools Called",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCalls = $input.first().json.tool_calls;\nconst results = [];\n\n// Process each tool call\nfor (const toolCall of toolCalls) {\n  const funcName = toolCall.function.name;\n  const args = JSON.parse(toolCall.function.arguments);\n  \n  results.push({\n    tool_call_id: toolCall.id,\n    function: funcName,\n    arguments: args\n  });\n}\n\nreturn { json: { tools_to_call: results } };"
+      },
+      "id": "parse-tool-calls",
+      "name": "Parse Tool Calls",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1850, 250]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "loop-tools",
+      "name": "Loop Over Tools",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [2050, 250]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.function }}",
+              "value2": "get_emails"
+            }
+          ]
+        }
+      },
+      "id": "if-get-emails",
+      "name": "If get_emails",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [2250, 150]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "additionalFields": {
+          "q": "after:{{ $json.arguments.date }}"
+        }
+      },
+      "id": "gmail-get-emails",
+      "name": "Gmail - Get Emails",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [2450, 50],
+      "credentials": {
+        "gmailOAuth2": "google-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.function }}",
+              "value2": "get_calendar"
+            }
+          ]
+        }
+      },
+      "id": "if-get-calendar",
+      "name": "If get_calendar",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [2250, 350]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "startTime": "={{ $json.arguments.startDate }}",
+        "endTime": "={{ $json.arguments.endDate }}"
+      },
+      "id": "calendar-get-events",
+      "name": "Calendar - Get Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 3,
+      "position": [2450, 250],
+      "credentials": {
+        "googleOAuth2": "google-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.function }}",
+              "value2": "get_tasks"
+            }
+          ]
+        }
+      },
+      "id": "if-get-tasks",
+      "name": "If get_tasks",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [2250, 550]
+    },
+    {
+      "parameters": {
+        "operation": "listRows",
+        "tableId": "{{ $env.BASEROW_TABLE_TASKS }}",
+        "filters": {
+          "filter": {
+            "field": 6,
+            "operator": "equals",
+            "value": "Pendente"
+          }
+        }
+      },
+      "id": "baserow-get-tasks",
+      "name": "Baserow - Get Tasks",
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1,
+      "position": [2450, 450],
+      "credentials": {
+        "baserowApi": "baserow-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.function }}",
+              "value2": "get_contacts"
+            }
+          ]
+        }
+      },
+      "id": "if-get-contacts",
+      "name": "If get_contacts",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1.1,
+      "position": [2250, 750]
+    },
+    {
+      "parameters": {
+        "operation": "listRows",
+        "tableId": "{{ $env.BASEROW_TABLE_CONTATOS }}"
+      },
+      "id": "baserow-get-contacts",
+      "name": "Baserow - Get Contacts",
+      "type": "n8n-nodes-base.baserow",
+      "typeVersion": 1,
+      "position": [2450, 650],
+      "credentials": {
+        "baserowApi": "baserow-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolResults = [];\n\n// Collect all results from the previous nodes\nconst allItems = $input.all();\n\nfor (const item of allItems) {\n  if (item.json.function) {\n    toolResults.push({\n      tool_call_id: item.json.tool_call_id,\n      role: 'tool',\n      content: JSON.stringify(item.json)\n    });\n  }\n}\n\nreturn { json: { tool_results: toolResults } };"
+      },
+      "id": "collect-tool-results",
+      "name": "Collect Tool Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2650, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.openai.com/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $credentials.openai_api_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-4"
+            },
+            {
+              "name": "messages",
+              "value": "={{ $json.messages }}"
+            }
+          ]
+        }
+      },
+      "id": "openai-final-response",
+      "name": "AI Final Response",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2850, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.choices[0].message.content }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-send",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 3,
+      "position": [3050, 300],
+      "credentials": {
+        "telegramApi": "telegram-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "Desculpe, não consegui processar sua mensagem. Pode tentar novamente?",
+        "additionalFields": {}
+      },
+      "id": "telegram-error",
+      "name": "Send Error Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 3,
+      "position": [1650, 500],
+      "credentials": {
+        "telegramApi": "telegram-credentials"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Direct message response without tool calls\nreturn {\n  json: {\n    messages: [\n      {\n        role: 'system',\n        content: 'Você é a Angie, uma assistente pessoal útil e amigável. Responda de forma clara e concisa em português.'\n      },\n      {\n        role: 'user',\n        content: $input.first().json.user_message\n      }\n    ],\n    chat_id: $input.first().json.chat_id\n  }\n};"
+      },
+      "id": "prepare-direct-response",
+      "name": "Prepare Direct Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1850, 450]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Message Type": {
+      "main": [
+        [
+          {
+            "node": "If Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Audio": {
+      "main": [
+        [
+          {
+            "node": "Get Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Audio": {
+      "main": [
+        [
+          {
+            "node": "Prepare Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Message": {
+      "main": [
+        [
+          {
+            "node": "AI Function Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Function Call": {
+      "main": [
+        [
+          {
+            "node": "If Tools Called",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Tools Called": {
+      "main": [
+        [
+          {
+            "node": "Parse Tool Calls",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Direct Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Tool Calls": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Tools",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Tools": {
+      "main": [
+        [
+          {
+            "node": "If get_emails",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If get_calendar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If get_tasks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If get_contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Get Emails": {
+      "main": [
+        [
+          {
+            "node": "Collect Tool Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar - Get Events": {
+      "main": [
+        [
+          {
+            "node": "Collect Tool Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baserow - Get Tasks": {
+      "main": [
+        [
+          {
+            "node": "Collect Tool Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baserow - Get Contacts": {
+      "main": [
+        [
+          {
+            "node": "Collect Tool Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Tool Results": {
+      "main": [
+        [
+          {
+            "node": "AI Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Final Response": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Direct Response": {
+      "main": [
+        [
+          {
+            "node": "AI Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "angie-main-workflow",
+  "tags": ["angie", "assistant", "telegram", "ai"],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-30T00:00:00.000Z",
+  "createdAt": "2026-03-30T00:00:00.000Z"
+}
