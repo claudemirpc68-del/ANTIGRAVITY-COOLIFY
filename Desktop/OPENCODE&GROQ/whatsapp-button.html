@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Chatbot</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .demo-text {
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ========================================
+       FLOATING WHATSAPP BUTTON
+       ======================================== */
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-direction: row-reverse;
+    }
+
+    .whatsapp-btn {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #25d366 0%, #128c7e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      box-shadow:
+        0 4px 15px rgba(37, 211, 102, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: whatsapp-pulse 3s ease-in-out infinite;
+    }
+
+    .whatsapp-btn::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(37, 211, 102, 0.3), rgba(18, 140, 126, 0.1));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .whatsapp-btn::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 211, 102, 0.15) 0%, transparent 70%);
+      z-index: -2;
+      animation: whatsapp-glow 3s ease-in-out infinite;
+    }
+
+    .whatsapp-btn:hover {
+      transform: scale(1.12) translateY(-2px);
+      box-shadow:
+        0 8px 30px rgba(37, 211, 102, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    }
+
+    .whatsapp-btn:hover::before {
+      opacity: 1;
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.95);
+      transition-duration: 0.1s;
+    }
+
+    .whatsapp-btn:focus-visible {
+      outline: 2px solid #25d366;
+      outline-offset: 4px;
+    }
+
+    .whatsapp-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: #ffffff;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+      transition: transform 0.3s ease;
+    }
+
+    .whatsapp-btn:hover svg {
+      transform: scale(1.08);
+    }
+
+    /* Tooltip */
+    .whatsapp-tooltip {
+      position: relative;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(10px);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.25),
+        0 1px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      pointer-events: none;
+    }
+
+    .whatsapp-tooltip::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .whatsapp-float:hover .whatsapp-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    /* Animações */
+    @keyframes whatsapp-pulse {
+      0%, 100% {
+        box-shadow:
+          0 4px 15px rgba(37, 211, 102, 0.35),
+          0 2px 6px rgba(0, 0, 0, 0.15),
+          inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      }
+      50% {
+        box-shadow:
+          0 4px 25px rgba(37, 211, 102, 0.5),
+          0 2px 10px rgba(0, 0, 0, 0.2),
+          inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      }
+    }
+
+    @keyframes whatsapp-glow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.15); }
+    }
+
+    @keyframes whatsapp-enter {
+      0% { opacity: 0; transform: scale(0.3) translateY(20px); }
+      50% { transform: scale(1.05) translateY(-2px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .whatsapp-float {
+      animation: whatsapp-enter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      animation-delay: 0.3s;
+      opacity: 0;
+    }
+
+    /* ========================================
+       CHATBOT INTERFACE
+       ======================================== */
+
+    .chatbot-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .chatbot-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .chatbot-container {
+      width: 100%;
+      max-width: 420px;
+      height: 600px;
+      max-height: 90vh;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.5),
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transform: scale(0.8) translateY(30px);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .chatbot-overlay.active .chatbot-container {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Header */
+    .chatbot-header {
+      background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .chatbot-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .chatbot-avatar svg {
+      width: 26px;
+      height: 26px;
+      fill: #ffffff;
+    }
+
+    .chatbot-avatar .online-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 10px;
+      height: 10px;
+      background: #4ade80;
+      border-radius: 50%;
+      border: 2px solid #25d366;
+      animation: online-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes online-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .chatbot-header-info {
+      flex: 1;
+    }
+
+    .chatbot-header-info h3 {
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .chatbot-header-info span {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.78rem;
+    }
+
+    .chatbot-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .chatbot-close:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: rotate(90deg);
+    }
+
+    .chatbot-close svg {
+      width: 18px;
+      height: 18px;
+      fill: #ffffff;
+    }
+
+    /* Messages Area */
+    .chatbot-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(37, 211, 102, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(18, 140, 126, 0.03) 0%, transparent 50%);
+    }
+
+    .chatbot-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chatbot-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    /* Message Bubble */
+    .message {
+      display: flex;
+      gap: 10px;
+      max-width: 85%;
+      animation: message-in 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    @keyframes message-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message.bot .message-avatar {
+      background: linear-gradient(135deg, #25d366, #128c7e);
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .message-avatar svg {
+      width: 16px;
+      height: 16px;
+      fill: #ffffff;
+    }
+
+    .message-content {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px 16px;
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+    }
+
+    .message.user .message-content {
+      background: linear-gradient(135deg, rgba(37, 211, 102, 0.2), rgba(18, 140, 126, 0.15));
+      border-color: rgba(37, 211, 102, 0.2);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 4px;
+    }
+
+    .message-content p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 4px 0;
+    }
+
+    .typing-indicator span {
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: typing-bounce 1.4s ease-in-out infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing-bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    /* Quick Replies */
+    .quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      animation: message-in 0.3s ease forwards;
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+
+    .quick-reply {
+      background: rgba(37, 211, 102, 0.15);
+      border: 1px solid rgba(37, 211, 102, 0.3);
+      color: #25d366;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-reply:hover {
+      background: rgba(37, 211, 102, 0.25);
+      transform: translateY(-1px);
+    }
+
+    /* Input Area */
+    .chatbot-input {
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .chatbot-input input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 12px 18px;
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .chatbot-input input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .chatbot-input input:focus {
+      border-color: rgba(37, 211, 102, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .chatbot-send {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    }
+
+    .chatbot-send:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+    }
+
+    .chatbot-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .chatbot-send svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
+    }
+
+    /* Progress Bar */
+    .chatbot-progress {
+      padding: 0 20px 12px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #25d366, #128c7e);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-text {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .whatsapp-float {
+        bottom: 20px;
+        right: 20px;
+      }
+
+      .whatsapp-btn {
+        width: 54px;
+        height: 54px;
+      }
+
+      .whatsapp-btn svg {
+        width: 26px;
+        height: 26px;
+      }
+
+      .chatbot-container {
+        width: calc(100% - 20px);
+        height: calc(100vh - 100px);
+        margin: 0 10px;
+        border-radius: 20px;
+      }
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed;
+      pointer-events: none;
+      z-index: 10001;
+      overflow: visible;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      opacity: 1;
+      animation: confetti-fall 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .confetti.circle { border-radius: 50%; }
+
+    .confetti.star {
+      width: 0;
+      height: 0;
+      background: none;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 12px solid currentColor;
+      border-radius: 0;
+    }
+
+    .confetti.ribbon {
+      width: 4px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .confetti.heart {
+      width: 10px;
+      height: 10px;
+      background: transparent;
+      border-radius: 0;
+      position: relative;
+    }
+
+    .confetti.heart::before {
+      content: '♥';
+      font-size: 14px;
+      color: inherit;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.5);
+      }
+    }
+
+    /* Ripple effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(37, 211, 102, 0.4);
+      animation: ripple-expand 0.8s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes ripple-expand {
+      0% { width: 0; height: 0; opacity: 1; }
+      100% { width: 200px; height: 200px; opacity: 0; margin-top: -100px; margin-left: -100px; }
+    }
+
+    /* Sparkle effect */
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #ffffff;
+      border-radius: 50%;
+      animation: sparkle-pop 0.8s ease-out forwards;
+      pointer-events: none;
+      box-shadow: 0 0 6px #ffffff;
+    }
+
+    @keyframes sparkle-pop {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      50% { opacity: 1; transform: translate(var(--tx), var(--ty)) scale(1.8); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <p class="demo-text">Clique no botão para iniciar o chat</p>
+
+  <!-- WhatsApp Float Button -->
+  <div class="whatsapp-float" role="complementary" aria-label="Contato via WhatsApp">
+    <button type="button" class="whatsapp-btn" aria-label="Abrir conversa no WhatsApp">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+    </button>
+    <span class="whatsapp-tooltip" aria-hidden="true">Fale conosco</span>
+  </div>
+
+  <!-- Chatbot Overlay -->
+  <div class="chatbot-overlay" id="chatbotOverlay">
+    <div class="chatbot-container">
+      <!-- Header -->
+      <div class="chatbot-header">
+        <div class="chatbot-avatar">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span class="online-dot"></span>
+        </div>
+        <div class="chatbot-header-info">
+          <h3>Atendente Virtual</h3>
+          <span>Online agora</span>
+        </div>
+        <button class="chatbot-close" id="chatbotClose" aria-label="Fechar chat">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+
+      <!-- Messages -->
+      <div class="chatbot-messages" id="chatbotMessages"></div>
+
+      <!-- Input -->
+      <div class="chatbot-input">
+        <input type="text" id="chatbotInput" placeholder="Digite sua mensagem..." autocomplete="off">
+        <button class="chatbot-send" id="chatbotSend" aria-label="Enviar mensagem">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========================================
+    // CHATBOT CONFIGURATION
+    // ========================================
+
+    const WHATSAPP_NUMBER = '5511961909818';
+    const API_URL = 'http://localhost:5000/chat';
+    
+    const WELCOME_MESSAGE = 'Olá! 👋 Sou um assistente virtual inteligente. Como posso te ajudar hoje?';
+
+    // ========================================
+    // CHATBOT STATE
+    // ========================================
+
+    let chatState = {
+      sessionId: 'web_' + Date.now(),
+      isTyping: false
+    };
+
+    // ========================================
+    // DOM ELEMENTS
+    // ========================================
+
+    const whatsappBtn = document.querySelector('.whatsapp-btn');
+    const chatbotOverlay = document.getElementById('chatbotOverlay');
+    const chatbotClose = document.getElementById('chatbotClose');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotSend = document.getElementById('chatbotSend');
+
+    // ========================================
+    // CONFETTI SYSTEM
+    // ========================================
+
+    const confettiColors = ['#25d366', '#128c7e', '#ffffff', '#ffd700', '#ff6b6b', '#4ecdc4', '#a855f7', '#3b82f6', '#ff69b4', '#00ff88'];
+
+    function createConfetti(x, y) {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      container.style.left = x + 'px';
+      container.style.top = y + 'px';
+      document.body.appendChild(container);
+
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      container.appendChild(ripple);
+
+      for (let i = 0; i < 12; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        const angle = (i / 12) * Math.PI * 2;
+        const distance = 50 + Math.random() * 40;
+        sparkle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+        sparkle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+        sparkle.style.animationDelay = Math.random() * 0.15 + 's';
+        container.appendChild(sparkle);
+      }
+
+      const particleCount = 35;
+      for (let i = 0; i < particleCount; i++) {
+        const confetti = document.createElement('div');
+        const types = ['', 'circle', 'star', 'ribbon', 'heart'];
+        confetti.className = 'confetti ' + types[Math.floor(Math.random() * types.length)];
+        
+        const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        confetti.style.backgroundColor = color;
+        confetti.style.color = color;
+
+        const angle = (i / particleCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
+        const velocity = 100 + Math.random() * 80;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity - 60;
+        const rot = (Math.random() - 0.5) * 1080;
+
+        confetti.style.setProperty('--tx', tx + 'px');
+        confetti.style.setProperty('--ty', ty + 'px');
+        confetti.style.setProperty('--rot', rot + 'deg');
+        confetti.style.animationDuration = 1 + Math.random() * 0.8 + 's';
+        confetti.style.animationDelay = Math.random() * 0.15 + 's';
+
+        container.appendChild(confetti);
+      }
+
+      setTimeout(() => container.remove(), 2000);
+    }
+
+    // ========================================
+    // CHATBOT FUNCTIONS
+    // ========================================
+
+    function openChatbot() {
+      chatbotOverlay.classList.add('active');
+      chatState.sessionId = 'web_' + Date.now();
+      chatbotMessages.innerHTML = '';
+      chatbotInput.placeholder = 'Digite sua mensagem...';
+      
+      setTimeout(() => {
+        addMessage(WELCOME_MESSAGE, 'bot');
+      }, 500);
+    }
+
+    function closeChatbot() {
+      chatbotOverlay.classList.remove('active');
+    }
+
+    function addMessage(content, type = 'bot', isTyping = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}`;
+
+      const avatarSvg = type === 'bot' 
+        ? '<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>'
+        : '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+
+      if (isTyping) {
+        messageDiv.innerHTML = `
+          <div class="message-avatar">${avatarSvg}</div>
+          <div class="message-content">
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        `;
+      } else {
+        messageDiv.innerHTML = `
+          <div class="message-avatar">${avatarSvg}</div>
+          <div class="message-content">
+            <p>${content}</p>
+          </div>
+        `;
+      }
+
+      chatbotMessages.appendChild(messageDiv);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+      
+      return messageDiv;
+    }
+
+    function showTyping() {
+      chatState.isTyping = true;
+      const typingMsg = addMessage('', 'bot', true);
+      return typingMsg;
+    }
+
+    function removeTyping(typingMsg) {
+      if (typingMsg && typingMsg.parentNode) {
+        typingMsg.remove();
+      }
+      chatState.isTyping = false;
+    }
+
+    async function handleTextSubmit() {
+      const text = chatbotInput.value.trim();
+      if (!text || chatState.isTyping) return;
+      
+      addMessage(text, 'user');
+      chatbotInput.value = '';
+      
+      const typingMsg = showTyping();
+      
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            session_id: chatState.sessionId
+          })
+        });
+        
+        const data = await response.json();
+        removeTyping(typingMsg);
+        
+        if (data.response) {
+          addMessage(data.response, 'bot');
+        } else if (data.error) {
+          addMessage('Desculpe, ocorreu um erro. Tente novamente.', 'bot');
+        }
+      } catch (error) {
+        removeTyping(typingMsg);
+        addMessage('Não consegui conectar ao servidor. Verifique se o backend está rodando.', 'bot');
+      }
+    }
+
+    // ========================================
+    // EVENT LISTENERS
+    // ========================================
+
+    whatsappBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const rect = this.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      createConfetti(x, y);
+      
+      this.style.transform = 'scale(0.9)';
+      setTimeout(() => {
+        this.style.transform = '';
+        openChatbot();
+      }, 400);
+    });
+
+    chatbotClose.addEventListener('click', closeChatbot);
+    
+    chatbotOverlay.addEventListener('click', function(e) {
+      if (e.target === this) closeChatbot();
+    });
+
+    chatbotSend.addEventListener('click', handleTextSubmit);
+    
+    chatbotInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') handleTextSubmit();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (chatbotOverlay.classList.contains('active')) {
+          closeChatbot();
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
