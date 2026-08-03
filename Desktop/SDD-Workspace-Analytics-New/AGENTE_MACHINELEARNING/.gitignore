@@ -1,0 +1,11 @@
+# Ignorar variáveis de ambiente com chaves de API
+.env
+*.env
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Cache de dados temporários
+data/docs_cache/
