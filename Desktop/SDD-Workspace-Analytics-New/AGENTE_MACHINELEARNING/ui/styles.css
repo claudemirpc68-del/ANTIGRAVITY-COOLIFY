@@ -1,0 +1,89 @@
+/* Estilização Customizada AgenteTutorML - Premium Dark / Glassmorphism */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+html, body, [class*="st-"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Container Principal */
+.stApp {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    color: #f8fafc;
+}
+
+/* Header Banner */
+.header-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.header-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+.header-subtitle {
+    color: #94a3b8;
+    font-size: 1.05rem;
+}
+
+/* Cards Semanais */
+.week-card {
+    background: rgba(30, 41, 59, 0.6);
+    border-left: 4px solid #6366f1;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.week-card:hover {
+    transform: translateY(-2px);
+    border-color: #38bdf8;
+}
+
+.week-badge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+}
+
+/* Caixas de Código e Snippets */
+.code-box {
+    background: #090d16;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Fira Code', monospace;
+    color: #e2e8f0;
+}
+
+/* Botões do Streamlit Customizados */
+.stButton > button {
+    background: linear-gradient(90deg, #4f46e5 0%, #0284c7 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 24px;
+    transition: opacity 0.2s ease;
+}
+
+.stButton > button:hover {
+    opacity: 0.9;
+}

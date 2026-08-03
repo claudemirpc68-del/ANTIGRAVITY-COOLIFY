@@ -1,0 +1,8 @@
+[
+  {
+    "title": "Documentação Scikit-Learn Random Forest",
+    "url": "https://scikit-learn.org/stable/modules/ensemble.html",
+    "content": "Random Forest é um algoritmo de aprendizado supervisionado baseado em várias árvores de decisão.",
+    "snippet": "Random Forest combina múltiplas árvores para reduzir overfitting."
+  }
+]
